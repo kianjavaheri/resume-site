@@ -22,7 +22,7 @@ function Proficiency() {
             </div>
 
             <div className="proficiency-card">
-              <h3>Javascript/Typescript</h3>
+              <h3>Javascript</h3>
               <div className="lang-container">
                   <div className="skills javascript"></div>
               </div>
