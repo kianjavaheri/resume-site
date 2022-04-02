@@ -12,7 +12,8 @@
 
 [data-theme='dark'] {
     /* dark theme */
-    --bgcolor: rgb(26, 26, 26);
+    /* --bgcolor: rgb(26, 26, 26); */
+    --bgcolor: rgb(31, 31, 31);
     --textcolor: rgb(255, 255, 255);
     --cardcolor: rgb(29, 29, 29);
     --cardbrightness: brightness(1.2);
@@ -74,14 +75,14 @@ a:visited {
     height: 34px;
   }
   
-  /* Hide default HTML checkbox */
-  .switch input {
+/* Hide default HTML checkbox */
+.switch input {
     opacity: 0;
     width: 0;
     height: 0;
-  }
+}
   
-  .slider {
+.slider {
     position: absolute;
     cursor: pointer;
     top: 0;
@@ -91,9 +92,9 @@ a:visited {
     background-color: rgb(224, 224, 224);
     -webkit-transition: .4s;
     transition: .4s;
-  }
+}
   
-  .slider:before {
+.slider:before {
     position: absolute;
     content: "";
     height: 26px;
@@ -103,25 +104,25 @@ a:visited {
     background-color: white;
     -webkit-transition: .4s;
     transition: .4s;
-  }
+}
   
-  input:checked + .slider {
-    background-color: #000000;
-  }
+input:checked + .slider {
+    background-color: #151515;
+}
   
-  input:checked + .slider:before {
+input:checked + .slider:before {
     -webkit-transform: translateX(26px);
     -ms-transform: translateX(26px);
     transform: translateX(26px);
-  }
+}
   
-  .slider.round {
+.slider.round {
     border-radius: 34px;
-  }
+}
   
-  .slider.round:before {
+.slider.round:before {
     border-radius: 50%;
-  }
+}
 
 .divider {
     border-top: 3px solid #bbb;
@@ -135,6 +136,7 @@ a:visited {
     justify-content: center;
     padding: 30px;
     color: var(--textcolor);
+    text-align: center;
 }
 
 .about-container {
@@ -146,9 +148,9 @@ a:visited {
 
 .about-container p {
     text-align: center;
-    width: 75%;
     padding: 0 15px 30px 15px;
     color: var(--textcolor);
+    max-width: 50%;
 }
 
 .proficiency-header {
@@ -156,6 +158,7 @@ a:visited {
     justify-content: center;
     padding: 30px;
     color: var(--textcolor);
+    text-align: center;
 }
 
 .proficiency-container {
@@ -170,8 +173,8 @@ a:visited {
     background-color: var(--cardcolor);
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     padding: 15px;
-    width: 17vw;
-    height: 17vw;
+    /* width: 17vw;
+    height: 17vw; */
     border-radius: 10px;
     text-align: center;
     cursor: pointer;
@@ -252,6 +255,7 @@ a:visited {
     justify-content: center;
     padding: 30px;
     color: var(--textcolor);
+    text-align: center;
 }
 
 .projects-container {
@@ -266,8 +270,8 @@ a:visited {
     background-color: var(--cardcolor);
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     padding: 15px;
-    width: 17vw;
-    height: 17vw;
+    /* width: 17vw;
+    height: 17vw; */
     border-radius: 10px;
     text-align: center;
     cursor: pointer;
@@ -285,6 +289,7 @@ a:visited {
     justify-content: center;
     padding: 30px;
     color: var(--textcolor);
+    text-align: center;
 }
 
 .contact-container {
@@ -301,7 +306,7 @@ a:visited {
 }
 
 .contact-container a:hover {
-    transform: scale(1.05);
+    transform: scale(1.1);
 }
 
 .contact-container .media-container {
@@ -312,7 +317,7 @@ a:visited {
 
 .contact-container .media-container svg {
     padding: 15px;
-    width: 3rem;
+    width: 2.75rem;
     fill: var(--textcolor);
 }
 
@@ -328,6 +333,7 @@ a:visited {
     width: 5vw;
     height: 5vw;
     transition: 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
+    opacity: 0;
 }
 
 .scroll-top:hover {
@@ -340,4 +346,19 @@ a:visited {
     background-color: white;
     border-radius: 50%;
     margin: auto;
+}
+
+@media (min-width: 800px) {
+    .proficiency-container .proficiency-card {
+        width: 19vw;
+    }
+    .projects-container .project-card {
+        width: 19vw;
+    }
+}
+
+@media screen {
+    .scroll-top {
+        opacity: 1;
+    }
 }
