@@ -6,7 +6,7 @@
     --textcolor: #000000;
     --cardcolor: rgb(255, 255, 255);
     --cardbrightness: brightness(0.95);
-    --shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    --shadow: rgba(100, 100, 111, 0.5) 0px 7px 29px 0px;
     --scrollcolor: rgb(224, 224, 224);
 }
 
