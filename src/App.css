@@ -1,38 +1,316 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap');
+/* https://simpleicons.org/ */
+
+:root {
+    --bgcolor: rgb(255, 255, 255);
+    --textcolor: #000000;
+    --cardcolor: rgb(255, 255, 255);
+    --cardbrightness: brightness(0.95);
+    --shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    --scrollcolor: rgb(224, 224, 224);
+}
+
+[data-theme='dark'] {
+    --bgcolor: rgb(26, 26, 26);
+    --textcolor: rgb(255, 255, 255);
+    --cardcolor: rgb(29, 29, 29);
+    --cardbrightness: brightness(1.2);
+    --shadow: rgba(0, 0, 0, 0.2) 0px 7px 29px 0px;
+    --scrollcolor: rgb(62, 62, 62);
+}
+
+* {
+    padding: 0;
+    border: 0;
+    margin: 0;
+    outline: 0;
+
+    list-style: none;
+    text-decoration: none;
+
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+}
+
+a {
+    color: var(--textcolor);
+}
+
+a:visited {
+    color: inherit;
+}
+
 .App {
-  text-align: center;
+    background-color: var(--bgcolor);
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.theme-but {
+    width: 100px;
+    height: 100px;
+    background-color: gray;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+.nav {
+    background-color: var(--bgcolor);
+    box-shadow: var(--shadow);
+    /* t, r, b, l */
+    padding: 15px 50px 15px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--textcolor);
+}
+
+.nav .name {
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
   }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+  
+  /* Hide default HTML checkbox */
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
   }
-  to {
-    transform: rotate(360deg);
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgb(224, 224, 224);
+    -webkit-transition: .4s;
+    transition: .4s;
   }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+  }
+  
+  input:checked + .slider {
+    background-color: #000000;
+  }
+  
+  input:checked + .slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+  }
+  
+  .slider.round {
+    border-radius: 34px;
+  }
+  
+  .slider.round:before {
+    border-radius: 50%;
+  }
+
+.divider {
+    border-top: 3px solid #bbb;
+    margin: auto;
+    width: 80%;
+    border-radius: 15px;
+}
+
+.about-header {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+    color: var(--textcolor);
+}
+
+.about-container {
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.about-container p {
+    text-align: center;
+    width: 75%;
+    padding: 0 15px 30px 15px;
+    color: var(--textcolor);
+}
+
+.proficiency-header {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+    color: var(--textcolor);
+}
+
+.proficiency-container {
+    padding: 15px 45px 15px 45px;
+    display: flex;
+    gap: 15px;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+}
+
+.proficiency-container .proficiency-card {
+    background-color: var(--cardcolor);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    padding: 15px;
+    width: 17vw;
+    height: 17vw;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--textcolor);
+    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.proficiency-container .proficiency-card:hover {
+    filter: var(--cardbrightness);
+    transform: scale(1.05);
+}
+
+.proficiency-container .proficiency-card .lang-container {
+    width: 100%;
+    background-color: #ddd;
+    border-radius: 10px;
+}
+
+.proficiency-container .proficiency-card .lang-container .skills {
+    text-align: right;
+    height: 10px;
+    box-shadow: rgba(0, 0, 0, 0.25) 5px 0px 10px;
+    border-radius: 10px;
+}
+
+.html {
+    width: 75%;
+    background-color: green;
+}
+
+.java {
+    width: 50%;
+    background-color: yellow;
+}
+
+.javascript {
+    width: 25%;
+    background-color: orange;
+}
+
+.react {
+    width: 50%;
+    background-color: yellow;
+}
+
+.cplus {
+    width: 5%;
+    background-color: red;
+}
+
+.go {
+    width: 5%;
+    background-color: red;
+}
+
+.csharp {
+    width: 5%;
+    background-color: red;
+}
+
+.sql {
+    width: 5%;
+    background-color: red;
+}
+
+.proficiency-container .proficiency-card h3 {
+    font-size: 1.25rem;
+    padding: 15px
+}
+
+.proficiency-container .proficiency-card p {
+    padding-top: 15px;
+    font-size: 0.9rem;
+}
+
+.projects-header {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+    color: var(--textcolor);
+}
+
+.contact-header {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+    color: var(--textcolor);
+}
+
+.contact-container {
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    text-align: center;
+    color: var(--textcolor);
+}
+
+.contact-container a:hover {
+    transition: 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.contact-container a:hover {
+    transform: scale(1.05);
+}
+
+.contact-container .media-container {
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.contact-container .media-container svg {
+    padding: 15px;
+    width: 3rem;
+    fill: var(--textcolor);
+}
+
+.scroll-top {
+    padding: 15px;      
+    background-color: var(--scrollcolor);
+    box-shadow: var(--shadow);
+    border-radius: 50%;
+    cursor: pointer;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 5vw;
+    height: 5vw;
+    transition: 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.scroll-top:hover {
+    filter: brightness(0.95);
+    transform: scale(1.05);
+}
+
+.scroll-top svg {
+    filter: invert(0%) sepia(4%) saturate(0%) hue-rotate(337deg) brightness(93%) contrast(107%);
+    background-color: white;
+    border-radius: 50%;
+    margin: auto;
 }

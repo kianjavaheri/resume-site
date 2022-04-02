@@ -1,24 +1,36 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
+import About from './Components/About';
+import Contact from './Components/Contact';
+import Navbar from './Components/Navbar';
+import Proficiency from './Components/Proficiency';
+import ScrollButton from './Components/Scroll';
+import Projects from './Components/Projects';
+
+import useLocalStorage from 'use-local-storage';
+
+
 function App() {
+  const defaultDark = 'light';
+  const [theme, setTheme] = useLocalStorage('theme', defaultDark ? 'light' : 'dark');
+
+  const switchTheme = () => {
+  const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="App" data-theme={theme}>
+        <Navbar switchTheme={switchTheme}/>
+        <About/>
+        <hr className="divider"/>
+        <Proficiency/>
+        <hr className="divider"/>
+        <Projects/>
+        <hr className="divider"/>
+        <Contact/>
+        <ScrollButton/>
     </div>
   );
 }
