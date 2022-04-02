@@ -137,6 +137,7 @@ input:checked + .slider:before {
     justify-content: center;
     padding: 30px;
     color: var(--textcolor);
+    text-align: center;
 }
 
 .about-container {
@@ -148,9 +149,9 @@ input:checked + .slider:before {
 
 .about-container p {
     text-align: center;
-    width: 75%;
     padding: 0 15px 30px 15px;
     color: var(--textcolor);
+    max-width: 50%;
 }
 
 .proficiency-header {
@@ -158,6 +159,7 @@ input:checked + .slider:before {
     justify-content: center;
     padding: 30px;
     color: var(--textcolor);
+    text-align: center;
 }
 
 .proficiency-container {
@@ -254,6 +256,7 @@ input:checked + .slider:before {
     justify-content: center;
     padding: 30px;
     color: var(--textcolor);
+    text-align: center;
 }
 
 .projects-container {
@@ -287,6 +290,7 @@ input:checked + .slider:before {
     justify-content: center;
     padding: 30px;
     color: var(--textcolor);
+    text-align: center;
 }
 
 .contact-container {
@@ -303,7 +307,7 @@ input:checked + .slider:before {
 }
 
 .contact-container a:hover {
-    transform: scale(1.05);
+    transform: scale(1.1);
 }
 
 .contact-container .media-container {
@@ -314,7 +318,7 @@ input:checked + .slider:before {
 
 .contact-container .media-container svg {
     padding: 15px;
-    width: 3rem;
+    width: 2.75rem;
     fill: var(--textcolor);
 }
 
@@ -330,6 +334,7 @@ input:checked + .slider:before {
     width: 5vw;
     height: 5vw;
     transition: 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
+    opacity: 0;
 }
 
 .scroll-top:hover {
@@ -350,5 +355,11 @@ input:checked + .slider:before {
     }
     .projects-container .project-card {
         width: 19vw;
+    }
+}
+
+@media screen {
+    .scroll-top {
+        opacity: 1;
     }
 }
