@@ -1,7 +1,6 @@
 {
   "name": "resume-sitep",
   "version": "0.1.0",
-  "homepage": "kianjavaheri.github.io/resume-site",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.3",
@@ -22,8 +21,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject && gh-pages -d build",
-    "deply": "npm run build"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
