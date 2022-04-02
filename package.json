@@ -1,7 +1,7 @@
 {
   "name": "resume-sitep",
   "version": "0.1.0",
-  "homepage": "kianjavaheri.github.io",
+  "homepage": "kianjavaheri.github.io/resume-site",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.3",
