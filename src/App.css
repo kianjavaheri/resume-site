@@ -2,15 +2,16 @@
 /* https://simpleicons.org/ */
 
 :root {
+    /* light theme */
     --bgcolor: rgb(255, 255, 255);
     --textcolor: #000000;
     --cardcolor: rgb(255, 255, 255);
-    --cardbrightness: brightness(0.95);
     --shadow: rgba(100, 100, 111, 0.5) 0px 7px 29px 0px;
     --scrollcolor: rgb(224, 224, 224);
 }
 
 [data-theme='dark'] {
+    /* dark theme */
     --bgcolor: rgb(26, 26, 26);
     --textcolor: rgb(255, 255, 255);
     --cardcolor: rgb(29, 29, 29);
@@ -251,6 +252,32 @@ a:visited {
     justify-content: center;
     padding: 30px;
     color: var(--textcolor);
+}
+
+.projects-container {
+    padding: 15px 45px 15px 45px;
+    display: flex;
+    gap: 15px;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+}
+
+.projects-container .project-card {
+    background-color: var(--cardcolor);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    padding: 15px;
+    width: 17vw;
+    height: 17vw;
+    border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--textcolor);
+    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.projects-container .project-card:hover {
+    filter: var(--cardbrightness);
+    transform: scale(1.05);
 }
 
 .contact-header {
