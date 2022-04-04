@@ -8,7 +8,7 @@ function Projects() {
             <div className="project-card">
               <h3>Twitter Scraper</h3>
               <p>
-                  Used twint api to scrape twitter. Used pandas to clean data and used Natural Language Processing (NLP) to perform sentiment analysis on the tweet content.
+                Used twint API to scrape Twitter. Used pandas to clean data and used Natural Language Processing (NLP) to perform sentiment analysis on the tweet content.
               </p>
             </div>
         </section>

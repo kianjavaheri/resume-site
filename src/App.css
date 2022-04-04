@@ -357,7 +357,7 @@ input:checked + .slider:before {
     }
 }
 
-@media screen {
+@media (hover:hover) {
     .scroll-top {
         opacity: 1;
     }

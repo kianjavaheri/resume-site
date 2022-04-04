@@ -10,7 +10,7 @@ function Proficiency() {
               <div className="lang-container">
                   <div className="skills html"></div>
               </div>
-              <p>I would consider python 3 to be my most proficienct language. I use python for pretty much every back-end job (except front-end logic). My strength definitely resides in data structures and algorithms and python makes that very simple.</p>
+              <p>I would consider python 3 to be my most proficient language. I use python for pretty much every back-end job (except front-end logic). My strength definitely resides in data structures and algorithms, and python makes that very simple.</p>
             </div>
 
             <div className="proficiency-card">
@@ -18,7 +18,7 @@ function Proficiency() {
               <div className="lang-container">
                   <div className="skills java"></div>
               </div>
-              <p>Java would definitely be my second most proficienct language. Not a big fan of the syntax but I have gotten used to it over the years. I use java mostly for game and application creation.</p>
+              <p>Java would definitely be my second most proficient language. Not a big fan of the syntax, but I have gotten used to it over the years. I use java mostly for game and application creation.</p>
             </div>
 
             <div className="proficiency-card">
@@ -26,7 +26,7 @@ function Proficiency() {
               <div className="lang-container">
                   <div className="skills javascript"></div>
               </div>
-              <p>My javascript knowledge pretty much ends at the required proficiency for react. I would like to know more javascript, but it seems that I'm typically doing back-end work most of the time and python is my go-to for that.</p>
+              <p>My javascript knowledge pretty much ends at the required proficiency for react. I would like to know more javascript, but it seems that I'm typically doing back-end work most of the time, and python is my go-to for that.</p>
             </div>
 
             <div className="proficiency-card">
@@ -34,7 +34,7 @@ function Proficiency() {
               <div className="lang-container">
                   <div className="skills react"></div>
               </div>
-              <p>My overrall react skills are fairly proficient. I know how to get around the interface and implement components, but my large-scale production needs some work. Although, I can see myself improving in the things I lack in react.</p>
+              <p>My overall react skills are fairly proficient. I know how to get around the interface and implement components, but my large-scale production needs some work. Although, I can see myself improving in the things I lack in react.</p>
             </div>
 
             <div className="proficiency-card">
@@ -42,7 +42,7 @@ function Proficiency() {
               <div className="lang-container">
                   <div className="skills cplus"></div>
               </div>
-              <p>C++ is a language I've always wanted to learn. The language always appearead difficuly and different from the languages I'm used so there's no doubt in saying I'm definitely not very proficienct However I can definitely see myself learning it in the future. </p>
+              <p>C++ is a language I've always wanted to learn. The language always appeared difficult and different from the languages I'm used so there's no doubt in saying I'm definitely not very proficient However I can definitely see myself learning it in the future.</p>
             </div>
 
             <div className="proficiency-card">
@@ -50,7 +50,7 @@ function Proficiency() {
               <div className="lang-container">
                   <div className="skills go"></div>
               </div>
-              <p>Like C++, I've always wanted to learn Go. I don't really have any reason to learn it as of now,and so I've put it on the backburner. However, I really do see myself getting into it in the next couple of years.</p>
+              <p>Like C++, I've always wanted to learn Go. I don't really have any reason to learn it as of now, so I've put it on the backburner. However, I really do see myself getting into it in the next couple of years.</p>
             </div>
 
             <div className="proficiency-card">
