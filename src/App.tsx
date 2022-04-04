@@ -12,7 +12,8 @@ import useLocalStorage from 'use-local-storage';
 
 
 function App() {
-  const defaultDark = 'light';
+  // const defaultDark = 'light';
+  const defaultDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const [theme, setTheme] = useLocalStorage('theme', defaultDark ? 'light' : 'dark');
 
   const switchTheme = () => {
