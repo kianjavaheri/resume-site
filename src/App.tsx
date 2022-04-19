@@ -20,15 +20,16 @@ function App() {
     setTheme(newTheme);
     check = !check
   }
-
+  console.log(check)
+  
   return (
     <div className="App" data-theme={theme}>
-        <Navbar switchTheme={switchTheme} checke={check}/>
+        <Navbar switchTheme={switchTheme} checked={check}/>
         <About/>
         <hr className="divider"/>
-        <Proficiency/>
-        <hr className="divider"/>
         <Projects/>
+        <hr className="divider"/>
+        <Proficiency/>
         <hr className="divider"/>
         <Contact/>
         <ScrollButton/>

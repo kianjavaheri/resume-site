@@ -11,6 +11,19 @@ function Projects() {
                 Used twint API to scrape Twitter. Used pandas to clean data and used Natural Language Processing (NLP) to perform sentiment analysis on the tweet content.
               </p>
             </div>
+
+            <div className="project-card">
+              <h3>Chat App</h3>
+              <p>
+                Used the ReactJS (TS) framework to create a working realtime chat app with Firebase authentication and database. 
+              </p>
+            </div>
+            <div className="project-card">
+              <h3>Wordle Clone</h3>
+              <p>
+                Used the pygame library to create a visualized working Wordle clone!
+              </p>
+            </div>
         </section>
     </div>
   )
