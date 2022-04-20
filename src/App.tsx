@@ -14,17 +14,18 @@ import useLocalStorage from 'use-local-storage';
 function App() {
   const defaultDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const [theme, setTheme] = useLocalStorage('theme', defaultDark ? 'light' : 'dark');
-  var check = false
   const switchTheme = () => {
   const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
-    check = !check
   }
-  console.log(check)
+  const isChecked = () => {
+    if (theme == 'light') return false
+    return true
+  }
   
   return (
     <div className="App" data-theme={theme}>
-        <Navbar switchTheme={switchTheme} checked={check}/>
+        <Navbar switchTheme={switchTheme} isChecked={isChecked}/>
         <About/>
         <hr className="divider"/>
         <Projects/>
