@@ -19,7 +19,7 @@ function App() {
     setTheme(newTheme);
   }
   const isChecked = () => {
-    if (theme == 'light') return false
+    if (theme === 'light') return false
     return true
   }
   
