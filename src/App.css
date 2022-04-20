@@ -1,24 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@100;200;300;400;500;600;700&display=swap');
 /* https://simpleicons.org/ */
+/* t, r, b, l */
 
-:root {
-    /* light theme */
+[data-theme='light'] {
     --bgcolor: rgb(255, 255, 255);
-    --textcolor: #000000;
+    --textcolor: rgb(0, 0, 0);
     --cardcolor: rgb(255, 255, 255);
     --shadow: rgba(100, 100, 111, 0.5) 0px 7px 29px 0px;
-    --scrollcolor: rgb(224, 224, 224);
+    --scrollcolor: rgb(237, 237, 237);
+    --filter-color: invert(0%) sepia(4%) saturate(0%) hue-rotate(337deg) brightness(93%) contrast(107%);
 }
 
 [data-theme='dark'] {
-    /* dark theme */
-    /* --bgcolor: rgb(26, 26, 26); */
-    --bgcolor: rgb(31, 31, 31);
+    --bgcolor: rgb(35, 35, 35);
     --textcolor: rgb(255, 255, 255);
-    --cardcolor: rgb(29, 29, 29);
+    --cardcolor: rgb(31, 31, 31);
     --cardbrightness: brightness(1.2);
     --shadow: rgba(0, 0, 0, 0.2) 0px 7px 29px 0px;
     --scrollcolor: rgb(62, 62, 62);
+    --filter-color: invert(99%) sepia(99%) saturate(2%) hue-rotate(165deg) brightness(104%) contrast(100%);
 }
 
 * {
@@ -54,7 +54,6 @@ a:visited {
 .nav {
     background-color: var(--bgcolor);
     box-shadow: var(--shadow);
-    /* t, r, b, l */
     padding: 15px 50px 15px 15px;
     display: flex;
     justify-content: space-between;
@@ -159,6 +158,12 @@ input:checked + .slider:before {
     padding: 30px;
     color: var(--textcolor);
     text-align: center;
+}
+
+.proficiency-container .proficiency-card .lang-logo {
+    width: 50px;
+    height: 50px;
+    padding: 15px;
 }
 
 .proficiency-container .proficiency-card .card-title {
@@ -321,10 +326,10 @@ input:checked + .slider:before {
     justify-content: center;
 }
 
-.contact-container .media-container svg {
+.contact-container .media-container img {
     padding: 15px;
     width: 2.75rem;
-    fill: var(--textcolor);
+    filter: var(--filter-color);
 }
 
 .scroll-top {
@@ -340,6 +345,9 @@ input:checked + .slider:before {
     height: 5vw;
     transition: 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
     opacity: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .scroll-top:hover {
@@ -347,11 +355,8 @@ input:checked + .slider:before {
     transform: scale(1.05);
 }
 
-.scroll-top svg {
-    filter: invert(0%) sepia(4%) saturate(0%) hue-rotate(337deg) brightness(93%) contrast(107%);
-    background-color: white;
-    border-radius: 50%;
-    margin: auto;
+.scroll-top img {
+    filter: var(--filter-color);
 }
 
 @media (min-width: 800px) {
