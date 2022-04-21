@@ -22,5 +22,5 @@
   },
   "include": [
     "src"
-  ]
+, "retired_components/Contact.tsx"  ]
 }

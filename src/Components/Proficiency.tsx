@@ -18,7 +18,7 @@ function Proficiency() {
             <div className="proficiency-card">
               <div className="card-title">
                   {/* <h3>Python 3</h3> */}
-                  <img src={pythonlogo} className="lang-logo"></img>
+                  <img src={pythonlogo} className="lang-logo" alt="python-logo"></img>
               </div>
               <div className="lang-container">
                   <div className="skills html"></div>
@@ -29,7 +29,7 @@ function Proficiency() {
             <div className="proficiency-card">
               <div className="card-title">
                   {/* <h3>Java</h3> */}
-                  <img src={javalogo} className="lang-logo"></img>
+                  <img src={javalogo} className="lang-logo" alt="java-logo"></img>
               </div>
               <div className="lang-container">
                   <div className="skills java"></div>
@@ -40,7 +40,7 @@ function Proficiency() {
             <div className="proficiency-card">
               <div className="card-title">
                   {/* <h3>Javascript</h3> */}
-                  <img src={javascriptlogo} className="lang-logo"></img>
+                  <img src={javascriptlogo} className="lang-logo" alt="javascript-logo"></img>
               </div>
               <div className="lang-container">
                   <div className="skills javascript"></div>
@@ -51,7 +51,7 @@ function Proficiency() {
             <div className="proficiency-card">
               <div className="card-title">
                   {/* <h3>React</h3> */}
-                  <img src={reactlogo} className="lang-logo"></img>
+                  <img src={reactlogo} className="lang-logo" alt="react-logo"></img>
               </div>
               <div className="lang-container">
                   <div className="skills react"></div>
@@ -62,7 +62,7 @@ function Proficiency() {
             <div className="proficiency-card">
               <div className="card-title">
                   {/* <h3>C++</h3> */}
-                  <img src={cplogo} className="lang-logo"></img>
+                  <img src={cplogo} className="lang-logo" alt="cpp-logo"></img>
               </div>
               <div className="lang-container">
                   <div className="skills cplus"></div>
@@ -73,7 +73,7 @@ function Proficiency() {
             <div className="proficiency-card">
               <div className="card-title">
                   {/* <h3>Go</h3> */}
-                  <img src={gologo} className="lang-logo"></img>
+                  <img src={gologo} className="lang-logo" alt="go-logo"></img>
               </div>
               <div className="lang-container">
                   <div className="skills go"></div>
@@ -84,7 +84,7 @@ function Proficiency() {
             <div className="proficiency-card">
               <div className="card-title">
                   {/* <h3>C#</h3> */}
-                  <img src={cslogo} className="lang-logo"></img>
+                  <img src={cslogo} className="lang-logo" alt="csharp-logo"></img>
               </div>
               <div className="lang-container">
                   <div className="skills csharp"></div>
@@ -95,7 +95,7 @@ function Proficiency() {
             <div className="proficiency-card">
               <div className="card-title">
                   {/* <h3>SQL</h3> */}
-                  <img src={sqllogo} className="lang-logo"></img>
+                  <img src={sqllogo} className="lang-logo" alt="sql-logo"></img>
               </div>
               <div className="lang-container">
                   <div className="skills sql"></div>

@@ -24,7 +24,7 @@ window.addEventListener('scroll', toggleVisible);
 
 return (
 	<button className="scroll-top" onClick={scrollToTop} style={{display: visible ? 'inline' : 'none'}}>
-		<img src={uparrow}></img>
+		<img src={uparrow} alt="arrow"></img>
 	</button>
 );
 }

@@ -1,24 +1,45 @@
 import React from 'react'
-import lilogo from '../svgs/linkedin.svg'
-import iglogo from '../svgs/instagram.svg'
-import twlogo from '../svgs/twitter.svg'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTwitter, faLinkedin, faGithub, faYoutube } from '@fortawesome/free-brands-svg-icons';
 
-function Contact() {
+function Contactt() {
   return (
     <div>
-        <h1 className="contact-header">Get in Contact!</h1>
         <section className="contact-container">
-            <div>
-                <a href="https://www.gmail.com" target="_blank">kianjavaheri911@gmail.com</a>
-                <div className="media-container">
-                  <a href="https://www.linkedin.com/in/kian-javaheri-abb134227/"target="_blank"><img src={lilogo}></img></a>
-                  <a href="https://www.instagram.com/kian_javaheri911/" target="_blank"><img src={iglogo}></img></a>
-                  <a href="https://twitter.com/kaewjae5" target="_blank"><img src={twlogo}></img></a>
-                </div>
-            </div>
+            <ul className="wrapper">
+                
+                <a href="https://twitter.com/kaewjae5" target="_blank">
+                    <li className="icon twitter">
+                        <span className="tooltip">Twitter</span>
+                        <FontAwesomeIcon icon={faTwitter} />
+                    </li>
+                </a>
+
+                <a href="https://www.linkedin.com/in/kian-javaheri-abb134227/" target="_blank">
+                    <li className="icon linkedin">
+                        <span className="tooltip">LinkedIn</span>
+                        <FontAwesomeIcon icon={faLinkedin} />
+                    </li>
+                </a>
+
+                <a href="https://github.com/kianjavaheri" target="_blank">
+                    <li className="icon github">
+                        <span className="tooltip">Github</span>
+                        <FontAwesomeIcon icon={faGithub} />
+                    </li>
+                </a>
+
+                <a href="https://www.youtube.com/channel/UC7diTWt3gPyKM8nIQpQAvZw" target="_blank">
+                    <li className="icon youtube">
+                        <span className="tooltip">Youtube</span>
+                        <FontAwesomeIcon icon={faYoutube} />
+                    </li>
+                </a>
+
+            </ul>
         </section>
     </div>
   )
 }
 
-export default Contact;
+export default Contactt

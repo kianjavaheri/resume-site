@@ -1,0 +1,36 @@
+.contact-header {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+    color: var(--textcolor);
+    text-align: center;
+}
+
+.contact-container {
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    text-align: center;
+    color: var(--textcolor);
+}
+
+.contact-container a:hover {
+    transition: 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.contact-container a:hover {
+    transform: scale(1.1);
+}
+
+.contact-container .media-container {
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.contact-container .media-container img {
+    padding: 15px;
+    width: 2.75rem;
+    filter: var(--filter-color);
+}

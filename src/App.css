@@ -9,6 +9,8 @@
     --shadow: rgba(100, 100, 111, 0.5) 0px 7px 29px 0px;
     --scrollcolor: rgb(237, 237, 237);
     --filter-color: invert(0%) sepia(4%) saturate(0%) hue-rotate(337deg) brightness(93%) contrast(107%);
+    /* black ^^^ */
+    --contrast-color: rgb(185, 185, 185);
 }
 
 [data-theme='dark'] {
@@ -19,6 +21,8 @@
     --shadow: rgba(0, 0, 0, 0.2) 0px 7px 29px 0px;
     --scrollcolor: rgb(62, 62, 62);
     --filter-color: invert(99%) sepia(99%) saturate(2%) hue-rotate(165deg) brightness(104%) contrast(100%);
+    /* white ^^^ */
+    --contrast-color: rgb(255, 255, 255);
 }
 
 * {
@@ -31,6 +35,12 @@
     text-decoration: none;
 
     font-family: 'IBM Plex Sans Arabic', sans-serif;
+}
+
+*:focus,
+*:active {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
 }
 
 a {
@@ -66,7 +76,7 @@ a:visited {
     font-size: 1.5rem;
 }
 
-/* The switch - the box around the slider */
+/* the switch - the box around the slider */
 .switch {
     position: relative;
     display: inline-block;
@@ -74,7 +84,7 @@ a:visited {
     height: 34px;
   }
 
-/* Hide default HTML checkbox */
+/* hide default html checkbox */
 .switch input {
     opacity: 0;
     width: 0;
@@ -295,41 +305,100 @@ input:checked + .slider:before {
     transform: scale(1.05);
 }
 
-.contact-header {
-    display: flex;
-    justify-content: center;
-    padding: 30px;
-    color: var(--textcolor);
-    text-align: center;
-}
-
 .contact-container {
-    padding: 15px;
     display: flex;
-    gap: 15px;
     justify-content: center;
-    text-align: center;
-    color: var(--textcolor);
+    padding: 50px;
 }
 
-.contact-container a:hover {
-    transition: 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-
-.contact-container a:hover {
-    transform: scale(1.1);
-}
-
-.contact-container .media-container {
-    padding: 15px;
-    display: flex;
+.wrapper {
+    display: inline-flex;
+    list-style: none;
     justify-content: center;
 }
 
-.contact-container .media-container img {
+.wrapper .icon {
+    position: relative;
+    background: var(--contrast-color);
+    border-radius: 50%;
     padding: 15px;
-    width: 2.75rem;
-    filter: var(--filter-color);
+    margin: 10px;
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.wrapper .tooltip {
+    position: absolute;
+    top: 0;
+    font-size: 14px;
+    background: #ffffff;
+    color: #ffffff;
+    padding: 5px 8px;
+    border-radius: 5px;
+    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.wrapper .tooltip::before {
+    position: absolute;
+    content: "";
+    height: 8px;
+    width: 8px;
+    background: #ffffff;
+    bottom: -3px;
+    left: 50%;
+    transform: translate(-50%) rotate(45deg);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.wrapper .icon:hover .tooltip {
+    top: -45px;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.wrapper .icon:hover span,
+.wrapper .icon:hover .tooltip {
+    text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.1);
+}
+
+.wrapper .twitter:hover,
+.wrapper .twitter:hover .tooltip,
+.wrapper .twitter:hover .tooltip::before {
+    background: #1DA1F2;
+    color: #ffffff;
+}
+
+.wrapper .linkedin:hover,
+.wrapper .linkedin:hover .tooltip,
+.wrapper .linkedin:hover .tooltip::before {
+    background: #0b65c2;
+    color: #ffffff;
+}
+
+.wrapper .github:hover,
+.wrapper .github:hover .tooltip,
+.wrapper .github:hover .tooltip::before {
+    background: #333333;
+    color: #ffffff;
+}
+
+.wrapper .youtube:hover,
+.wrapper .youtube:hover .tooltip,
+.wrapper .youtube:hover .tooltip::before {
+    background: #CD201F;
+    color: #ffffff;
 }
 
 .scroll-top {

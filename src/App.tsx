@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 
 import About from './Components/About';
-import Contact from './Components/Contact';
+import Contactt from './Components/Contact';
 import Navbar from './Components/Navbar';
 import Proficiency from './Components/Proficiency';
 import ScrollButton from './Components/Scroll';
@@ -22,7 +22,8 @@ function App() {
     if (theme === 'light') return false
     return true
   }
-  
+  // theme stuff
+
   return (
     <div className="App" data-theme={theme}>
         <Navbar switchTheme={switchTheme} isChecked={isChecked}/>
@@ -32,7 +33,7 @@ function App() {
         <hr className="divider"/>
         <Proficiency/>
         <hr className="divider"/>
-        <Contact/>
+        <Contactt />
         <ScrollButton/>
     </div>
   );
