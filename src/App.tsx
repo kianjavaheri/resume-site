@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 
 import About from './Components/About';
-import Contactt from './Components/Contact';
+import Contact from './Components/Contact';
 import Navbar from './Components/Navbar';
 import Proficiency from './Components/Proficiency';
 import ScrollButton from './Components/Scroll';
@@ -33,7 +33,7 @@ function App() {
         <hr className="divider"/>
         <Proficiency/>
         <hr className="divider"/>
-        <Contactt />
+        <Contact />
         <ScrollButton/>
     </div>
   );

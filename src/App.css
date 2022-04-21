@@ -10,7 +10,7 @@
     --scrollcolor: rgb(237, 237, 237);
     --filter-color: invert(0%) sepia(4%) saturate(0%) hue-rotate(337deg) brightness(93%) contrast(107%);
     /* black ^^^ */
-    --contrast-color: rgb(185, 185, 185);
+    --button-color: rgb(226, 226, 226);
 }
 
 [data-theme='dark'] {
@@ -22,7 +22,7 @@
     --scrollcolor: rgb(62, 62, 62);
     --filter-color: invert(99%) sepia(99%) saturate(2%) hue-rotate(165deg) brightness(104%) contrast(100%);
     /* white ^^^ */
-    --contrast-color: rgb(255, 255, 255);
+    --button-color: rgb(255, 255, 255);
 }
 
 * {
@@ -194,8 +194,6 @@ input:checked + .slider:before {
     background-color: var(--cardcolor);
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     padding: 15px;
-    /* width: 17vw;
-    height: 17vw; */
     border-radius: 10px;
     text-align: center;
     cursor: pointer;
@@ -291,8 +289,6 @@ input:checked + .slider:before {
     background-color: var(--cardcolor);
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     padding: 15px;
-    /* width: 17vw;
-    height: 17vw; */
     border-radius: 10px;
     text-align: center;
     cursor: pointer;
@@ -319,7 +315,7 @@ input:checked + .slider:before {
 
 .wrapper .icon {
     position: relative;
-    background: var(--contrast-color);
+    background: var(--button-color);
     border-radius: 50%;
     padding: 15px;
     margin: 10px;
