@@ -17,7 +17,6 @@
     "node-sass": "^7.0.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "react-scripts": "^5.0.0",
     "typescript": "^4.6.3",
     "use-local-storage": "^2.3.6",
     "web-vitals": "^2.1.4"
@@ -50,6 +49,7 @@
   },
   "devDependencies": {
     "@types/react": "^17.0.43",
-    "gh-pages": "^3.2.3"
+    "gh-pages": "^3.2.3",
+    "react-scripts": "^5.0.0"
   }
 }
