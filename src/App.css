@@ -313,6 +313,13 @@ input:checked + .slider:before {
     justify-content: center;
 }
 
+.wrapper a {
+    border-radius: 50%; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .wrapper .icon {
     position: relative;
     background: var(--button-color);
