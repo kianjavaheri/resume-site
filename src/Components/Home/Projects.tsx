@@ -18,10 +18,18 @@ function Projects() {
                 Used the ReactJS (TS) framework to create a working realtime chat app with Firebase authentication and database. 
               </p>
             </div>
+
             <div className="project-card">
               <h3>Wordle Clone</h3>
               <p>
-                Used the pygame library to create a visualized working Wordle clone!
+                Used the pygame library to create a visualized working Wordle clone.
+              </p>
+            </div>
+
+            <div className="project-card">
+              <h3>Nash Equilibrium Simulation</h3>
+              <p>
+                Simulated a 'table' game to find nash equilibriums (Game Theory).
               </p>
             </div>
         </section>

@@ -1,12 +1,12 @@
 import React from 'react'
-import pythonlogo from '../svgs/pythonlogo.svg'
-import javalogo from '../svgs/javalogo.svg'
-import javascriptlogo from '../svgs/javascriptlogo.svg'
-import reactlogo from '../svgs/reactlogo.svg'
-import cplogo from '../svgs/cplogo.svg'
-import gologo from '../svgs/gologo.svg'
-import cslogo from '../svgs/cslogo.svg'
-import sqllogo from '../svgs/sqllogo.svg'
+import pythonlogo from '../../svgs/pythonlogo.svg'
+import javalogo from '../../svgs/javalogo.svg'
+import javascriptlogo from '../../svgs/javascriptlogo.svg'
+import reactlogo from '../../svgs/reactlogo.svg'
+import cplogo from '../../svgs/cplogo.svg'
+import gologo from '../../svgs/gologo.svg'
+import cslogo from '../../svgs/cslogo.svg'
+import sqllogo from '../../svgs/sqllogo.svg'
 
 
 function Proficiency() {
