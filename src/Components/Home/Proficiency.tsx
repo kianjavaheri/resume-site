@@ -21,7 +21,7 @@ function Proficiency() {
                   <img src={pythonlogo} className="lang-logo" alt="python-logo"></img>
               </div>
               <div className="lang-container">
-                  <div className="skills html"></div>
+                  <div className="skills python"></div>
               </div>
               <p>I would consider python 3 to be my most proficient language. I use python for pretty much every back-end job (except front-end logic). My strength definitely resides in data structures and algorithms, and python makes that very simple.</p>
             </div>

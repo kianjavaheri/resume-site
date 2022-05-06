@@ -206,13 +206,13 @@ input:checked + .slider:before {
     transform: scale(1.05);
 }
 
-.proficiencytest-container .proficiencytest-main .lang-container {
+.proficiency-container .proficiency-card .lang-container {
     width: 100%;
     background-color: #ddd;
     border-radius: 10px;
 }
 
-.proficiencytest-container .proficiencytest-main .lang-container .skills {
+.proficiency-container .proficiency-card .lang-container .skills {
     text-align: right;
     height: 10px;
     box-shadow: rgba(0, 0, 0, 0.25) 5px 0px 10px;
