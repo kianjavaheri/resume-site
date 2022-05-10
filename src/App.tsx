@@ -9,7 +9,6 @@ import Navbar from './Components/Home/Navbar';
 import Proficiency from './Components/Home/Proficiency';
 import ScrollButton from './Components/Home/Scroll';
 import Projects from './Components/Home/Projects';
-import ProficiencyTest from './Components/Home/ProficiencyTest';
 
 
 const defaultDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -30,13 +29,12 @@ function HomePage() {
     <div className="App" data-theme={theme}>
         <Navbar switchTheme={switchTheme} isChecked={isChecked}/>
         <About/>
-        {/* <hr className="divider"/> */}
-        {/* <Projects/> */}
         <hr className="divider"/>
-        <ProficiencyTest />
-        {/* <Proficiency/> */}
-        {/* <hr className="divider"/>
-        <Contact /> */}
+        <Projects/>
+        <hr className="divider"/>
+        <Proficiency/>
+        <hr className="divider"/>
+        <Contact />
         <ScrollButton/>
     </div>
   );
