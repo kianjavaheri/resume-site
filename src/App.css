@@ -2,6 +2,10 @@
 /* https://simpleicons.org/ */
 /* t, r, b, l */
 
+:root {
+    --dark: rgb(35, 35, 35);
+}
+
 [data-theme='light'] {
     --bgcolor: rgb(255, 255, 255);
     --textcolor: rgb(0, 0, 0);
@@ -318,6 +322,7 @@ input:checked + .slider:before {
     display: flex;
     justify-content: center;
     align-items: center;
+    color: var(--dark);
 }
 
 .wrapper .icon {
