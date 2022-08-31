@@ -6,7 +6,7 @@ function About() {
         <h1 className="about-header">About Me</h1>
         <section className="about-container">
             <p>
-                My name is Kian Javaheri. I'm 18 years old and I'm an aspiring back-end software engineer from the Bay Area in California. I am currently studying Computer Scienc at Barrett, The Honors College at Arizona State University.
+                My name is Kian Javaheri. I'm 18 years old and I'm an aspiring back-end software engineer from the Bay Area in California. I am currently studying Computer Science at Barrett, The Honors College at Arizona State University.
             </p>
         </section>
 
