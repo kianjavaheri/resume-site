@@ -14,7 +14,7 @@
     --scrollcolor: rgb(237, 237, 237);
     --filter-color: invert(0%) sepia(4%) saturate(0%) hue-rotate(337deg) brightness(93%) contrast(107%);
     /* black ^^^ */
-    --button-color: rgb(226, 226, 226);
+    --button-color: rgb(220, 220, 220);
 }
 
 [data-theme='dark'] {
