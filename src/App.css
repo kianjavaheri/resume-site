@@ -166,6 +166,28 @@ input:checked + .slider:before {
     max-width: 50%;
 }
 
+.resume-container {
+    display: flex;
+    padding-bottom: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    color: white;
+}
+
+.resume-button {
+    background-color: rgb(65, 65, 239);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    border-radius: 5px;
+    padding: 10px;
+    font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.resume-button:hover {
+    filter: brightness(0.9);
+}
+
 .proficiency-header {
     display: flex;
     justify-content: center;

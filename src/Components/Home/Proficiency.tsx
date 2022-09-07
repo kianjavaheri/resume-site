@@ -58,50 +58,6 @@ function Proficiency() {
               </div>
               <p>My overall react skills are fairly proficient. I know how to get around the interface and implement components, but my large-scale production needs some work. Although, I can see myself improving in the things I lack in react.</p>
             </div>
-
-            <div className="proficiency-card">
-              <div className="card-title">
-                  {/* <h3>C++</h3> */}
-                  <img src={cplogo} className="lang-logo" alt="cpp-logo"></img>
-              </div>
-              <div className="lang-container">
-                  <div className="skills cplus"></div>
-              </div>
-              <p>C++ is a language I've always wanted to learn. The language always appeared difficult and different from the languages I'm used so there's no doubt in saying I'm definitely not very proficient However I can definitely see myself learning it in the future.</p>
-            </div>
-
-            <div className="proficiency-card">
-              <div className="card-title">
-                  {/* <h3>Go</h3> */}
-                  <img src={gologo} className="lang-logo" alt="go-logo"></img>
-              </div>
-              <div className="lang-container">
-                  <div className="skills go"></div>
-              </div>
-              <p>Like C++, I've always wanted to learn Go. I don't really have any reason to learn it as of now, so I've put it on the backburner. However, I really do see myself getting into it in the next couple of years.</p>
-            </div>
-
-            <div className="proficiency-card">
-              <div className="card-title">
-                  {/* <h3>C#</h3> */}
-                  <img src={cslogo} className="lang-logo" alt="csharp-logo"></img>
-              </div>
-              <div className="lang-container">
-                  <div className="skills csharp"></div>
-              </div>
-              <p>Once more, C# is a language I want to learn. However, due to the tedious nature of game design, I've also put it on the back burner so I really have no reason to learn C#. However, if I ever get into game design, there is no doubt that I will learn C#.</p>
-            </div>
-
-            <div className="proficiency-card">
-              <div className="card-title">
-                  {/* <h3>SQL</h3> */}
-                  <img src={sqllogo} className="lang-logo" alt="sql-logo"></img>
-              </div>
-              <div className="lang-container">
-                  <div className="skills sql"></div>
-              </div>
-              <p>SQL is probably next up for me. I really need to get going with database languages. I have no reason not to learn it and now is a great time to start. I expect myself to be fairly proficient in SQL by mid-next year.</p>
-            </div>
         </section>
     </div>
   )
