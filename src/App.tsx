@@ -10,6 +10,7 @@ import Proficiency from './Components/Home/Proficiency';
 import ScrollButton from './Components/Home/Scroll';
 import Projects from './Components/Home/Projects';
 import Resume from './Components/Home/Resume';
+import Courses from './Components/Home/Courses';
 
 
 const defaultDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -35,6 +36,8 @@ function HomePage() {
         <Projects/>
         <hr className="divider"/>
         <Proficiency/>
+        <hr className="divider"/>
+        <Courses/>
         <hr className="divider"/>
         <Contact />
         <ScrollButton/>

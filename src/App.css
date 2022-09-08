@@ -4,6 +4,8 @@
 
 :root {
     --dark: rgb(35, 35, 35);
+    --blue: rgb(65, 65, 239);
+    --light-blue: rgb(124, 124, 249);
 }
 
 [data-theme='light'] {
@@ -176,7 +178,7 @@ input:checked + .slider:before {
 }
 
 .resume-button {
-    background-color: rgb(65, 65, 239);
+    background-color: var(--blue);
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     border-radius: 5px;
     padding: 10px;
@@ -209,7 +211,7 @@ input:checked + .slider:before {
 }
 
 .proficiency-container {
-    padding: 15px 45px 15px 45px;
+    padding: 15px 45px 45px 45px;
     display: flex;
     gap: 15px;
     justify-content: space-evenly;
@@ -304,7 +306,7 @@ input:checked + .slider:before {
 }
 
 .projects-container {
-    padding: 15px 45px 15px 45px;
+    padding: 15px 45px 45px 45px;
     display: flex;
     gap: 15px;
     justify-content: space-evenly;
@@ -320,11 +322,47 @@ input:checked + .slider:before {
     cursor: pointer;
     color: var(--textcolor);
     transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
 }
 
 .projects-container .project-card:hover {
     filter: var(--cardbrightness);
     transform: scale(1.05);
+}
+
+.projects-container .project-card a {
+    color: var(--light-blue);
+    font-weight: 800;
+    /* position: absolute;
+    bottom: 0; */
+}
+
+.projects-container .project-card a:hover {
+    text-decoration: underline;
+}
+
+.courses-header {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+    color: var(--textcolor);
+    text-align: center;
+}
+
+.courses-container {
+    padding: 15px 45px 45px 45px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.course-list {
+    color: var(--textcolor);
+    font-weight: 500;
+}
+
+.course-list a:hover {
+    text-decoration: underline;
 }
 
 .contact-container {

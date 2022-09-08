@@ -1,5 +1,7 @@
 import React from 'react'
 
+
+
 function Projects() {
   return (
     <div>
@@ -10,6 +12,9 @@ function Projects() {
               <p>
                 Used twint API to scrape Twitter. Used pandas to clean data and used Natural Language Processing (NLP) to perform sentiment analysis on the tweet content.
               </p>
+              <a href="https://github.com/kianjavaheri/twint-analysis" target="_blank">
+                See GitHub Project
+              </a>
             </div>
 
             <div className="project-card">
@@ -17,6 +22,9 @@ function Projects() {
               <p>
                 Used the ReactJS (TS) framework to create a working realtime chat app with Firebase authentication and database. 
               </p>
+              <a href="#" target="_blank">
+                See GitHub Project
+              </a>
             </div>
 
             <div className="project-card">
@@ -24,6 +32,9 @@ function Projects() {
               <p>
                 Used the pygame library to create a visualized working Wordle clone.
               </p>
+              <a href="#" target="_blank">
+                See GitHub Project
+              </a>
             </div>
 
             <div className="project-card">
@@ -31,6 +42,9 @@ function Projects() {
               <p>
                 Simulated a 'table' game to find nash equilibriums (Game Theory).
               </p>
+              <a href="#" target="_blank">
+                See GitHub Project
+              </a>
             </div>
         </section>
     </div>
