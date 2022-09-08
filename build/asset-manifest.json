@@ -1,0 +1,18 @@
+{
+  "main.css": "/resume-site/static/css/main.336a7eec.chunk.css",
+  "main.js": "/resume-site/static/js/main.28a385a0.chunk.js",
+  "main.js.map": "/resume-site/static/js/main.28a385a0.chunk.js.map",
+  "runtime~main.js": "/resume-site/static/js/runtime~main.9454f64d.js",
+  "runtime~main.js.map": "/resume-site/static/js/runtime~main.9454f64d.js.map",
+  "static/js/2.c549c271.chunk.js": "/resume-site/static/js/2.c549c271.chunk.js",
+  "static/js/2.c549c271.chunk.js.map": "/resume-site/static/js/2.c549c271.chunk.js.map",
+  "index.html": "/resume-site/index.html",
+  "precache-manifest.fa78fda418033d0eb339a6c4e4b233a3.js": "/resume-site/precache-manifest.fa78fda418033d0eb339a6c4e4b233a3.js",
+  "service-worker.js": "/resume-site/service-worker.js",
+  "static/css/main.336a7eec.chunk.css.map": "/resume-site/static/css/main.336a7eec.chunk.css.map",
+  "static/media/javalogo.svg": "/resume-site/static/media/javalogo.f8857fd2.svg",
+  "static/media/javascriptlogo.svg": "/resume-site/static/media/javascriptlogo.ef58f40b.svg",
+  "static/media/pythonlogo.svg": "/resume-site/static/media/pythonlogo.a7e91e07.svg",
+  "static/media/reactlogo.svg": "/resume-site/static/media/reactlogo.7db11b8d.svg",
+  "static/media/uparrow.svg": "/resume-site/static/media/uparrow.85ef088a.svg"
+}
