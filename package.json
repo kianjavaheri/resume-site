@@ -1,7 +1,7 @@
 {
   "name": "resume-site",
   "version": "0.1.0",
-  "homepage": "https://kianjavaheri.github.io/resume-site",
+  "homepage": "https://kianjavaheri.github.io/",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.1.1",
