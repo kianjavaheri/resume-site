@@ -1,11 +1,11 @@
 self.__precacheManifest = [
   {
-    "revision": "6211b70cbb8d286d7444",
-    "url": "/resume-site/static/css/main.336a7eec.chunk.css"
+    "revision": "826b0f33e48c6c957da6",
+    "url": "/resume-site/static/css/main.6da61c25.chunk.css"
   },
   {
-    "revision": "6211b70cbb8d286d7444",
-    "url": "/resume-site/static/js/main.28a385a0.chunk.js"
+    "revision": "826b0f33e48c6c957da6",
+    "url": "/resume-site/static/js/main.52779480.chunk.js"
   },
   {
     "revision": "575e873410de6d70e939",
@@ -36,7 +36,7 @@ self.__precacheManifest = [
     "url": "/resume-site/static/media/uparrow.85ef088a.svg"
   },
   {
-    "revision": "c0e0f60ee9a347e2f719596e9f0c32fc",
+    "revision": "2c201bf064fddd35cdd2f94408a10d15",
     "url": "/resume-site/index.html"
   }
 ];
