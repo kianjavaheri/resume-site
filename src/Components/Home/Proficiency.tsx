@@ -23,7 +23,7 @@ function Proficiency() {
               <div className="lang-container">
                   <div className="skills python"></div>
               </div>
-              <p>I would consider python 3 to be my most proficient language. I use python for pretty much every back-end job (except front-end logic). My strength definitely resides in data structures and algorithms, and python makes that very simple.</p>
+              <p>Python is by far my favorite language. I love the simplicity of the language as it allows me to focus on other things. I also find Python's expansive library to be very useful and convenient.</p>
             </div>
 
             <div className="proficiency-card">
@@ -34,7 +34,7 @@ function Proficiency() {
               <div className="lang-container">
                   <div className="skills java"></div>
               </div>
-              <p>Java would definitely be my second most proficient language. Not a big fan of the syntax, but I have gotten used to it over the years. I use java mostly for game and application creation.</p>
+              <p>Java would definitely be my second most proficient language. I have gotten really used to it over the years. Java is my go-to for performance-based programming.</p>
             </div>
 
             <div className="proficiency-card">
@@ -45,7 +45,7 @@ function Proficiency() {
               <div className="lang-container">
                   <div className="skills javascript"></div>
               </div>
-              <p>My javascript knowledge pretty much ends at the required proficiency for react. I would like to know more javascript, but it seems that I'm typically doing back-end work most of the time, and python is my go-to for that.</p>
+              <p>Javascript is definitely a language that I both enjoy using and want to learn more about. As of now, I only use Javascript for front-end.</p>
             </div>
 
             <div className="proficiency-card">
@@ -56,7 +56,7 @@ function Proficiency() {
               <div className="lang-container">
                   <div className="skills react"></div>
               </div>
-              <p>My overall react skills are fairly proficient. I know how to get around the interface and implement components, but my large-scale production needs some work. Although, I can see myself improving in the things I lack in react.</p>
+              <p>My overall react skills are fairly proficient. I would say I know how to get around the interface and implement certain features.</p>
             </div>
         </section>
     </div>
