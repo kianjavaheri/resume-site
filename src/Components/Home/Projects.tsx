@@ -22,7 +22,7 @@ function Projects() {
               <p>
                 Used the ReactJS (TS) framework to create a working realtime chat app with Firebase authentication and database. 
               </p>
-              <a href="#" target="_blank">
+              <a href="https://github.com/kianjavaheri/chat-app" target="_blank">
                 See GitHub Project
               </a>
             </div>
@@ -32,7 +32,7 @@ function Projects() {
               <p>
                 Used the pygame library to create a visualized working Wordle clone.
               </p>
-              <a href="#" target="_blank">
+              <a href="https://github.com/kianjavaheri/wordle-clone" target="_blank">
                 See GitHub Project
               </a>
             </div>
@@ -42,7 +42,7 @@ function Projects() {
               <p>
                 Simulated a 'table' game to find nash equilibriums (Game Theory).
               </p>
-              <a href="#" target="_blank">
+              <a href="https://github.com/kianjavaheri/nash-equilibrium" target="_blank">
                 See GitHub Project
               </a>
             </div>
