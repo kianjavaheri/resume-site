@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import useLocalStorage from 'use-local-storage';
 import './App.css';
 
@@ -28,20 +28,20 @@ function HomePage() {
   // theme stuff
 
   return (
-    <div className="App" data-theme={theme}>
-        <Navbar switchTheme={switchTheme} isChecked={isChecked}/>
-        <About/>
-        <Resume/>
-        <hr className="divider"/>
-        <Projects/>
-        <hr className="divider"/>
-        <Proficiency/>
-        <hr className="divider"/>
-        <Courses/>
-        <hr className="divider"/>
-        <Contact />
-        <ScrollButton/>
-    </div>
+        <div className="App" data-theme={theme}>
+            <Navbar switchTheme={switchTheme} isChecked={isChecked}/>
+            <About/>
+            <Resume/>
+            <hr className="divider"/>
+            <Projects/>
+            <hr className="divider"/>
+            <Proficiency/>
+            <hr className="divider"/>
+            <Courses/>
+            <hr className="divider"/>
+            <Contact />
+            <ScrollButton/>
+        </div>
   );
 }
 
@@ -51,7 +51,7 @@ function App() {
   return (
     <div className="App" data-theme={theme}>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={ <HomePage/> }/>
         </Routes>
     </div>
   );
