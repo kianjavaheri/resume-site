@@ -4,7 +4,7 @@ function Resume() {
   return (
     <div>
         <section className="resume-container">
-            <a href="https://drive.google.com/file/d/1tCqEL8mld0FE7DPgLOvbwAItV2ll6aVO/view?usp=sharing" className="resume-button" target="_blank">Resume</a>
+            <a href="https://drive.google.com/file/d/1B2sgk7Omvsf22ewzZkY5IYNlg0c8g9gz/view?usp=sharing" className="resume-button" target="_blank">Resume</a>
         </section>
     </div>
   )

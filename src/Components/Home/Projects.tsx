@@ -16,6 +16,21 @@ function Projects() {
             </div>
 
             <div className="project-card">
+              <h3>Whiteboard</h3>
+              <p>
+              Used ReactJS to create and deploy a fully functioning whiteboarding web app. A user can free draw, draw rectangles, draw lines, select lines and move them around, and undo/redo.
+              </p>
+              <a href="https://github.com/kianjavaheri/whiteboard" target="_blank">
+                See GitHub Project
+              </a>
+              <br/>
+              <br/>
+              <a href="https://whiteboard-app-363204.uw.r.appspot.com/" target="_blank">
+                See Deployed Project
+              </a>
+            </div>
+
+            <div className="project-card">
               <h3>Chat App</h3>
               <p>
                 Used the ReactJS (TS) framework to create a working realtime chat app with Firebase authentication and database. 
