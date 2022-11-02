@@ -1,0 +1,23 @@
+.courses-header {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+    color: var(--textcolor);
+    text-align: center;
+}
+
+.courses-container {
+    padding: 15px 45px 45px 45px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.course-list {
+    color: var(--textcolor);
+    font-weight: 500;
+}
+
+.course-list a:hover {
+    text-decoration: underline;
+}

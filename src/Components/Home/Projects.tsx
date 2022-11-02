@@ -2,6 +2,7 @@ import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGithub } from '@fortawesome/free-brands-svg-icons'
 import Tooltip from '@mui/material/Tooltip'
+import './css/Projects.css'
 
 function Projects() {
   return (

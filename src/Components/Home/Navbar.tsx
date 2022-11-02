@@ -1,5 +1,6 @@
 import React from 'react'
 import Tooltip from '@mui/material/Tooltip'
+import './css/Nav.css'
 
 function Navbar({switchTheme, isChecked}:any) {
   return (

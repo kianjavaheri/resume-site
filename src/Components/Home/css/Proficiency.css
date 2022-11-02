@@ -1,0 +1,93 @@
+.proficiency-header {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+    color: var(--textcolor);
+    text-align: center;
+}
+
+.proficiency-container .proficiency-card .lang-logo {
+    width: 50px;
+    height: 50px;
+    padding: 15px;
+}
+
+.proficiency-container .proficiency-card .card-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.proficiency-container {
+    padding: 15px 45px 45px 45px;
+    display: flex;
+    gap: 15px;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+}
+
+.proficiency-container .proficiency-card {
+    background-color: var(--cardcolor);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--textcolor);
+    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.proficiency-container .proficiency-card:hover {
+    filter: var(--cardbrightness);
+    transform: scale(1.05);
+}
+
+.proficiency-container .proficiency-card .lang-container {
+    width: 100%;
+    background-color: #ddd;
+    border-radius: 5px;
+}
+
+.proficiency-container .proficiency-card .lang-container .skills {
+    text-align: right;
+    height: 10px;
+    box-shadow: rgba(0, 0, 0, 0.25) 5px 0px 10px;
+    border-radius: 5px;
+}
+
+.python {
+    width: 75%;
+    background-color: green;
+}
+
+.java {
+    width: 50%;
+    background-color: yellow;
+}
+
+.javascript {
+    width: 25%;
+    background-color: orange;
+}
+
+.react {
+    width: 50%;
+    background-color: yellow;
+}
+
+.proficiency-container .proficiency-card h3 {
+    font-size: 1.25rem;
+    padding: 15px
+}
+
+.proficiency-container .proficiency-card p {
+    padding-top: 15px;
+    font-size: 0.9rem;
+}
+
+
+@media (min-width: 800px) {
+    .proficiency-container .proficiency-card {
+        width: 19vw;
+    }
+}
