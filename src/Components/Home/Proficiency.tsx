@@ -12,52 +12,32 @@ function Proficiency() {
         <h1 className="proficiency-header">Language Proficiency</h1>
         <section className="proficiency-container">
 
-            <div className="proficiency-card">
-              <div className="card-title">
-                  {/* <h3>Python 3</h3> */}
-                  <img src={pythonlogo} className="lang-logo" alt="python-logo"></img>
-              </div>
-              <div className="lang-container">
-                  <div className="skills python"></div>
-              </div>
-              <p>Python is by far my favorite language. I love the simplicity of the language as it allows me to focus on other things. I also find Python's expansive library to be very useful and convenient.</p>
-            </div>
+          <ProficiencyCard icon={pythonlogo} lang="python" desc="Python is by far my favorite language. I love the simplicity of the language as it allows me to focus on other things. I also find Python's expansive library to be very useful and convenient."/>
 
-            <div className="proficiency-card">
-              <div className="card-title">
-                  {/* <h3>Java</h3> */}
-                  <img src={javalogo} className="lang-logo" alt="java-logo"></img>
-              </div>
-              <div className="lang-container">
-                  <div className="skills java"></div>
-              </div>
-              <p>Java would definitely be my second most proficient language. I have gotten really used to it over the years. Java is my go-to for performance-based programming.</p>
-            </div>
+          <ProficiencyCard icon={javalogo} lang="java" desc="Java would definitely be my second most proficient language. I have gotten really used to it over the years. Java is my go-to for performance-based programming."/>
 
-            <div className="proficiency-card">
-              <div className="card-title">
-                  {/* <h3>Javascript</h3> */}
-                  <img src={javascriptlogo} className="lang-logo" alt="javascript-logo"></img>
-              </div>
-              <div className="lang-container">
-                  <div className="skills javascript"></div>
-              </div>
-              <p>Javascript is definitely a language that I both enjoy using and want to learn more about. As of now, I only use Javascript for front-end.</p>
-            </div>
+          <ProficiencyCard icon={javascriptlogo} lang="javascript" desc="Javascript is definitely a language that I both enjoy using and want to learn more about. As of now, I only use Javascript for front-end."/>
 
-            <div className="proficiency-card">
-              <div className="card-title">
-                  {/* <h3>React</h3> */}
-                  <img src={reactlogo} className="lang-logo" alt="react-logo"></img>
-              </div>
-              <div className="lang-container">
-                  <div className="skills react"></div>
-              </div>
-              <p>My overall react skills are fairly proficient. I would say I know how to get around the interface and implement certain features.</p>
-            </div>
+          <ProficiencyCard icon={reactlogo} lang="react" desc="My overall react skills are fairly proficient. I would say I know how to get around the interface and implement certain features."/>
+
         </section>
     </div>
   )
+}
+
+function ProficiencyCard(props:any) {
+
+  return (
+      <div className="proficiency-card">
+          <div className="card-title">
+              <img src={props.icon} className="lang-logo" alt={props.lang + " logo"}></img>
+          </div>
+          <div className="lang-container">
+              <div className={"skills " + props.lang}></div>
+          </div>
+          <p>{props.desc}</p>
+      </div>
+)
 }
 
 export default Proficiency;

@@ -9,8 +9,8 @@
 .projects-container {
     padding: 15px 45px 45px 45px;
     display: flex;
-    gap: 15px;
-    justify-content: space-evenly;
+    gap: 45px;
+    justify-content: center;
     flex-wrap: wrap;
 }
 
@@ -23,17 +23,22 @@
     cursor: pointer;
     color: var(--textcolor);
     transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
-    position: relative;
-    border-collapse: collapse;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 20vh;
 }
 
 .projects-container .project-card:hover {
-    filter: var(--cardbrightness);
+    filter: brightness(1.1);
     transform: scale(1.05);
 }
 
 .projects-container .project-card a {
     color: var(--light-blue);
+    font-weight: 600;
+    padding: 10px;
+    bottom: 0;
     margin: 0;
 }
 

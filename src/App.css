@@ -9,25 +9,18 @@
 
 [data-theme='light'] {
     --bgcolor: rgb(255, 255, 255);
+    --contact: rgb(124, 124, 249);
     --textcolor: rgb(0, 0, 0);
     --cardcolor: rgb(255, 255, 255);
     --shadow: rgba(100, 100, 111, 0.5) 0px 7px 29px 0px;
-    --scrollcolor: rgb(237, 237, 237);
-    --filter-color: invert(0%) sepia(4%) saturate(0%) hue-rotate(337deg) brightness(93%) contrast(107%);
-    /* black ^^^ */
-    --button-color: rgb(220, 220, 220);
 }
 
 [data-theme='dark'] {
     --bgcolor: rgb(35, 35, 35);
+    --contact: rgb(255, 255, 255);
     --textcolor: rgb(255, 255, 255);
     --cardcolor: rgb(31, 31, 31);
-    --cardbrightness: brightness(1.2);
     --shadow: rgba(0, 0, 0, 0.2) 0px 7px 29px 0px;
-    --scrollcolor: rgb(62, 62, 62);
-    --filter-color: invert(99%) sepia(99%) saturate(2%) hue-rotate(165deg) brightness(104%) contrast(100%);
-    /* white ^^^ */
-    --button-color: rgb(255, 255, 255);
 }
 
 * {
@@ -69,29 +62,28 @@ a:visited {
 
 .scroll-top {
     padding: 15px;      
-    background-color: var(--scrollcolor);
+    background-color: var(--light-blue);
     box-shadow: var(--shadow);
-    border-radius: 50%;
+    border-radius: 5px;
     cursor: pointer;
     position: fixed;
     bottom: 30px;
     right: 30px;
-    width: 5vw;
-    height: 5vw;
-    transition: 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
+    width: 70px;
+    height: 70px;
     opacity: 0;
     display: flex;
     justify-content: center;
     align-items: center;
+    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
 .scroll-top:hover {
-    filter: brightness(0.95);
-    transform: scale(1.05);
+    filter: brightness(0.85);
 }
 
-.scroll-top img {
-    filter: var(--filter-color);
+.scroll-top .arrow {
+    color: white;
 }
 
 @media (hover:hover) {

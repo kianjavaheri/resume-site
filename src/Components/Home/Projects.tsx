@@ -9,62 +9,36 @@ function Projects() {
     <div>
         <h1 className="projects-header">Projects</h1>
         <section className="projects-container">
-            <div className="project-card">
-              <h3>Twitter Scraper</h3>
-              <p>
-                Used twint API to scrape Twitter. Used pandas to clean data and used Natural Language Processing (NLP) to perform sentiment analysis on the tweet content.
-              </p>
-              <a href="https://github.com/kianjavaheri/twint-analysis" target="_blank">
-                <Tooltip title="See Project"><FontAwesomeIcon size="3x" icon={faGithub} /></Tooltip>
-                See GitHub Project
-              </a>
-            </div>
+            <ProjectCard title="Twitter Scraper" desc="Used twint API to scrape Twitter. Used pandas to clean data and used Natural Language Processing (NLP) to perform sentiment analysis on the tweet content." gitlink="https://github.com/kianjavaheri/twint-analysis"/>
 
-            <div className="project-card">
-              <h3>Whiteboard</h3>
-              <p>
-              Used ReactJS to create and deploy a fully functioning whiteboarding web app. A user can free draw, draw rectangles, draw lines, select lines and move them around, and undo/redo.
-              </p>
-              <a href="https://github.com/kianjavaheri/whiteboard" target="_blank">
-                See GitHub Project
-              </a>
-              <br/>
-              <br/>
-              <a href="https://whiteboard-app-363204.uw.r.appspot.com/" target="_blank">
-                See Deployed Project
-              </a>
-            </div>
+            <ProjectCard title="Whiteboard" desc="Used ReactJS to create and deploy a fully functioning whiteboarding web app. A user can free draw, draw rectangles, draw lines, select lines and move them around, and undo/redo." gitlink="https://github.com/kianjavaheri/whiteboard" deplink="https://whiteboard-app-363204.uw.r.appspot.com/"/>
 
-            <div className="project-card">
-              <h3>Chat App</h3>
-              <p>
-                Used the ReactJS (TS) framework to create a working realtime chat app with Firebase authentication and database. 
-              </p>
-              <a href="https://github.com/kianjavaheri/chat-app" target="_blank">
-                See GitHub Project
-              </a>
-            </div>
+            <ProjectCard title="Chat App" desc="Used the ReactJS (TS) framework to create a working realtime chat app with Firebase authentication and database. " gitlink="https://github.com/kianjavaheri/chat-app"/>
 
-            <div className="project-card">
-              <h3>Wordle Clone</h3>
-              <p>
-                Used the pygame library to create a visualized working Wordle clone.
-              </p>
-              <a href="https://github.com/kianjavaheri/wordle-clone" target="_blank">
-                See GitHub Project
-              </a>
-            </div>
+            <ProjectCard title="Wordle Clone" desc="Used the pygame library to create a visualized working Wordle clone." gitlink="https://github.com/kianjavaheri/wordle-clone"/>
 
-            <div className="project-card">
-              <h3>Nash Equilibrium Simulation</h3>
-              <p>
-                Simulated a 'table' game to find nash equilibriums (Game Theory).
-              </p>
-              <a href="https://github.com/kianjavaheri/nash-equilibrium" target="_blank">
-                See GitHub Project
-              </a>
-            </div>
+            <ProjectCard title="Nash Equilibrium Simulation" desc="Simulated a 'table' game to find nash equilibriums (Game Theory)." gitlink="https://github.com/kianjavaheri/nash-equilibrium"/>
+
+            <ProjectCard title="Sudoku Solver" desc="Created a sudoku game with a solve function using backtracking." gitlink="https://github.com/kianjavaheri/sudoku-solver"/>
+
         </section>
+    </div>
+  )
+}
+
+function ProjectCard(props:any) {
+  return (
+    <div className="project-card">
+      <h3>{props.title}</h3>
+          <p>
+              {props.desc}
+          </p>
+      {/* <FontAwesomeIcon size="3x" icon={faGithub} /> */}
+      <div>
+          <a href={props.gitlink} target="_blank">GitHub Project</a>
+        { props.deplink && <a href={props.deplink} target="_blank">Deployed Project</a> }
+      </div>
+      
     </div>
   )
 }

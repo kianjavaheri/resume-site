@@ -15,12 +15,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--dark);
+    color: var(--bgcolor);
 }
 
 .wrapper .icon {
     position: relative;
-    background: var(--button-color);
+    background: var(--contact);
     border-radius: 50%;
     padding: 15px;
     margin: 10px;

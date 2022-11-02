@@ -21,7 +21,7 @@
 .proficiency-container {
     padding: 15px 45px 45px 45px;
     display: flex;
-    gap: 15px;
+    gap: 45px;
     justify-content: space-evenly;
     flex-wrap: wrap;
 }
