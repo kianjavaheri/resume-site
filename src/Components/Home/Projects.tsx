@@ -1,4 +1,7 @@
 import React from 'react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faGithub } from '@fortawesome/free-brands-svg-icons'
+import Tooltip from '@mui/material/Tooltip'
 
 function Projects() {
   return (
@@ -11,6 +14,7 @@ function Projects() {
                 Used twint API to scrape Twitter. Used pandas to clean data and used Natural Language Processing (NLP) to perform sentiment analysis on the tweet content.
               </p>
               <a href="https://github.com/kianjavaheri/twint-analysis" target="_blank">
+                <Tooltip title="See Project"><FontAwesomeIcon size="3x" icon={faGithub} /></Tooltip>
                 See GitHub Project
               </a>
             </div>
