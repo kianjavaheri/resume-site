@@ -1,8 +1,6 @@
 import React from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGithub } from '@fortawesome/free-brands-svg-icons'
-import Tooltip from '@mui/material/Tooltip'
 import './css/Projects.css'
+
 
 function Projects() {
   return (
@@ -27,16 +25,18 @@ function Projects() {
 }
 
 function ProjectCard(props:any) {
+
+  
+
   return (
     <div className="project-card">
       <h3>{props.title}</h3>
           <p>
               {props.desc}
           </p>
-      {/* <FontAwesomeIcon size="3x" icon={faGithub} /> */}
       <div>
-          <a href={props.gitlink} target="_blank">GitHub Project</a>
-        { props.deplink && <a href={props.deplink} target="_blank">Deployed Project</a> }
+            <a href={props.gitlink} target="_blank" rel="noopener noreferrer">GitHub Code</a>
+            { props.deplink && <a href={props.deplink} target="_blank" rel="noopener noreferrer">Website</a> }
       </div>
       
     </div>

@@ -6,7 +6,7 @@ function Navbar({switchTheme, isChecked}:any) {
   return (
     <div>
         <nav className="nav"> 
-            <a href="" className="name">KJ</a>
+            <a href="/" className="name">KJ</a>
             <Tooltip title="Theme">
               <label className="switch">
                 <input type="checkbox" onClick={switchTheme} checked={isChecked()} ></input>

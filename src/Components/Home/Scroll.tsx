@@ -1,6 +1,7 @@
-import React, {useState} from 'react'
+import React, {useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowUp } from '@fortawesome/free-solid-svg-icons'
+import './css/Scroll.css'
 
 
 function ScrollButton() {
@@ -24,8 +25,10 @@ function ScrollButton() {
 
 	window.addEventListener('scroll', toggleVisible);
 
+	// scroll function
+
 	return (
-		<button className="scroll-top" onClick={scrollToTop} style={{display: visible ? 'inline' : 'none'}}>
+		<button className="scroll-top"	 onClick={scrollToTop} style={{display: visible ? 'inline' : 'none'}}>
 			<FontAwesomeIcon icon={faArrowUp} className="arrow" size="2x"/>
 		</button>
 	);

@@ -1,0 +1,25 @@
+.gcabout-header {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+    color: var(--textcolor);
+    text-align: center;
+}
+
+.gcabout-container {
+    padding: 15px 45px 45px 45px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.gcabout-container p {
+    text-align: center;
+    padding: 0 15px 30px 15px;
+    color: var(--textcolor);
+    max-width: 50%;
+}
+
+.gcabout-container img {
+    transform: scale(0.1);
+}

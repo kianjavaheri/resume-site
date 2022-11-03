@@ -6,88 +6,48 @@
     text-align: center;
 }
 
-.proficiency-container .proficiency-card .lang-logo {
-    width: 50px;
-    height: 50px;
-    padding: 15px;
-}
-
-.proficiency-container .proficiency-card .card-title {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .proficiency-container {
     padding: 15px 45px 45px 45px;
     display: flex;
     gap: 45px;
-    justify-content: space-evenly;
+    justify-content: center;
     flex-wrap: wrap;
 }
 
-.proficiency-container .proficiency-card {
+.skill-container {
+    background-color: rgb(89, 89, 89);
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+}
+
+.skill-container .skill-card {
     background-color: var(--cardcolor);
     box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
     padding: 15px;
     border-radius: 5px;
-    text-align: center;
     cursor: pointer;
     color: var(--textcolor);
     transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+    width: max-content;
+    margin: 10px;
+    text-align: center;
 }
 
-.proficiency-container .proficiency-card:hover {
-    filter: var(--cardbrightness);
-    transform: scale(1.05);
+.skill-container .skill-card img {
+    width: 100px;
+    height: 100px;
 }
 
-.proficiency-container .proficiency-card .lang-container {
-    width: 100%;
-    background-color: #ddd;
-    border-radius: 5px;
+.skill-container .skill-card .react  {
+    filter: invert(91%) sepia(13%) saturate(6938%) hue-rotate(162deg) brightness(100%) contrast(97%);
 }
 
-.proficiency-container .proficiency-card .lang-container .skills {
-    text-align: right;
-    height: 10px;
-    box-shadow: rgba(0, 0, 0, 0.25) 5px 0px 10px;
-    border-radius: 5px;
+.skill-container .skill-card .go  {
+    filter: invert(51%) sepia(21%) saturate(2486%) hue-rotate(151deg) brightness(99%) contrast(101%);
 }
 
-.python {
-    width: 75%;
-    background-color: green;
-}
-
-.java {
-    width: 50%;
-    background-color: yellow;
-}
-
-.javascript {
-    width: 25%;
-    background-color: orange;
-}
-
-.react {
-    width: 50%;
-    background-color: yellow;
-}
-
-.proficiency-container .proficiency-card h3 {
-    font-size: 1.25rem;
-    padding: 15px
-}
-
-.proficiency-container .proficiency-card p {
-    padding-top: 15px;
-    font-size: 0.9rem;
-}
-
-
-@media (min-width: 800px) {
-    .proficiency-container .proficiency-card {
-        width: 19vw;
-    }
+.skill-container .skill-card .cpp  {
+    filter: invert(21%) sepia(84%) saturate(1835%) hue-rotate(187deg) brightness(95%) contrast(101%);
 }
