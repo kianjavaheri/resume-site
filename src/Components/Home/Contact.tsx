@@ -9,12 +9,12 @@ function Contact() {
         <section className="contact-container">
             <ul className="wrapper">
                 
-                <a href="https://twitter.com/kaewjae5" target="_blank" rel="noopener noreferrer">
+                {/* <a href="https://twitter.com/kaewjae5" target="_blank" rel="noopener noreferrer">
                     <li className="icon twitter">
                         <span className="tooltip">Twitter</span>
                         <FontAwesomeIcon icon={faTwitter} />
                     </li>
-                </a>
+                </a> */}
 
                 <a href="https://www.linkedin.com/in/kian-javaheri-abb134227/" target="_blank" rel="noopener noreferrer">
                     <li className="icon linkedin">

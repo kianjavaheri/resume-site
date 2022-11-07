@@ -9,16 +9,21 @@
 
 [data-theme='light'] {
     --bgcolor: rgb(255, 255, 255);
+    --wall: rgb(241, 241, 241);
     --contact: rgb(124, 124, 249);
     --textcolor: rgb(0, 0, 0);
+    --contrast-text: rgb(255, 255, 255);
     --cardcolor: rgb(255, 255, 255);
     --shadow: rgba(100, 100, 111, 0.5) 0px 7px 29px 0px;
+    
 }
 
 [data-theme='dark'] {
     --bgcolor: rgb(35, 35, 35);
+    --wall: rgb(57, 57, 57);
     --contact: rgb(255, 255, 255);
     --textcolor: rgb(255, 255, 255);
+    --contrast-text: rgb(0, 0, 0);
     --cardcolor: rgb(31, 31, 31);
     --shadow: rgba(0, 0, 0, 0.2) 0px 7px 29px 0px;
 }

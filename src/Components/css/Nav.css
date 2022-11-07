@@ -6,8 +6,7 @@
 
 .nav {
     background-color: var(--bgcolor);
-    /* box-shadow: var(--shadow); */
-    box-shadow: rgba(100, 100, 111, 0.5) 0px 7px 29px 0px;
+    box-shadow: var(--shadow);
     padding: 15px 50px 15px 15px;
     display: flex;
     justify-content: space-between;

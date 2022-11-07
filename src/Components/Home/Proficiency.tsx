@@ -24,12 +24,6 @@ function Proficiency() {
             <ProficiencyCard icon={go} lang="go" title="Go"/>
             <ProficiencyCard icon={cpp} lang="cpp" title="C++"/>
             <ProficiencyCard icon={gcp} lang="gcp" title="Google Cloud"/>
-            <ProficiencyCard icon={gcp} lang="gcp" title="Google Cloud"/>
-            <ProficiencyCard icon={gcp} lang="gcp" title="Google Cloud"/>
-            <ProficiencyCard icon={gcp} lang="gcp" title="Google Cloud"/>
-            <ProficiencyCard icon={gcp} lang="gcp" title="Google Cloud"/>
-            <ProficiencyCard icon={gcp} lang="gcp" title="Google Cloud"/>
-            <ProficiencyCard icon={gcp} lang="gcp" title="Google Cloud"/>
           </div>
         </section>
     </div>

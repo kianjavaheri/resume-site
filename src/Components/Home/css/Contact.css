@@ -8,6 +8,7 @@
     display: inline-flex;
     list-style: none;
     justify-content: center;
+    color: var(--contrast-text);
 }
 
 .wrapper a {
@@ -15,7 +16,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--bgcolor);
+    color: var(--contrast-text);
 }
 
 .wrapper .icon {

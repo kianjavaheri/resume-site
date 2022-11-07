@@ -15,11 +15,13 @@
 }
 
 .skill-container {
-    background-color: rgb(89, 89, 89);
+    background-color: var(--wall);
     border-radius: 5px;
     padding: 10px;
     display: flex;
     justify-content: center;
+    width: 75%;
+    flex-wrap: wrap;
 }
 
 .skill-container .skill-card {
@@ -36,18 +38,6 @@
 }
 
 .skill-container .skill-card img {
-    width: 100px;
-    height: 100px;
-}
-
-.skill-container .skill-card .react  {
-    filter: invert(91%) sepia(13%) saturate(6938%) hue-rotate(162deg) brightness(100%) contrast(97%);
-}
-
-.skill-container .skill-card .go  {
-    filter: invert(51%) sepia(21%) saturate(2486%) hue-rotate(151deg) brightness(99%) contrast(101%);
-}
-
-.skill-container .skill-card .cpp  {
-    filter: invert(21%) sepia(84%) saturate(1835%) hue-rotate(187deg) brightness(95%) contrast(101%);
+    width: 5vw;
+    height: 5vw;
 }
