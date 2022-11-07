@@ -45,6 +45,7 @@
     display: block;
     width: 100%;
     margin: 10px;
+    font-size: 1.5ch;
 }
 
 .projects-container .project-card a:hover {
