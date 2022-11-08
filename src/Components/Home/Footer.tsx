@@ -9,7 +9,7 @@ function Footer() {
         <footer>
             <div>
                 <p>Copyright © Kian Javaheri 2022</p>
-                <p>Last updated on Tuesday, November 7 at 4:19 AM MST</p>
+                <p>Last updated on Tuesday, November 8 at 4:58 AM MST</p>
             </div>
         </footer>
     </div>
