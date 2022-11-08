@@ -9,6 +9,7 @@ import go from '../../svgs/go.svg'
 import cpp from '../../svgs/cpp.svg'
 import gcp from '../../svgs/gcp.svg'
 
+import Tooltip from '@mui/material/Tooltip'
 
 
 function Proficiency() {
@@ -33,10 +34,12 @@ function Proficiency() {
 function ProficiencyCard(props:any) {
 
   return (
+      <Tooltip title={props.title}>
       <div className="skill-card">
           <img src={props.icon} className={props.lang} alt={props.lang + " logo"}></img>
-          <h3>{props.title}</h3>
+          {/* <h3>{props.title}</h3> */}
       </div>
+      </Tooltip>
   )
 }
 

@@ -30,13 +30,13 @@ function ProjectCard(props:any) {
 
   return (
     <div className="project-card">
-      <h3>{props.title}</h3>
+      <h2>{props.title}</h2>
           <p>
               {props.desc}
           </p>
       <div>
-            <a href={props.gitlink} target="_blank" rel="noopener noreferrer">GitHub Code</a>
-            { props.deplink && <a href={props.deplink} target="_blank" rel="noopener noreferrer">Website</a> }
+            <a href={props.gitlink} target="_blank" rel="noopener noreferrer">VIEW PROJECT</a>
+            {/* { props.deplink && <a href={props.deplink} target="_blank" rel="noopener noreferrer">Website</a> } */}
       </div>
       
     </div>

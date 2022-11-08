@@ -15,8 +15,8 @@
 }
 
 .skill-container {
-    background-color: var(--wall);
-    border-radius: 5px;
+    /* background-color: var(--wall); */ /* this is the wall color which you cant see bc bg-color*/
+    border-radius: 2px;
     padding: 10px;
     display: flex;
     justify-content: center;
@@ -26,9 +26,12 @@
 
 .skill-container .skill-card {
     background-color: var(--cardcolor);
-    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    /* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 
+        0 3px 1px -2px rgba(0, 0, 0, 0.2), 
+        0 1px 5px 0 rgba(0, 0, 0, 0.12);
     padding: 15px;
-    border-radius: 5px;
+    border-radius: 2px;
     cursor: pointer;
     color: var(--textcolor);
     transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -38,6 +41,6 @@
 }
 
 .skill-container .skill-card img {
-    width: 5vw;
-    height: 5vw;
+    width: 6vw;
+    height: 6vw;
 }

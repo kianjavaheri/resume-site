@@ -17,9 +17,22 @@
     color: var(--textcolor);
     font-weight: 500;
     text-align: center;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.course-list a {
+    background-color: var(--button-default);
+    padding: 4px 12px 4px 12px;
+    border-radius: 1px;
+    margin: 5px;
     display: block;
+    /* border: 2px dashed rgb(128, 128, 128, 0); */
 }
 
 .course-list a:hover {
-    text-decoration: underline;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    /* border: 2px dashed rgb(128, 128, 128, 1); */
+    background-color: var(--button-highlight);
 }

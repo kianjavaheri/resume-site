@@ -10,10 +10,12 @@ import ScrollButton from './Scroll';
 import Projects from './Projects';
 import Resume from './Resume';
 import Courses from './Courses';
+import Footer from './Footer';
 
 
 function Home() {
-  const defaultDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  // const defaultDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const defaultDark = 'dark';
   const [theme, setTheme] = useLocalStorage('theme', defaultDark ? 'light' : 'dark');
   const switchTheme = () => {
   const newTheme = theme === 'light' ? 'dark' : 'light';
@@ -38,6 +40,7 @@ function Home() {
             <Courses/>
             <hr className="divider"/>
             <Contact />
+            <Footer />
             <ScrollButton/>
         </div>
   );

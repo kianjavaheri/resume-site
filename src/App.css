@@ -8,14 +8,17 @@
 }
 
 [data-theme='light'] {
-    --bgcolor: rgb(255, 255, 255);
+    --bgcolor: #f0f0f0;
     --wall: rgb(241, 241, 241);
     --contact: rgb(124, 124, 249);
     --textcolor: rgb(0, 0, 0);
     --contrast-text: rgb(255, 255, 255);
     --cardcolor: rgb(255, 255, 255);
     --shadow: rgba(100, 100, 111, 0.5) 0px 7px 29px 0px;
-    
+    --button-default: rgb(0, 0, 0, 0);
+    --button-highlight: rgb(0, 0, 0, 0.15);
+    --footer-bg: rgb(196, 196, 196);
+    --footer-text: rgb(41, 41, 41);
 }
 
 [data-theme='dark'] {
@@ -26,6 +29,10 @@
     --contrast-text: rgb(0, 0, 0);
     --cardcolor: rgb(31, 31, 31);
     --shadow: rgba(0, 0, 0, 0.2) 0px 7px 29px 0px;
+    --button-default: rgb(255, 255, 255, 0);
+    --button-highlight: rgb(255, 255, 255, 0.15);
+    --footer-bg: rgb(25, 25, 25);
+    --footer-text: rgb(128, 128, 128);
 }
 
 * {
@@ -55,8 +62,8 @@ a:visited {
 }
 
 .divider {
-    border-top: 3px solid #bbb;
+    border-top: 2px solid #bbb;
     margin: auto;
-    width: 80%;
+    width: 75%;
     border-radius: 15px;
 }
