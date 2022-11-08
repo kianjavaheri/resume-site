@@ -7,13 +7,13 @@
 }
 
 .projects-container {
-    padding: 15px 45px 45px 45px;
+    padding: 0 0 45px 0;
     display: flex;
-    gap: 45px;
+    gap: 40px;
     justify-content: center;
-    margin: auto;
     flex-wrap: wrap;
     width: 90%;
+    margin: auto;
 }
 
 .projects-container .project-card {
