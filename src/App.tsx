@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from './Components/Home/Home'
-import GCSP from './Components/GCSP/GCSP'
 import './App.css'
 
 

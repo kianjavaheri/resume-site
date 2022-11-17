@@ -15,21 +15,21 @@
     --contrast-text: rgb(255, 255, 255);
     --cardcolor: rgb(255, 255, 255);
     --shadow: rgba(100, 100, 111, 0.5) 0px 7px 29px 0px;
-    --button-default: rgb(0, 0, 0, 0);
+    --button-default: rgb(0, 0, 0, 0.07);
     --button-highlight: rgb(0, 0, 0, 0.15);
     --footer-bg: rgb(196, 196, 196);
     --footer-text: rgb(41, 41, 41);
 }
 
 [data-theme='dark'] {
-    --bgcolor: rgb(35, 35, 35);
+    --bgcolor: #121212;
     --wall: rgb(57, 57, 57);
     --contact: rgb(255, 255, 255);
     --textcolor: rgb(255, 255, 255);
     --contrast-text: rgb(0, 0, 0);
     --cardcolor: rgb(31, 31, 31);
     --shadow: rgba(0, 0, 0, 0.2) 0px 7px 29px 0px;
-    --button-default: rgb(255, 255, 255, 0);
+    --button-default: rgb(255, 255, 255, 0.05);
     --button-highlight: rgb(255, 255, 255, 0.15);
     --footer-bg: rgb(25, 25, 25);
     --footer-text: rgb(128, 128, 128);

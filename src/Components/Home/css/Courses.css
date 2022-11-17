@@ -24,8 +24,8 @@
 
 .course-list a {
     background-color: var(--button-default);
-    padding: 4px 12px 4px 12px;
-    border-radius: 1px;
+    padding: 15px;
+    border-radius: 2px;
     margin: 5px;
     display: block;
     /* border: 2px dashed rgb(128, 128, 128, 0); */

@@ -35,7 +35,9 @@ function ProjectCard(props:any) {
               {props.desc}
           </p>
       <div>
-            <a href={props.gitlink} target="_blank" rel="noopener noreferrer">VIEW PROJECT</a>
+            <a href={props.gitlink} target="_blank" rel="noopener noreferrer">
+                VIEW CODE
+            </a>
             {/* { props.deplink && <a href={props.deplink} target="_blank" rel="noopener noreferrer">Website</a> } */}
       </div>
       
