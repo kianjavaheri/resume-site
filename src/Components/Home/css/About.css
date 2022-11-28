@@ -11,13 +11,26 @@
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
+    
 }
 
-.about-container p {
-    text-align: center;
-    padding: 0 15px 30px 15px;
-    color: var(--textcolor);
+.about-container .about-wrapper {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    /* background-color: rgb(0, 0, 0); */
+    /* width: fit-content; */
     max-width: 50%;
+    padding: 15px;
+    border-radius: 1px;
+    border-left: 2px solid var(--opacity);
+    border-right: 2px solid var(--opacity);
+}
+
+.about-container .about-wrapper p {
+    text-align: center;
+    /* padding: 0 15px 30px 15px; */
+    color: var(--textcolor);
 }
 
 .about-container .asulogo {

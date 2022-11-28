@@ -19,6 +19,7 @@
     --button-highlight: rgb(0, 0, 0, 0.15);
     --footer-bg: rgb(196, 196, 196);
     --footer-text: rgb(41, 41, 41);
+    --opacity: rgb(0, 0, 0, 0);
 }
 
 [data-theme='dark'] {
@@ -33,6 +34,7 @@
     --button-highlight: rgb(255, 255, 255, 0.15);
     --footer-bg: rgb(25, 25, 25);
     --footer-text: rgb(128, 128, 128);
+    --opacity: rgb(255, 255, 255, 1);
 }
 
 * {

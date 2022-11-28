@@ -15,7 +15,7 @@ function Projects() {
 
             <ProjectCard title="Wordle Clone" desc="Used the pygame library to create a visualized working Wordle clone." gitlink="https://github.com/kianjavaheri/wordle-clone"/>
 
-            <ProjectCard title="Nash Equilibrium Simulation" desc="Simulated a 'table' game to find nash equilibriums (Game Theory)." gitlink="https://github.com/kianjavaheri/nash-equilibrium"/>
+            {/* <ProjectCard title="Nash Equilibrium Simulation" desc="Simulated a 'table' game to find nash equilibriums (Game Theory)." gitlink="https://github.com/kianjavaheri/nash-equilibrium"/> */}
 
             <ProjectCard title="Sudoku Solver" desc="Created a sudoku game with a solve function using backtracking." gitlink="https://github.com/kianjavaheri/sudoku-solver"/>
 

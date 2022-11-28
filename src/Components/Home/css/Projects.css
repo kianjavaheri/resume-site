@@ -32,6 +32,11 @@
     min-height: 20vh;
 }
 
+.projects-container .project-card h2 {
+    font-weight: 600;
+    padding-bottom: 15px;
+}
+
 .projects-container .project-card div {
     padding: 10px;
     display: flex;
@@ -39,7 +44,6 @@
 }
 
 .projects-container .project-card a {
-    /* color: white; */
     color: var(--textcolor);
     font-weight: 600;
     padding: 10px;
