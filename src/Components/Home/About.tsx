@@ -9,8 +9,7 @@ function About() {
         <section className="about-container">
           <div className="about-wrapper">
             <p>
-                {/* My name is Kian Javaheri. I was born and raised in the Bay Area in California. Currently, I am an 18-year-old computer science major and economics minor at Barrett, The Honors College at Arizona State University. I am looking to work in full-stack development or ultimately machine learning/artificial intelligence! */}
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Cum ducimus suscipit beatae nam harum? Sint veritatis, porro alias ipsam officiis veniam, nostrum, nihil deserunt facere adipisci placeat eum ea quas. Minus unde reprehenderit illum temporibus reiciendis beatae natus blanditiis fuga.
+                My name is Kian Javaheri. I was born and raised in the Bay Area in California. Currently, I am an 18-year-old computer science major and economics minor at Barrett, The Honors College at Arizona State University. I am looking to work in full-stack development or ultimately machine learning/artificial intelligence!
             </p>
             {/* <img src={asulogo} className="asulogo" alt="asu logo"></img> */}
           </div>
