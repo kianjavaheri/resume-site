@@ -12,7 +12,6 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={ <Home/> }/>
-          {/* <Route path="gcsp" element={ <GCSP/> }/> */}
         </Routes>
       </BrowserRouter> 
     </div>
