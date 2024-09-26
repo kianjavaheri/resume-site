@@ -15,9 +15,9 @@
     --contrast-text: rgb(255, 255, 255);
     --cardcolor: rgb(255, 255, 255);
     --shadow: rgba(100, 100, 111, 0.5) 0px 7px 29px 0px;
-    --button-default: rgb(0, 0, 0, 0.07);
-    --button-highlight: rgb(0, 0, 0, 0.15);
-    --footer-bg: rgb(196, 196, 196);
+    --button-default: rgb(220, 220, 220);
+    --button-highlight: rgb(200, 200, 200);
+    --footer-bg: rgb(220, 220, 220);
     --footer-text: rgb(41, 41, 41);
 }
 

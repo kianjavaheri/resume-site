@@ -1,13 +1,13 @@
 import React from 'react'
-import './css/Proficiency.css'
+import './../styling/components/Proficiency.css'
 
-import python from '../../svgs/python.svg'
-import java from '../../svgs/java.svg'
-import js from '../../svgs/js.svg'
-import react from '../../svgs/react.svg'
-import go from '../../svgs/go.svg'
-import cpp from '../../svgs/cpp.svg'
-import gcp from '../../svgs/gcp.svg'
+import python from './../util/svgs/python.svg'
+import java from './../util/svgs/java.svg'
+import js from './../util/svgs/js.svg'
+import react from './../util/svgs/react.svg'
+import go from './../util/svgs/go.svg'
+import cpp from './../util/svgs/cpp.svg'
+import gcp from './../util/svgs/gcp.svg'
 
 import Tooltip from '@mui/material/Tooltip'
 

@@ -1,6 +1,5 @@
 import React from 'react'
-import './css/Footer.css'
-
+import './../styling/components/Footer.css'
 
 
 function Footer() {
@@ -8,7 +7,7 @@ function Footer() {
     <div>
         <footer>
             <div>
-                <p>Copyright © Kian Javaheri 2022</p>
+                <p>Kian Javaheri</p>
                 {/* <p>Last updated on Tuesday, November 17 at 11:39 PM MST</p> */}
             </div>
         </footer>
