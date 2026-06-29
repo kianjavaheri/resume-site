@@ -28,3 +28,14 @@
     text-transform: uppercase;
     color: var(--muted);
 }
+
+@media (max-width: 768px) {
+    .skills-grid {
+        gap: 32px 40px;
+    }
+
+    .skill-icon {
+        width: 32px;
+        height: 32px;
+    }
+}

@@ -44,3 +44,20 @@
 .resume-link:hover {
     opacity: 0.5;
 }
+
+@media (max-width: 768px) {
+    .about-hero {
+        padding: 48px 20px 40px;
+    }
+
+    .about-body {
+        max-width: 100%;
+        gap: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-hero {
+        padding: 36px 20px 32px;
+    }
+}

@@ -26,3 +26,16 @@
 .contact-link:hover {
     opacity: 0.45;
 }
+
+@media (max-width: 768px) {
+    .contact-link {
+        font-size: 1.25rem;
+        padding: 18px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .contact-link {
+        font-size: 1rem;
+    }
+}

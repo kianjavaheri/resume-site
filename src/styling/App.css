@@ -62,6 +62,24 @@ a:visited {
     padding: 64px 48px;
 }
 
+/* ── Tablet ──────────────────────────────────── */
+@media (max-width: 1024px) {
+    .section-inner {
+        grid-template-columns: 120px 1fr;
+        gap: 32px;
+        padding: 48px 32px;
+    }
+}
+
+/* ── Mobile ──────────────────────────────────── */
+@media (max-width: 768px) {
+    .section-inner {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 36px 20px;
+    }
+}
+
 ::-webkit-scrollbar {
     width: 4px;
 }

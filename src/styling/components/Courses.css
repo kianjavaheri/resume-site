@@ -70,3 +70,14 @@
     font-size: 0.9rem;
     font-weight: 400;
 }
+
+@media (max-width: 480px) {
+    .course-row {
+        grid-template-columns: 70px 1fr;
+        gap: 12px;
+    }
+
+    .course-name {
+        font-size: 0.8rem;
+    }
+}

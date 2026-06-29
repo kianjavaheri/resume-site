@@ -32,7 +32,6 @@
     font-weight: 500;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    opacity: 1;
     transition: opacity 0.15s;
 }
 
@@ -53,4 +52,76 @@
 
 .theme-toggle:hover {
     opacity: 0.5;
+}
+
+/* Hamburger — hidden on desktop */
+.hamburger {
+    display: none;
+    background: none;
+    color: var(--textcolor);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 0;
+}
+
+/* Full-screen mobile menu */
+.mobile-menu {
+    display: none;
+}
+
+/* ── Mobile ─────────────────────────────────── */
+@media (max-width: 768px) {
+    .nav {
+        padding: 0 24px;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .hamburger {
+        display: block;
+    }
+
+    .mobile-menu {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 52px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--bgcolor);
+        border-top: 1px solid var(--border);
+        z-index: 99;
+        padding: 0 24px;
+        overflow-y: auto;
+    }
+
+    .mobile-menu a,
+    .mobile-theme-toggle {
+        font-size: 0.85rem;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--textcolor);
+        padding: 22px 0;
+        border-bottom: 1px solid var(--border);
+        display: block;
+        transition: opacity 0.15s;
+    }
+
+    .mobile-theme-toggle {
+        cursor: pointer;
+        user-select: none;
+        color: var(--muted);
+    }
+
+    .mobile-menu a:hover,
+    .mobile-theme-toggle:hover {
+        opacity: 0.5;
+    }
 }

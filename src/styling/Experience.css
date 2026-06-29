@@ -137,10 +137,48 @@
     letter-spacing: 0.04em;
 }
 
+@media (max-width: 1024px) {
+    .experience-item {
+        grid-template-columns: 180px 1fr;
+        gap: 32px;
+        padding: 40px 32px;
+    }
+}
+
 @media (max-width: 768px) {
     .experience-item {
         grid-template-columns: 1fr;
-        gap: 20px;
-        padding: 32px 24px;
+        gap: 16px;
+        padding: 32px 20px;
+    }
+
+    .exp-meta {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: baseline;
+    }
+
+    .exp-company {
+        flex-shrink: 0;
+    }
+
+    .exp-location::before {
+        content: '·';
+        margin-right: 8px;
+    }
+
+    .exp-date {
+        margin-top: 0;
+        width: 100%;
+    }
+
+    .exp-ta-meta {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .exp-ta-date {
+        white-space: normal;
     }
 }
