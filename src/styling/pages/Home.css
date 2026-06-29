@@ -1,3 +1,5 @@
 .home {
     background-color: var(--bgcolor);
+    color: var(--textcolor);
+    padding-top: 52px;
 }

@@ -1,45 +1,32 @@
 import React from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTwitter, faLinkedin, faGithub, faYoutube } from '@fortawesome/free-brands-svg-icons'
 import './../styling/components/Contact.css'
+
+const links = [
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/kian-javaheri-abb134227/' },
+  { label: 'GitHub', href: 'https://github.com/kianjavaheri' },
+  { label: 'YouTube', href: 'https://www.youtube.com/channel/UC7diTWt3gPyKM8nIQpQAvZw' },
+]
 
 function Contact() {
   return (
-    <div>
-        <section className="contact-container">
-            <ul className="wrapper">
-                
-                {/* <a href="https://twitter.com/kaewjae5" target="_blank" rel="noopener noreferrer">
-                    <li className="icon twitter">
-                        <span className="tooltip">Twitter</span>
-                        <FontAwesomeIcon icon={faTwitter} />
-                    </li>
-                </a> */}
-
-                <a href="https://www.linkedin.com/in/kian-javaheri-abb134227/" target="_blank" rel="noopener noreferrer">
-                    <li className="icon linkedin">
-                        <span className="tooltip">LinkedIn</span>
-                        <FontAwesomeIcon icon={faLinkedin} />
-                    </li>
-                </a>
-
-                <a href="https://github.com/kianjavaheri" target="_blank" rel="noopener noreferrer">
-                    <li className="icon github">
-                        <span className="tooltip">Github</span>
-                        <FontAwesomeIcon icon={faGithub} />
-                    </li>
-                </a>
-
-                <a href="https://www.youtube.com/channel/UC7diTWt3gPyKM8nIQpQAvZw" target="_blank" rel="noopener noreferrer">
-                    <li className="icon youtube">
-                        <span className="tooltip">Youtube</span>
-                        <FontAwesomeIcon icon={faYoutube} />
-                    </li>
-                </a>
-
-            </ul>
-        </section>
-    </div>
+    <section id="contact" className="contact-section">
+      <div className="section-inner">
+        <span className="section-label">Contact</span>
+        <div className="contact-links">
+          {links.map((l) => (
+            <a
+              key={l.label}
+              href={l.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="contact-link"
+            >
+              {l.label} ↗
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
   )
 }
 

@@ -1,51 +1,69 @@
 import React, { useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import './../styling/components/Courses.css'
 
+const cseCourses = [
+  { code: 'CSE 310', name: 'Data Structures & Algorithms' },
+  { code: 'CSE 330', name: 'Operating Systems' },
+  { code: 'CSE 340', name: 'Principles of Programming Languages' },
+  { code: 'CSE 355', name: 'Introduction to Theoretical Computer Science' },
+  { code: 'CSE 434', name: 'Computer Networks' },
+  { code: 'CSE 445', name: 'Distributed Software Development' },
+  { code: 'CSE 446', name: 'Software Integration and Engineering' },
+  { code: 'CSE 460', name: 'Software Analysis and Design' },
+  { code: 'CSE 463', name: 'Introduction to Human Computer Interaction' },
+  { code: 'CSE 464', name: 'Software QA and Testing' },
+  { code: 'CSE 471', name: 'Introduction to Artificial Intelligence' },
+]
+
+const ecnCourses = [
+  { code: 'ECN 306', name: 'Survey of International Economics' },
+  { code: 'ECN 416', name: 'Game Theory & Economic Behavior' },
+  { code: 'ECN 423', name: 'Economics of Education' },
+  { code: 'ECN 425', name: 'Introduction to Econometrics' },
+  { code: 'ECN 445', name: 'Environmental Economics' },
+]
 
 function Courses() {
-  const [expanded, setExpanded] = useState(false);
-
+  const [expanded, setExpanded] = useState(false)
 
   return (
-    <div>
-        <h1 className="courses-header">Courses</h1>
-        <section className="courses-container">
-              <span onClick={() => setExpanded(!expanded)}>
-                  <FontAwesomeIcon 
-                    icon={faCaretDown} 
-                    style={{ 
-                      transition: 'transform 0.3s ease', 
-                      transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)'
-                    }} 
-                  />
-            </span>
-            
-            <div className={`course-list ${expanded ? 'expanded' : ''}`} style={{ display: expanded ? 'flex' : 'none' }}>
-                {/* <a href="https://apcentral.collegeboard.org/courses/ap-computer-science-a" target="_blank" rel="noopener noreferrer">CSE 110: Principles of Programming (AP Computer Science A)</a> */}
-                
-                <a href="https://webapp4.asu.edu/bookstore/viewsyllabus/2201/13389" target="_blank" rel="noopener noreferrer">CSE 120: Digital Design Fundamentals</a>
-
-                <a href="https://webapp4.asu.edu/bookstore/viewsyllabus/2227/98741" target="_blank" rel="noopener noreferrer">CSE 205: Object Oriented Programming and Data Structures</a>
-
-                <a href="https://www.public.asu.edu/~ychen10/teaching/cse240/SyllabusInfoCSE240.pdf" target="_blank" rel="noopener noreferrer">CSE 240: Introduction to Programming Languages</a>
-
-                {/* <a href="https://apstudents.collegeboard.org/courses/ap-macroeconomics" target="_blank" rel="noopener noreferrer">ECN 211: Macroeconomic Principles (AP Macroeconomics)</a> */}
-
-                {/* <a href="https://math.asu.edu/mat267" target="_blank" rel="noopener noreferrer">MAT 267: Calculus for Engineers III</a> */}
-
-                {/* <a href="https://math.asu.edu/mat243" target="_blank" rel="noopener noreferrer">MAT 243: Discrete Mathematical Structures</a> */}
-                <a href="https://webapp4.asu.edu/bookstore/viewsyllabus/2237/70479/pdf;jsessionid=3C1EE83573846AAEF2B912AA6D208CDB" target="_blank" rel="noopener noreferrer">CSE 310: Data Structures & Algorithms</a>
-
-                <a href="https://webapp4.asu.edu/bookstore/viewsyllabus/2241/17086/pdf" target="_blank" rel="noopener noreferrer">CSE 330: Operating Systems</a>
-
-                <a href="https://catalog.apps.asu.edu/catalog/classes/classlist?campusOrOnlineSelection=C&catalogNbr=340&honors=F&promod=F&searchType=all&subject=CSE&term=2247#detailsOpen=66813-104194" target="_blank" rel="noopener noreferrer">CSE 340: Principles of Programming Languages</a>
-
-                <a href="https://webapp4.asu.edu/bookstore/viewsyllabus/2241/13275/pdf" target="_blank" rel="noopener noreferrer">CSE 355: Introduction to Theoretical Computer Science</a>
+    <section id="courses" className="courses-section">
+      <div className="section-inner">
+        <span className="section-label">Courses</span>
+        <div className="courses-content">
+          <button className="courses-toggle" onClick={() => setExpanded(!expanded)}>
+            <span>{expanded ? '−' : '+'}</span>
+            <span>{expanded ? 'Collapse' : 'Show all courses'}</span>
+          </button>
+          {expanded && (
+            <div className="courses-groups">
+              <div className="course-group">
+                <p className="course-group-label">Computer Science</p>
+                <div className="courses-list">
+                  {cseCourses.map((c) => (
+                    <div key={c.code} className="course-row">
+                      <span className="course-code">{c.code}</span>
+                      <span className="course-name">{c.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="course-group">
+                <p className="course-group-label">Economics</p>
+                <div className="courses-list">
+                  {ecnCourses.map((c) => (
+                    <div key={c.code} className="course-row">
+                      <span className="course-code">{c.code}</span>
+                      <span className="course-name">{c.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-        </section>
-    </div>
+          )}
+        </div>
+      </div>
+    </section>
   )
 }
 

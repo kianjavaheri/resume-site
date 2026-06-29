@@ -3,46 +3,34 @@ import useLocalStorage from 'use-local-storage';
 import './../styling/pages/Home.css'
 
 import About from '../components/About';
+import Experience from '../components/Experience';
 import Contact from '../components/Contact';
 import Navbar from '../components/Navbar';
 import Proficiency from '../components/Proficiency';
 import ScrollButton from '../components/Scroll';
 import Projects from '../components/Projects';
-import Resume from '../components/Resume';
 import Courses from '../components/Courses';
 import Footer from '../components/Footer';
 
-
 function Home() {
-  // const defaultDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const defaultDark = 'dark';
-  const [theme, setTheme] = useLocalStorage('theme', defaultDark ? 'light' : 'dark');
+  const [theme, setTheme] = useLocalStorage('theme', 'light');
   const switchTheme = () => {
-  const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
+    setTheme(theme === 'light' ? 'dark' : 'light');
   }
-  const isChecked = () => {
-    if (theme === 'light') return false
-    return true
-  }
-  // theme stuff
+  const isChecked = () => theme === 'dark';
 
   return (
-        <div className="home" data-theme={theme}>
-            <Navbar switchTheme={switchTheme} isChecked={isChecked}/>
-            <About/>
-            <Resume/>
-            <hr className="divider"/>
-            <Projects/>
-            <hr className="divider"/>
-            <Proficiency/>
-            <hr className="divider"/>
-            <Courses/>
-            <hr className="divider"/>
-            <Contact />
-            <Footer />
-            <ScrollButton/>
-        </div>
+    <div className="home" data-theme={theme}>
+      <Navbar switchTheme={switchTheme} isChecked={isChecked} />
+      <About />
+      <Experience />
+      <Projects />
+      <Proficiency />
+      <Courses />
+      <Contact />
+      <Footer />
+      <ScrollButton />
+    </div>
   );
 }
 

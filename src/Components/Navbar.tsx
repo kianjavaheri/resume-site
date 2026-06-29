@@ -1,20 +1,22 @@
 import React from 'react'
-import Tooltip from '@mui/material/Tooltip'
 import './../styling/components/Nav.css'
 
-function Navbar({switchTheme, isChecked}:any) {
+function Navbar({ switchTheme, isChecked }: any) {
   return (
-    <div>
-        <nav className="nav"> 
-            <a href="/" className="name">KJ</a>
-            <Tooltip title="Theme">
-              <label className="switch">
-                <input type="checkbox" onClick={switchTheme} checked={isChecked()} ></input>
-                <span className="slider round"></span>
-              </label>
-            </Tooltip>
-        </nav>
-    </div>
+    <nav className="nav">
+      <a href="/" className="name">Kian Javaheri</a>
+      <div className="nav-links">
+        <a href="#about">About</a>
+        <a href="#experience">Experience</a>
+        <a href="#projects">Work</a>
+        <a href="#skills">Skills</a>
+        <a href="#courses">Courses</a>
+        <a href="#contact">Contact</a>
+        <span className="theme-toggle" onClick={switchTheme}>
+          {isChecked() ? 'Light' : 'Dark'}
+        </span>
+      </div>
+    </nav>
   )
 }
 

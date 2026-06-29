@@ -1,46 +1,30 @@
-.proficiency-header {
-    display: flex;
-    justify-content: center;
-    padding: 30px;
-    color: var(--textcolor);
-    text-align: center;
+.skills-section {
+    border-bottom: 1px solid var(--border);
 }
 
-.proficiency-container {
-    padding: 15px 45px 45px 45px;
+.skills-grid {
     display: flex;
-    gap: 45px;
-    justify-content: center;
     flex-wrap: wrap;
+    gap: 40px 56px;
 }
 
-.skill-container {
-    /* background-color: var(--wall); /* this is the wall color which you cant see bc bg-color */
-    border-radius: 2px;
-    padding: 10px;
+.skill-item {
     display: flex;
-    justify-content: center;
-    width: 75%;
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
 }
 
-.skill-container .skill-card {
-    background-color: var(--cardcolor);
-    /* box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px; */
-    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 
-        0 3px 1px -2px rgba(0, 0, 0, 0.2), 
-        0 1px 5px 0 rgba(0, 0, 0, 0.12);
-    padding: 15px;
-    border-radius: 2px;
-    cursor: pointer;
-    color: var(--textcolor);
-    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
-    width: max-content;
-    margin: 10px;
-    text-align: center;
+.skill-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
 }
 
-.skill-container .skill-card img {
-    width: 5vw;
-    height: 5vw;
+.skill-name {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
 }

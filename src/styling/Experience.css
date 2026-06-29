@@ -1,0 +1,146 @@
+.experience-section {
+    border-bottom: 1px solid var(--border);
+}
+
+.experience-label-row {
+    border-bottom: 1px solid var(--border);
+}
+
+.experience-item {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 48px;
+    padding: 48px;
+    border-bottom: 1px solid var(--border);
+}
+
+.experience-item:last-child {
+    border-bottom: none;
+}
+
+.exp-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 2px;
+}
+
+.exp-company {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.exp-location {
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+}
+
+.exp-date {
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+.exp-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.exp-role {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.exp-desc {
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1.7;
+    color: var(--muted);
+}
+
+.exp-bullets {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-left: 0;
+    list-style: none;
+}
+
+.exp-bullets li {
+    font-size: 0.85rem;
+    font-weight: 400;
+    line-height: 1.65;
+    color: var(--muted);
+    padding-left: 16px;
+    position: relative;
+}
+
+.exp-bullets li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--muted);
+}
+
+.exp-ta-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.exp-ta-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+}
+
+.exp-ta-row:first-child {
+    padding-top: 0;
+    border-top: none;
+}
+
+.exp-ta-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+}
+
+.exp-ta-course {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+}
+
+.exp-ta-date {
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+.exp-ta-prof {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+}
+
+@media (max-width: 768px) {
+    .experience-item {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 32px 24px;
+    }
+}

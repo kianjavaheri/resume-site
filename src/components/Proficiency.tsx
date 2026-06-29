@@ -9,37 +9,31 @@ import go from './../util/svgs/go.svg'
 import cpp from './../util/svgs/cpp.svg'
 import gcp from './../util/svgs/gcp.svg'
 
-import Tooltip from '@mui/material/Tooltip'
-
+const skills = [
+  { icon: python, lang: 'python', title: 'Python' },
+  { icon: java, lang: 'java', title: 'Java' },
+  { icon: js, lang: 'javascript', title: 'Javascript' },
+  { icon: react, lang: 'react', title: 'React' },
+  { icon: go, lang: 'go', title: 'Go' },
+  { icon: cpp, lang: 'cpp', title: 'C++' },
+  { icon: gcp, lang: 'gcp', title: 'GCP' },
+]
 
 function Proficiency() {
   return (
-    <div>
-        <h1 className="proficiency-header">Skillset</h1>
-        <section className="proficiency-container">
-          <div className="skill-container">
-            <ProficiencyCard icon={python} lang="python" title="Python"/>
-            <ProficiencyCard icon={java} lang="java" title="Java"/>
-            <ProficiencyCard icon={js} lang="javascript" title="Javascript"/>
-            <ProficiencyCard icon={react} lang="react" title="React"/>
-            <ProficiencyCard icon={go} lang="go" title="Go"/>
-            <ProficiencyCard icon={cpp} lang="cpp" title="C++"/>
-            <ProficiencyCard icon={gcp} lang="gcp" title="Google Cloud"/>
-          </div>
-        </section>
-    </div>
-  )
-}
-
-function ProficiencyCard(props:any) {
-
-  return (
-      <Tooltip title={props.title}>
-      <div className="skill-card">
-          <img src={props.icon} className={props.lang} alt={props.lang + " logo"}></img>
-          {/* <h3>{props.title}</h3> */}
+    <section id="skills" className="skills-section">
+      <div className="section-inner">
+        <span className="section-label">Skills</span>
+        <div className="skills-grid">
+          {skills.map((s) => (
+            <div className="skill-item" key={s.lang}>
+              <img src={s.icon} className={`skill-icon ${s.lang}`} alt={s.lang} />
+              <span className="skill-name">{s.title}</span>
+            </div>
+          ))}
+        </div>
       </div>
-      </Tooltip>
+    </section>
   )
 }
 

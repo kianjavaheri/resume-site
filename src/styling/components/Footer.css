@@ -2,11 +2,14 @@ footer {
     background-color: var(--footer-bg);
     color: var(--footer-text);
     display: flex;
-    justify-content: center;
-    padding: 20px;
-    text-align: center;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 48px;
 }
 
-footer div p {
-    margin: 40px;
+footer p {
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
 }

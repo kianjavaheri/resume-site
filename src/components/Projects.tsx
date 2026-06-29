@@ -1,46 +1,57 @@
 import React from 'react'
 import './../styling/components/Projects.css'
 
+const works = [
+  {
+    tag: 'CS Capstone',
+    title: 'Shipment Quoting Microservice',
+    desc: 'Architected a high-throughput relational caching layer using PostgreSQL and Flask within a Dockerized microservice environment, intercepting and caching external carrier API responses to reduce redundant network calls. Achieved a 64.4% reduction in processing latency (334ms → 119ms) — a 2.8x speedup over live API calls.',
+    link: 'https://github.com/haamidj/ResponsiveWebUI',
+    linkLabel: 'GitHub ↗',
+  },
+  {
+    tag: 'Barrett Honors Thesis',
+    title: 'Public Perception vs. Actual Economic Effects of U.S.–China Trade Policy',
+    desc: 'Investigated the divergence between the economic outcomes of the 2018–2020 U.S.–China trade war and the public\'s perception of those outcomes. Empirical evidence points to complete tariff pass-through to U.S. importers and consumers, resulting in $1.4B/month in deadweight loss. The paper examines how partisan affiliation and media framing drove public support despite these costs, and offers frameworks for better policy communication.',
+    link: 'https://keep.lib.asu.edu/items/203948',
+    linkLabel: 'Read Paper ↗',
+  },
+  {
+    tag: 'Economics Capstone',
+    title: 'Universal Basic Income vs. Targeted Welfare: A Macroeconomic Assessment',
+    desc: 'Analyzed the macroeconomic feasibility and behavioral trade-offs of UBI versus targeted welfare systems. Drawing on empirical data and policy models from five recent global studies across developing nations (South Africa, Indonesia, Peru) and developed economies (U.S., Finland, New Zealand), the paper evaluates how funding mechanisms — consumption vs. income taxes — affect GDP growth, employment incentives, and long-term fiscal sustainability.',
+    link: 'https://drive.google.com/file/d/19Bbjpar0qdztJOmNx8wKYgUJMy7kNWJi/view?usp=sharing',
+    linkLabel: 'Read Paper ↗',
+  },
+]
 
 function Projects() {
   return (
-    <div>
-        <h1 className="projects-header">Projects</h1>
-        <section className="projects-container">
-            <ProjectCard title="Twitter Scraper" desc="Used twint API to scrape Twitter. Used pandas to clean data and used Natural Language Processing (NLP) to perform sentiment analysis on the tweet content." gitlink="https://github.com/kianjavaheri/twint-analysis"/>
-
-            <ProjectCard title="Whiteboard" desc="Used ReactJS to create and deploy a fully functioning whiteboarding web app. A user can free draw, draw rectangles, draw lines, select lines and move them around, and undo/redo." gitlink="https://github.com/kianjavaheri/whiteboard" deplink="https://whiteboard-app-363204.uw.r.appspot.com/"/>
-
-            <ProjectCard title="Chat App" desc="Used the ReactJS (TS) framework to create a working realtime chat app with Firebase authentication and database. " gitlink="https://github.com/kianjavaheri/chat-app"/>
-
-            <ProjectCard title="Wordle Clone" desc="Used the pygame library to create a visualized working Wordle clone." gitlink="https://github.com/kianjavaheri/wordle-clone"/>
-
-            {/* <ProjectCard title="Nash Equilibrium Simulation" desc="Simulated a 'table' game to find nash equilibriums (Game Theory)." gitlink="https://github.com/kianjavaheri/nash-equilibrium"/> */}
-
-            <ProjectCard title="Sudoku Solver" desc="Created a sudoku game with a solve function using backtracking." gitlink="https://github.com/kianjavaheri/sudoku-solver"/>
-
-        </section>
-    </div>
+    <section id="projects" className="projects-section">
+      <div className="section-inner projects-header-row">
+        <span className="section-label">Selected Work</span>
+        <span className="projects-count">{works.length} works</span>
+      </div>
+      <div className="projects-grid">
+        {works.map((w, i) => (
+          <WorkCard key={i} {...w} />
+        ))}
+      </div>
+    </section>
   )
 }
 
-function ProjectCard(props:any) {
-
-  
-
+function WorkCard({ tag, title, desc, link, linkLabel }: any) {
   return (
     <div className="project-card">
-      <h2>{props.title}</h2>
-          <p>
-              {props.desc}
-          </p>
-      <div>
-            <a href={props.gitlink} target="_blank" rel="noopener noreferrer">
-                VIEW CODE
-            </a>
-            {/* { props.deplink && <a href={props.deplink} target="_blank" rel="noopener noreferrer">Website</a> } */}
+      <span className="project-tag">{tag}</span>
+      <h2 className="project-title">{title}</h2>
+      <p className="project-desc">{desc}</p>
+      <div className="project-links">
+        <a href={link} target="_blank" rel="noopener noreferrer" className="project-link">
+          {linkLabel}
+        </a>
       </div>
-      
     </div>
   )
 }

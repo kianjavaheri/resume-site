@@ -1,61 +1,46 @@
-.about-header {
-    display: flex;
-    justify-content: center;
-    padding: 30px;
-    color: var(--textcolor);
-    text-align: center;
+.about-section {
+    border-bottom: 1px solid var(--border);
 }
 
-.about-container {
-    padding: 15px;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    
+.about-hero {
+    border-bottom: 1px solid var(--border);
+    padding: 80px 48px 64px;
 }
 
-.about-container .about-wrapper {
+.about-hero-name {
+    font-size: clamp(4rem, 10vw, 10rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    text-transform: uppercase;
+}
+
+.about-body {
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 32px;
+    max-width: 640px;
+}
+
+.about-bio {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.75;
+    color: var(--muted);
+}
+
+.resume-link {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 3px;
     width: fit-content;
-    max-width: 50%;
-    padding: 15px;
-    /* border-radius: 4px; */
-    /* background-color: rgb(28, 28, 28); */
+    transition: opacity 0.15s;
 }
 
-.about-container .about-wrapper p {
-    text-align: center;
-    /* padding: 0 15px 30px 15px; */
-    color: var(--textcolor);
-}
-
-.about-container .asulogo {
-    width: 15vw;
-}
-
-.resume-container {
-    display: flex;
-    padding-bottom: 40px;
-    justify-content: center;
-    flex-wrap: wrap;
-    width: 100%;
-    color: white;
-}
-
-.resume-button {
-    background-color: var(--blue);
-    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 
-        0 3px 1px -2px rgba(0, 0, 0, 0.2), 
-        0 1px 5px 0 rgba(0, 0, 0, 0.12);
-    border-radius: 2px;
-    padding: 10px;
-    color: white;
-    font-weight: 600;
-    transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-
-.resume-button:hover {
-    filter: brightness(0.9);
+.resume-link:hover {
+    opacity: 0.5;
 }
