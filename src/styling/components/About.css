@@ -8,18 +8,37 @@
 }
 
 .about-hero-name {
-    font-size: clamp(4rem, 10vw, 10rem);
+    font-size: clamp(2.5rem, 6vw, 5.5rem);
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 0.95;
     text-transform: uppercase;
 }
 
-.about-body {
+/* Static (non-collapsible) header variant */
+.section-header-static {
+    cursor: default;
+    border-bottom: 1px solid var(--border);
+}
+
+.section-header-static:hover {
+    opacity: 1;
+}
+
+/* About content: bio left, gallery right */
+.about-content-area {
+    display: flex;
+    gap: 48px;
+    padding: 64px 48px;
+    align-items: flex-start;
+}
+
+.about-text {
+    flex: 3;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 32px;
-    max-width: 640px;
+    gap: 16px;
 }
 
 .about-bio {
@@ -27,6 +46,7 @@
     font-weight: 400;
     line-height: 1.75;
     color: var(--muted);
+    margin: 0;
 }
 
 .resume-link {
@@ -39,20 +59,108 @@
     padding-bottom: 3px;
     width: fit-content;
     transition: opacity 0.15s;
+    margin-top: 8px;
 }
 
 .resume-link:hover {
     opacity: 0.5;
 }
 
+/* Gallery */
+.about-gallery {
+    flex: 2;
+    min-width: 0;
+    flex-shrink: 0;
+}
+
+.gallery-frame {
+    overflow: hidden;
+    border-radius: 100px !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+}
+
+.gallery-img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Slide-in animations */
+@keyframes gallery-slide-right {
+    from { opacity: 0; transform: translateX(28px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes gallery-slide-left {
+    from { opacity: 0; transform: translateX(-28px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+.gallery-img-enter-right {
+    animation: gallery-slide-right 0.32s ease forwards;
+}
+
+.gallery-img-enter-left {
+    animation: gallery-slide-left 0.32s ease forwards;
+}
+
+.gallery-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    padding: 0 2px;
+}
+
+.gallery-arrow {
+    background: none;
+    color: var(--textcolor);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: opacity 0.15s;
+    letter-spacing: 0;
+}
+
+.gallery-arrow:hover {
+    opacity: 0.45;
+}
+
+.gallery-count {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+/* ── Tablet ──────────────────────────────────── */
+@media (max-width: 1024px) {
+    .about-hero {
+        padding: 64px 32px 48px;
+    }
+
+    .about-content-area {
+        gap: 36px;
+        padding: 48px 32px;
+    }
+}
+
+/* ── Mobile: stack gallery below bio ─────────── */
 @media (max-width: 768px) {
     .about-hero {
         padding: 48px 20px 40px;
     }
 
-    .about-body {
-        max-width: 100%;
-        gap: 24px;
+    .about-content-area {
+        flex-direction: column;
+        gap: 32px;
+        padding: 36px 20px;
+    }
+
+    .about-gallery {
+        flex: none;
+        width: 100%;
     }
 }
 

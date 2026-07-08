@@ -10,8 +10,10 @@ const links = [
 function Contact() {
   return (
     <section id="contact" className="contact-section">
-      <div className="section-inner">
+      <div className="section-header section-header-static">
         <span className="section-label">Contact</span>
+      </div>
+      <div className="section-body">
         <div className="contact-links">
           {links.map((l) => (
             <a

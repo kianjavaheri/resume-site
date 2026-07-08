@@ -1,33 +1,3 @@
-.courses-section {
-    border-bottom: 1px solid var(--border);
-}
-
-.courses-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-}
-
-.courses-toggle {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    cursor: pointer;
-    background: none;
-    color: var(--textcolor);
-    padding: 0;
-    margin-bottom: 32px;
-    transition: opacity 0.15s;
-}
-
-.courses-toggle:hover {
-    opacity: 0.5;
-}
-
 .courses-groups {
     display: flex;
     flex-direction: column;

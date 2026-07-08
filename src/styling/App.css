@@ -55,6 +55,61 @@ a:visited {
     padding-top: 4px;
 }
 
+/* ── Collapsible section header ──────────────────── */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 20px 48px;
+    background: none;
+    color: var(--textcolor);
+    cursor: pointer;
+    border-top: 1px solid var(--border);
+    transition: opacity 0.15s;
+}
+
+.section-header:hover {
+    opacity: 0.5;
+}
+
+.section-header .section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--textcolor);
+    padding-top: 0;
+}
+
+.section-toggle-icon {
+    font-size: 1.1rem;
+    font-weight: 300;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.section-open .section-header {
+    border-bottom: 1px solid var(--border);
+}
+
+/* ── Collapse/expand animation ───────────────────── */
+.section-body-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s ease;
+}
+
+.section-open .section-body-wrapper {
+    grid-template-rows: 1fr;
+}
+
+.section-body-inner {
+    overflow: hidden;
+}
+
+.section-body {
+    padding: 64px 48px;
+}
+
 .section-inner {
     display: grid;
     grid-template-columns: 160px 1fr;
@@ -69,6 +124,12 @@ a:visited {
         gap: 32px;
         padding: 48px 32px;
     }
+    .section-header {
+        padding: 18px 32px;
+    }
+    .section-body {
+        padding: 48px 32px;
+    }
 }
 
 /* ── Mobile ──────────────────────────────────── */
@@ -76,6 +137,12 @@ a:visited {
     .section-inner {
         grid-template-columns: 1fr;
         gap: 12px;
+        padding: 36px 20px;
+    }
+    .section-header {
+        padding: 16px 20px;
+    }
+    .section-body {
         padding: 36px 20px;
     }
 }

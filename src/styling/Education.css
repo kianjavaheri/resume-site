@@ -1,0 +1,100 @@
+.education-item {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 48px;
+    padding: 48px;
+    border-bottom: 1px solid var(--border);
+}
+
+.edu-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 2px;
+}
+
+.edu-institution {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.edu-location {
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+}
+
+.edu-date {
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+.edu-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.edu-college {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.edu-degree {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.edu-honors {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: var(--muted);
+    margin-top: 4px;
+}
+
+@media (max-width: 1024px) {
+    .education-item {
+        grid-template-columns: 180px 1fr;
+        gap: 32px;
+        padding: 40px 32px;
+    }
+}
+
+@media (max-width: 768px) {
+    .education-item {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 32px 20px;
+    }
+
+    .edu-meta {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: baseline;
+    }
+
+    .edu-institution {
+        flex-shrink: 0;
+    }
+
+    .edu-location::before {
+        content: '·';
+        margin-right: 8px;
+    }
+
+    .edu-date {
+        margin-top: 0;
+        width: 100%;
+    }
+}

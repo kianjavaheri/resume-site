@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import './../styling/components/Projects.css'
 
 const works = [
@@ -26,16 +26,22 @@ const works = [
 ]
 
 function Projects() {
+  const [open, setOpen] = useState(false)
+
   return (
-    <section id="projects" className="projects-section">
-      <div className="section-inner projects-header-row">
+    <section id="projects" className={`projects-section ${open ? 'section-open' : ''}`}>
+      <button className="section-header" onClick={() => setOpen(!open)}>
         <span className="section-label">Selected Work</span>
-        <span className="projects-count">{works.length} works</span>
-      </div>
-      <div className="projects-grid">
-        {works.map((w, i) => (
-          <WorkCard key={i} {...w} />
-        ))}
+        <span className="section-toggle-icon">{open ? '−' : '+'}</span>
+      </button>
+      <div className="section-body-wrapper">
+        <div className="section-body-inner">
+          <div className="projects-grid">
+            {works.map((w, i) => (
+              <WorkCard key={i} {...w} />
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   )

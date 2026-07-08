@@ -24,18 +24,17 @@ const ecnCourses = [
 ]
 
 function Courses() {
-  const [expanded, setExpanded] = useState(false)
+  const [open, setOpen] = useState(false)
 
   return (
-    <section id="courses" className="courses-section">
-      <div className="section-inner">
+    <section id="courses" className={`courses-section ${open ? 'section-open' : ''}`}>
+      <button className="section-header" onClick={() => setOpen(!open)}>
         <span className="section-label">Courses</span>
-        <div className="courses-content">
-          <button className="courses-toggle" onClick={() => setExpanded(!expanded)}>
-            <span>{expanded ? '−' : '+'}</span>
-            <span>{expanded ? 'Collapse' : 'Show all courses'}</span>
-          </button>
-          {expanded && (
+        <span className="section-toggle-icon">{open ? '−' : '+'}</span>
+      </button>
+      <div className="section-body-wrapper">
+        <div className="section-body-inner">
+          <div className="section-body">
             <div className="courses-groups">
               <div className="course-group">
                 <p className="course-group-label">Computer Science</p>
@@ -60,7 +59,7 @@ function Courses() {
                 </div>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
     </section>

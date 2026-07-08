@@ -1,21 +1,3 @@
-.projects-section {
-    border-bottom: 1px solid var(--border);
-}
-
-.projects-header-row {
-    border-bottom: 1px solid var(--border);
-}
-
-.projects-count {
-    font-size: 0.7rem;
-    font-weight: 400;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    align-self: flex-start;
-    padding-top: 4px;
-}
-
 .projects-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

@@ -3,6 +3,7 @@ import useLocalStorage from 'use-local-storage';
 import './../styling/pages/Home.css'
 
 import About from '../components/About';
+import Education from '../components/Education';
 import Experience from '../components/Experience';
 import Contact from '../components/Contact';
 import Navbar from '../components/Navbar';
@@ -23,6 +24,7 @@ function Home() {
     <div className="home" data-theme={theme}>
       <Navbar switchTheme={switchTheme} isChecked={isChecked} />
       <About />
+      <Education />
       <Experience />
       <Projects />
       <Proficiency />

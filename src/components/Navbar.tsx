@@ -13,6 +13,7 @@ function Navbar({ switchTheme, isChecked }: any) {
 
         <div className="nav-links">
           <a href="#about">About</a>
+          <a href="#education">Education</a>
           <a href="#experience">Experience</a>
           <a href="#projects">Work</a>
           <a href="#skills">Skills</a>
@@ -31,6 +32,7 @@ function Navbar({ switchTheme, isChecked }: any) {
       {menuOpen && (
         <div className="mobile-menu">
           <a href="#about" onClick={close}>About</a>
+          <a href="#education" onClick={close}>Education</a>
           <a href="#experience" onClick={close}>Experience</a>
           <a href="#projects" onClick={close}>Work</a>
           <a href="#skills" onClick={close}>Skills</a>

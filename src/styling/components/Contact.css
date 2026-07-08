@@ -1,5 +1,5 @@
-.contact-section {
-    border-bottom: 1px solid var(--border);
+.contact-body {
+    padding-bottom: 0;
 }
 
 .contact-links {
