@@ -28,7 +28,7 @@
 /* About content: bio left, gallery right */
 .about-content-area {
     display: flex;
-    gap: 48px;
+    gap: 56px;
     padding: 64px 48px;
     align-items: flex-start;
 }
@@ -55,11 +55,14 @@
     font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
+    background: none;
+    color: var(--textcolor);
     border-bottom: 1px solid var(--border);
     padding-bottom: 3px;
     width: fit-content;
     transition: opacity 0.15s;
     margin-top: 8px;
+    cursor: pointer;
 }
 
 .resume-link:hover {
@@ -70,38 +73,40 @@
 .about-gallery {
     flex: 2;
     min-width: 0;
-    flex-shrink: 0;
 }
 
 .gallery-frame {
+    aspect-ratio: 4 / 3;
     overflow: hidden;
-    border-radius: 100px !important;
+    border-radius: 75px !important;
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
 }
 
 .gallery-img {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
     display: block;
 }
 
 /* Slide-in animations */
 @keyframes gallery-slide-right {
-    from { opacity: 0; transform: translateX(28px); }
+    from { opacity: 0; transform: translateX(40px); }
     to   { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes gallery-slide-left {
-    from { opacity: 0; transform: translateX(-28px); }
+    from { opacity: 0; transform: translateX(-40px); }
     to   { opacity: 1; transform: translateX(0); }
 }
 
 .gallery-img-enter-right {
-    animation: gallery-slide-right 0.32s ease forwards;
+    animation: gallery-slide-right 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .gallery-img-enter-left {
-    animation: gallery-slide-left 0.32s ease forwards;
+    animation: gallery-slide-left 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .gallery-controls {

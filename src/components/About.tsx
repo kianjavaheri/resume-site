@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import './../styling/components/About.css'
 
 const images = [
@@ -7,6 +7,31 @@ const images = [
   // '/images/img3.jpg',
   // '/images/img4.jpg',
 ]
+
+function PDFModal({ src, onClose }: { src: string; onClose: () => void }) {
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
+  const handleKey = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') onClose()
+  }, [onClose])
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [handleKey])
+
+  return (
+    <div className="pdf-overlay" onClick={onClose}>
+      <div className="pdf-modal" onClick={e => e.stopPropagation()}>
+        <button type="button" className="pdf-close" onClick={onClose} aria-label="Close">×</button>
+        <iframe src={src} className="pdf-frame" title="Document viewer" />
+      </div>
+    </div>
+  )
+}
 
 function Gallery() {
   const [idx, setIdx] = useState(0)
@@ -45,41 +70,46 @@ function Gallery() {
 }
 
 function About() {
+  const [resumeOpen, setResumeOpen] = useState(false)
+
   return (
-    <section id="about" className="about-section">
-      <div className="about-hero">
-        <h1 className="about-hero-name">Kian Javaheri</h1>
-      </div>
-
-      <div className="section-header section-header-static">
-        <span className="section-label">About</span>
-      </div>
-
-      <div className="about-content-area">
-        <div className="about-text">
-          <p className="about-bio">Hi, I'm Kian Javaheri.</p>
-          <p className="about-bio">
-            I am a recent graduate and aspiring developer based in the Bay Area, California, looking to
-            start my career in software and data engineering. I recently graduated Summa Cum Laude from
-            Barrett, The Honors College at Arizona State University with a double major in Computer
-            Science and Economics.
-          </p>
-          <p className="about-bio">
-            I'm actively applying for full-time Software Engineering and Data Engineering roles and am
-            open to any opportunities in the area.
-          </p>
-          <a
-            href="https://drive.google.com/file/d/1NU59Ov-BMng6bWruN8ES2jGUtGxMNxuM/view?usp=sharing"
-            className="resume-link"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View Resume ↗
-          </a>
+    <>
+      <section id="about" className="about-section">
+        <div className="about-hero">
+          <h1 className="about-hero-name">Kian Javaheri</h1>
         </div>
-        <Gallery />
-      </div>
-    </section>
+
+        <div className="section-header section-header-static">
+          <span className="section-label">About</span>
+        </div>
+
+        <div className="about-content-area">
+          <div className="about-text">
+            <p className="about-bio">Hi, I'm Kian Javaheri.</p>
+            <p className="about-bio">
+              I am a recent graduate and aspiring developer based in the Bay Area, California, looking to
+              start my career in software and data engineering. I recently graduated Summa Cum Laude from
+              Barrett, The Honors College at Arizona State University with a double major in Computer
+              Science and Economics.
+            </p>
+            <p className="about-bio">
+              I'm actively applying for full-time Software Engineering and Data Engineering roles and am
+              open to any opportunities in the area.
+            </p>
+            <button
+              type="button"
+              className="resume-link"
+              onClick={() => setResumeOpen(true)}
+            >
+              View Resume ↗
+            </button>
+          </div>
+          <Gallery />
+        </div>
+      </section>
+
+      {resumeOpen && <PDFModal src="/pdfs/resume.pdf" onClose={() => setResumeOpen(false)} />}
+    </>
   )
 }
 

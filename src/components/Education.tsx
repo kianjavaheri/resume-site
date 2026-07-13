@@ -13,6 +13,7 @@ function Education() {
       <div className="section-body-wrapper">
         <div className="section-body-inner">
           <div className="education-item">
+            <img src="/svgs/asu.svg" alt="Arizona State University" className="edu-logo" />
             <div className="edu-meta">
               <p className="edu-institution">Arizona State University</p>
               <p className="edu-location">Tempe, AZ</p>

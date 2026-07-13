@@ -50,9 +50,12 @@
     font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
+    background: none;
+    color: var(--textcolor);
     border-bottom: 1px solid var(--border);
     padding-bottom: 2px;
     transition: opacity 0.15s;
+    cursor: pointer;
 }
 
 .project-link:hover {
