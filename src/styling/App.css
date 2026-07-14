@@ -194,11 +194,36 @@ a:visited {
     opacity: 0.7;
 }
 
-.pdf-frame {
+.pdf-pages {
     width: 100%;
     flex: 1;
-    border: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    background: var(--muted-bg, rgba(128, 128, 128, 0.08));
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.pdf-page {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    max-width: 100%;
+}
+
+.pdf-page canvas {
+    max-width: 100%;
+    height: auto !important;
     display: block;
+}
+
+.pdf-status {
+    padding: 48px 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-align: center;
 }
 
 @media (max-width: 768px) {
@@ -216,6 +241,10 @@ a:visited {
     .pdf-close {
         top: -44px;
         right: 16px;
+    }
+
+    .pdf-pages {
+        padding: 16px;
     }
 }
 

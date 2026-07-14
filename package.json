@@ -12,6 +12,7 @@
     "@mui/material": "^5.10.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-pdf": "^10.4.1",
     "react-router-dom": "^6.30.4",
     "use-local-storage": "^2.3.6"
   },

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState } from 'react'
+import PdfModal from './PdfModal'
 import './../styling/components/Projects.css'
 
 const works = [
@@ -24,36 +25,6 @@ const works = [
     linkLabel: 'Read Paper ↗',
   },
 ]
-
-interface PDFModalProps {
-  src: string
-  onClose: () => void
-}
-
-function PDFModal({ src, onClose }: PDFModalProps) {
-  useEffect(() => {
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = '' }
-  }, [])
-
-  const handleKey = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape') onClose()
-  }, [onClose])
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [handleKey])
-
-  return (
-    <div className="pdf-overlay" onClick={onClose}>
-      <div className="pdf-modal" onClick={e => e.stopPropagation()}>
-        <button type="button" className="pdf-close" onClick={onClose} aria-label="Close">×</button>
-        <iframe src={src} className="pdf-frame" title="Document viewer" />
-      </div>
-    </div>
-  )
-}
 
 interface WorkProps {
   tag: string
@@ -115,7 +86,7 @@ function Projects() {
         </div>
       </section>
 
-      {activePdf && <PDFModal src={activePdf} onClose={closePdf} />}
+      {activePdf && <PdfModal src={activePdf} onClose={closePdf} />}
     </>
   )
 }

@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState } from 'react'
+import PdfModal from './PdfModal'
 import './../styling/components/About.css'
 
 const images = [
@@ -7,31 +8,6 @@ const images = [
   // '/images/img3.jpg',
   // '/images/img4.jpg',
 ]
-
-function PDFModal({ src, onClose }: { src: string; onClose: () => void }) {
-  useEffect(() => {
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = '' }
-  }, [])
-
-  const handleKey = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape') onClose()
-  }, [onClose])
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [handleKey])
-
-  return (
-    <div className="pdf-overlay" onClick={onClose}>
-      <div className="pdf-modal" onClick={e => e.stopPropagation()}>
-        <button type="button" className="pdf-close" onClick={onClose} aria-label="Close">×</button>
-        <iframe src={src} className="pdf-frame" title="Document viewer" />
-      </div>
-    </div>
-  )
-}
 
 function Gallery() {
   const [idx, setIdx] = useState(0)
@@ -108,7 +84,7 @@ function About() {
         </div>
       </section>
 
-      {resumeOpen && <PDFModal src="/pdfs/resume.pdf" onClose={() => setResumeOpen(false)} />}
+      {resumeOpen && <PdfModal src="/pdfs/resume.pdf" onClose={() => setResumeOpen(false)} />}
     </>
   )
 }
