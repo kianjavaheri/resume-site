@@ -24,6 +24,13 @@ const works = [
     pdfSrc: '/pdfs/basic-income.pdf',
     linkLabel: 'Read Paper ↗',
   },
+  {
+    tag: 'Independent Research',
+    title: 'Estimating the Wage Effects of a Universal Basic Income',
+    desc: 'Applied Double Machine Learning (LinearDML and CausalForestDML) to longitudinal CPS ASEC microdata to estimate the causal effect of unconditional cash transfers on future labor income, then used the model to simulate the predicted wage impact of a $6,000/year UBI program. Used XGBoost within the DoubleML framework to control for nonlinear confounding across demographic and socioeconomic variables.',
+    link: 'https://github.com/kianjavaheri/welfare-model',
+    linkLabel: 'View GitHub ↗',
+  },
 ]
 
 interface WorkProps {
