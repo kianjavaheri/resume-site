@@ -10,23 +10,20 @@ const links = [
 function Contact() {
   return (
     <section id="contact" className="contact-section">
-      <div className="section-header section-header-static">
-        <span className="section-label">Contact</span>
-      </div>
-      <div className="section-body">
-        <div className="contact-links">
-          {links.map((l) => (
-            <a
-              key={l.label}
-              href={l.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="contact-link"
-            >
-              {l.label} ↗
-            </a>
-          ))}
-        </div>
+      <p className="card-title contact-section-title">Contact</p>
+      <div className="contact-cards">
+        {links.map((l) => (
+          <a
+            key={l.label}
+            href={l.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="contact-card"
+          >
+            <span className="contact-card-label">{l.label}</span>
+            <span className="contact-card-arrow">↗</span>
+          </a>
+        ))}
       </div>
     </section>
   )

@@ -45,7 +45,7 @@ interface WorkProps {
 
 function WorkCard({ tag, title, desc, pdfSrc, link, linkLabel, onOpenPdf }: WorkProps) {
   return (
-    <div className="project-card">
+    <div className="sub-card project-card">
       <span className="project-tag">{tag}</span>
       <h2 className="project-title">{title}</h2>
       <p className="project-desc">{desc}</p>
@@ -77,11 +77,13 @@ function Projects() {
 
   return (
     <>
-      <section id="projects" className={`projects-section ${open ? 'section-open' : ''}`}>
-        <button className="section-header" onClick={() => setOpen(!open)}>
-          <span className="section-label">Selected Work</span>
-          <span className="section-toggle-icon">{open ? '−' : '+'}</span>
-        </button>
+      <section id="projects" className={`section-card projects-section ${open ? 'section-open' : ''}`}>
+        <div className="card-header" onClick={() => !open && setOpen(true)}>
+          <span className="card-title">Selected Work</span>
+          <button className="card-toggle-btn" onClick={(e) => { e.stopPropagation(); setOpen(!open); }}>
+            <span className="card-toggle-icon">{open ? '−' : '+'}</span>
+          </button>
+        </div>
         <div className="section-body-wrapper">
           <div className="section-body-inner">
             <div className="projects-grid">

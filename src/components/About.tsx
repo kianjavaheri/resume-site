@@ -50,18 +50,18 @@ function About() {
 
   return (
     <>
-      <section id="about" className="about-section">
-        <div className="about-hero">
-          <h1 className="about-hero-name">Kian Javaheri</h1>
+      <section id="about" className="section-card about-section">
+        <div className="card-header-static">
+          <span className="card-title">About</span>
         </div>
 
-        <div className="section-header section-header-static">
-          <span className="section-label">About</span>
+        <div className="about-hero">
+          <h1 className="about-hero-name">Hi, I'm Kian Javaheri!</h1>
         </div>
 
         <div className="about-content-area">
           <div className="about-text">
-            <p className="about-bio">Hi, I'm Kian Javaheri.</p>
+            {/* <p className="about-bio">Hi, I'm Kian Javaheri.</p> */}
             <p className="about-bio">
               I am a recent graduate and aspiring developer based in the Bay Area, California, looking to
               start my career in software and data engineering. I recently graduated Summa Cum Laude from

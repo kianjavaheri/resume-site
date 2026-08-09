@@ -5,14 +5,14 @@ const cseCourses = [
   { code: 'CSE 310', name: 'Data Structures & Algorithms' },
   { code: 'CSE 330', name: 'Operating Systems' },
   { code: 'CSE 340', name: 'Principles of Programming Languages' },
-  { code: 'CSE 355', name: 'Introduction to Theoretical Computer Science' },
+  { code: 'CSE 355', name: 'Intro to Theoretical CS' },
   { code: 'CSE 434', name: 'Computer Networks' },
   { code: 'CSE 445', name: 'Distributed Software Development' },
-  { code: 'CSE 446', name: 'Software Integration and Engineering' },
+  { code: 'CSE 446', name: 'Software Integration & Engineering' },
   { code: 'CSE 460', name: 'Software Analysis and Design' },
-  { code: 'CSE 463', name: 'Introduction to Human Computer Interaction' },
+  { code: 'CSE 463', name: 'Human Computer Interaction' },
   { code: 'CSE 464', name: 'Software QA and Testing' },
-  { code: 'CSE 471', name: 'Introduction to Artificial Intelligence' },
+  { code: 'CSE 471', name: 'Intro to Artificial Intelligence' },
 ]
 
 const ecnCourses = [
@@ -27,38 +27,41 @@ function Courses() {
   const [open, setOpen] = useState(false)
 
   return (
-    <section id="courses" className={`courses-section ${open ? 'section-open' : ''}`}>
-      <button className="section-header" onClick={() => setOpen(!open)}>
-        <span className="section-label">Courses</span>
-        <span className="section-toggle-icon">{open ? '−' : '+'}</span>
-      </button>
+    <section id="courses" className={`section-card courses-section ${open ? 'section-open' : ''}`}>
+      <div className="card-header" onClick={() => !open && setOpen(true)}>
+        <span className="card-title">Courses</span>
+        <button className="card-toggle-btn" onClick={(e) => { e.stopPropagation(); setOpen(!open); }}>
+          <span className="card-toggle-icon">{open ? '−' : '+'}</span>
+        </button>
+      </div>
       <div className="section-body-wrapper">
         <div className="section-body-inner">
-          <div className="section-body">
-            <div className="courses-groups">
-              <div className="course-group">
-                <p className="course-group-label">Computer Science</p>
-                <div className="courses-list">
-                  {cseCourses.map((c) => (
-                    <div key={c.code} className="course-row">
-                      <span className="course-code">{c.code}</span>
-                      <span className="course-name">{c.name}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="course-group">
-                <p className="course-group-label">Economics</p>
-                <div className="courses-list">
-                  {ecnCourses.map((c) => (
-                    <div key={c.code} className="course-row">
-                      <span className="course-code">{c.code}</span>
-                      <span className="course-name">{c.name}</span>
-                    </div>
-                  ))}
-                </div>
+          <div className="courses-wrapper">
+
+            <div className="course-section">
+              <p className="course-section-label">Computer Science</p>
+              <div className="courses-grid">
+                {cseCourses.map((c) => (
+                  <div key={c.code} className="course-card">
+                    <span className="course-card-code">{c.code}</span>
+                    <span className="course-card-name">{c.name}</span>
+                  </div>
+                ))}
               </div>
             </div>
+
+            <div className="course-section">
+              <p className="course-section-label">Economics</p>
+              <div className="courses-grid">
+                {ecnCourses.map((c) => (
+                  <div key={c.code} className="course-card">
+                    <span className="course-card-code">{c.code}</span>
+                    <span className="course-card-name">{c.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
         </div>
       </div>

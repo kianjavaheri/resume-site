@@ -1,13 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 [data-theme='light'] {
     --bgcolor: #ffffff;
     --textcolor: #000000;
     --border: #000000;
     --muted: #666666;
-    --card-bg: #ffffff;
+    --card-bg: #ebebeb;
+    --card-bg-hover: #e5e5e5;
+    --card-border: rgba(0, 0, 0, 0.1);
+    --sub-card-fill: #ffffff;
     --footer-bg: #000000;
     --footer-text: #ffffff;
+    --card-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+    --sub-card-shadow: 0 1px 5px rgba(0, 0, 0, 0.07);
+    --toggle-btn-bg: rgba(0, 0, 0, 0.09);
+    --toggle-btn-bg-hover: rgba(0, 0, 0, 0.13);
 }
 
 [data-theme='dark'] {
@@ -15,9 +22,16 @@
     --textcolor: #ffffff;
     --border: #ffffff;
     --muted: #999999;
-    --card-bg: #111111;
+    --card-bg: #141414;
+    --card-bg-hover: #181818;
+    --card-border: rgba(255, 255, 255, 0.1);
+    --sub-card-fill: #252525;
     --footer-bg: #ffffff;
     --footer-text: #000000;
+    --card-shadow: 0 1px 8px rgba(0, 0, 0, 0.22);
+    --sub-card-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+    --toggle-btn-bg: rgba(255, 255, 255, 0.12);
+    --toggle-btn-bg-hover: rgba(255, 255, 255, 0.18);
 }
 
 * {
@@ -29,7 +43,7 @@
     list-style: none;
     text-decoration: none;
     border-radius: 0 !important;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 *:focus,
@@ -46,52 +60,87 @@ a:visited {
     color: inherit;
 }
 
-.section-label {
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    padding-top: 4px;
+/* ── Cards page wrapper ───────────────────────── */
+.cards-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 56px 36px 44px;
 }
 
-/* ── Collapsible section header ──────────────────── */
-.section-header {
+/* ── Outer section card ───────────────────────── */
+.section-card {
+    border-radius: 20px !important;
+    background: var(--card-bg);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.section-card:hover {
+    background: var(--card-bg-hover);
+}
+
+/* ── Card title (large top-left label) ────────── */
+.card-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--textcolor);
+}
+
+/* ── Card header (collapsible sections) ── */
+.card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 20px 48px;
+    padding: 18px 28px;
+}
+
+/* ── Static (non-collapsible) card header ─────── */
+.card-header-static {
+    padding: 18px 28px 0;
+}
+
+/* ── Toggle button ───────────────────────────── */
+.card-toggle-btn {
     background: none;
-    color: var(--textcolor);
+    border: none !important;
+    width: 36px;
+    height: 36px;
+    border-radius: 50% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    border-top: 1px solid var(--border);
-    transition: opacity 0.15s;
-}
-
-.section-header:hover {
-    opacity: 0.5;
-}
-
-.section-header .section-label {
-    font-size: 0.75rem;
-    font-weight: 700;
-    color: var(--textcolor);
-    padding-top: 0;
-}
-
-.section-toggle-icon {
-    font-size: 1.1rem;
-    font-weight: 300;
-    line-height: 1;
+    color: var(--muted);
     flex-shrink: 0;
+    line-height: 1;
+    padding: 0;
+    transition: background 0.15s;
 }
 
-.section-open .section-header {
-    border-bottom: 1px solid var(--border);
+.card-toggle-btn:hover {
+    background: var(--toggle-btn-bg);
 }
 
-/* ── Collapse/expand animation ───────────────────── */
+/* Pointer on entire header when collapsed */
+.section-card:not(.section-open) .card-header {
+    cursor: pointer;
+}
+
+/* ── Toggle icon ─────────────────────────────── */
+.card-toggle-icon {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--muted);
+    pointer-events: none;
+    user-select: none;
+}
+
+/* ── Collapse / expand animation ─────────────── */
 .section-body-wrapper {
     display: grid;
     grid-template-rows: 0fr;
@@ -106,45 +155,20 @@ a:visited {
     overflow: hidden;
 }
 
-.section-body {
-    padding: 64px 48px;
+/* ── Sub-cards container ─────────────────────── */
+.sub-cards-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 22px 22px;
 }
 
-.section-inner {
-    display: grid;
-    grid-template-columns: 160px 1fr;
-    gap: 48px;
-    padding: 64px 48px;
-}
-
-/* ── Tablet ──────────────────────────────────── */
-@media (max-width: 1024px) {
-    .section-inner {
-        grid-template-columns: 120px 1fr;
-        gap: 32px;
-        padding: 48px 32px;
-    }
-    .section-header {
-        padding: 18px 32px;
-    }
-    .section-body {
-        padding: 48px 32px;
-    }
-}
-
-/* ── Mobile ──────────────────────────────────── */
-@media (max-width: 768px) {
-    .section-inner {
-        grid-template-columns: 1fr;
-        gap: 12px;
-        padding: 36px 20px;
-    }
-    .section-header {
-        padding: 16px 20px;
-    }
-    .section-body {
-        padding: 36px 20px;
-    }
+/* ── Sub-card (inner item card) ──────────────── */
+.sub-card {
+    border-radius: 14px !important;
+    background: var(--sub-card-fill);
+    box-shadow: var(--sub-card-shadow);
+    padding: 20px 26px;
 }
 
 /* ── PDF Modal (shared) ──────────────────────── */
@@ -194,6 +218,13 @@ a:visited {
     opacity: 0.7;
 }
 
+.pdf-frame {
+    width: 100%;
+    flex: 1;
+    border: none;
+    display: block;
+}
+
 .pdf-pages {
     width: 100%;
     flex: 1;
@@ -206,11 +237,6 @@ a:visited {
     flex-direction: column;
     align-items: center;
     gap: 16px;
-}
-
-.pdf-page {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    max-width: 100%;
 }
 
 .pdf-page canvas {
@@ -226,7 +252,30 @@ a:visited {
     text-align: center;
 }
 
+/* ── Mobile ──────────────────────────────────── */
 @media (max-width: 768px) {
+    .cards-wrapper {
+        padding: 68px 16px 48px;
+        gap: 12px;
+    }
+
+    .card-header {
+        padding: 22px 28px;
+    }
+
+    .card-header-static {
+        padding: 22px 28px 0;
+    }
+
+    .sub-cards-stack {
+        padding: 14px 16px 20px;
+        gap: 10px;
+    }
+
+    .sub-card {
+        padding: 22px 24px;
+    }
+
     .pdf-overlay {
         padding: 0;
         align-items: flex-end;
@@ -257,5 +306,5 @@ a:visited {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--border);
+    background: var(--card-border);
 }

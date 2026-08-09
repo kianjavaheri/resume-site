@@ -1,35 +1,19 @@
-.about-section {
-    border-bottom: 1px solid var(--border);
-}
-
 .about-hero {
-    border-bottom: 1px solid var(--border);
-    padding: 80px 48px 64px;
+    padding: 28px 28px 20px;
 }
 
 .about-hero-name {
-    font-size: clamp(2.5rem, 6vw, 5.5rem);
+    font-size: clamp(1.6rem, 3.5vw, 3rem);
     font-weight: 700;
     letter-spacing: -0.02em;
-    line-height: 0.95;
-    text-transform: uppercase;
-}
-
-/* Static (non-collapsible) header variant */
-.section-header-static {
-    cursor: default;
-    border-bottom: 1px solid var(--border);
-}
-
-.section-header-static:hover {
-    opacity: 1;
+    line-height: 1.05;
 }
 
 /* About content: bio left, gallery right */
 .about-content-area {
     display: flex;
-    gap: 56px;
-    padding: 64px 48px;
+    gap: 32px;
+    padding: 20px 28px 28px;
     align-items: flex-start;
 }
 
@@ -42,7 +26,7 @@
 }
 
 .about-bio {
-    font-size: 1rem;
+    font-size: 0.875rem;
     font-weight: 400;
     line-height: 1.75;
     color: var(--muted);
@@ -142,25 +126,25 @@
 /* ── Tablet ──────────────────────────────────── */
 @media (max-width: 1024px) {
     .about-hero {
-        padding: 64px 32px 48px;
+        padding: 40px 28px 36px;
     }
 
     .about-content-area {
         gap: 36px;
-        padding: 48px 32px;
+        padding: 36px 28px;
     }
 }
 
 /* ── Mobile: stack gallery below bio ─────────── */
 @media (max-width: 768px) {
     .about-hero {
-        padding: 48px 20px 40px;
+        padding: 32px 20px 28px;
     }
 
     .about-content-area {
         flex-direction: column;
         gap: 32px;
-        padding: 36px 20px;
+        padding: 28px 20px;
     }
 
     .about-gallery {

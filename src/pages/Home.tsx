@@ -23,13 +23,15 @@ function Home() {
   return (
     <div className="home" data-theme={theme}>
       <Navbar switchTheme={switchTheme} isChecked={isChecked} />
-      <About />
-      <Education />
-      <Experience />
-      <Projects />
-      <Proficiency />
-      <Courses />
-      <Contact />
+      <div className="cards-wrapper">
+        <About />
+        <Education />
+        <Experience />
+        <Projects />
+        <Proficiency />
+        <Courses />
+        <Contact />
+      </div>
       <Footer />
       <ScrollButton />
     </div>
