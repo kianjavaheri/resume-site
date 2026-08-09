@@ -6,11 +6,8 @@ function Education() {
 
   return (
     <section id="education" className={`section-card education-section ${open ? 'section-open' : ''}`}>
-      <div className="card-header" onClick={() => !open && setOpen(true)}>
+      <div className="card-header" onClick={() => setOpen(!open)}>
         <span className="card-title">Education</span>
-        <button className="card-toggle-btn" onClick={(e) => { e.stopPropagation(); setOpen(!open); }}>
-          <span className="card-toggle-icon">{open ? '−' : '+'}</span>
-        </button>
       </div>
       <div className="section-body-wrapper">
         <div className="section-body-inner">
@@ -20,7 +17,7 @@ function Education() {
               <div className="edu-meta">
                 <p className="edu-institution">Arizona State University</p>
                 <p className="edu-location">Tempe, AZ</p>
-                <p className="edu-date">Aug. 2022 – May 2026</p>
+                <p className="edu-date">Aug 2022 – May 2026</p>
               </div>
               <div className="edu-content">
                 <p className="edu-college">Barrett, The Honors College</p>

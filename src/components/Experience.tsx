@@ -6,11 +6,8 @@ function Experience() {
 
   return (
     <section id="experience" className={`section-card experience-section ${open ? 'section-open' : ''}`}>
-      <div className="card-header" onClick={() => !open && setOpen(true)}>
+      <div className="card-header" onClick={() => setOpen(!open)}>
         <span className="card-title">Experience</span>
-        <button className="card-toggle-btn" onClick={(e) => { e.stopPropagation(); setOpen(!open); }}>
-          <span className="card-toggle-icon">{open ? '−' : '+'}</span>
-        </button>
       </div>
 
       <div className="section-body-wrapper">
@@ -22,7 +19,7 @@ function Experience() {
               <div className="exp-meta">
                 <p className="exp-company">Sandia National Laboratories</p>
                 <p className="exp-location">Livermore, CA</p>
-                <p className="exp-date">May 2023 – Aug. 2024</p>
+                <p className="exp-date">May 2023 – Aug 2024</p>
                 <img src="/svgs/sandia.svg" className="exp-org-logo" alt="Sandia National Laboratories" />
               </div>
               <div className="exp-content">
@@ -83,13 +80,13 @@ function Experience() {
                     <div className="exp-tl-body">
                       <div className="exp-tl-header">
                         <p className="exp-role">Undergraduate Teaching Assistant</p>
-                        <p className="exp-date">Aug. 2023 – May 2024</p>
+                        <p className="exp-date">Aug 2023 – May 2024</p>
                       </div>
                       <div className="exp-ta-rows">
                         <div className="exp-ta-row">
                           <div className="exp-ta-meta">
                             <span className="exp-ta-course">FSE 150: Intro to Grand Challenges</span>
-                            <span className="exp-ta-date">Aug. – Dec. 2023</span>
+                            <span className="exp-ta-date">Aug – Dec. 2023</span>
                           </div>
                           <p className="exp-ta-prof">Prof. Amy Trowbridge</p>
                           <ul className="exp-bullets">
@@ -99,7 +96,7 @@ function Experience() {
                         <div className="exp-ta-row">
                           <div className="exp-ta-meta">
                             <span className="exp-ta-course">CSE 310: Data Structures & Algorithms</span>
-                            <span className="exp-ta-date">Jan. – May 2024</span>
+                            <span className="exp-ta-date">Jan – May 2024</span>
                           </div>
                           <p className="exp-ta-prof">Prof. Xuerong Feng</p>
                           <ul className="exp-bullets">

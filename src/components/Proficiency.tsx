@@ -18,11 +18,8 @@ function Proficiency() {
 
   return (
     <section id="skills" className={`section-card skills-section ${open ? 'section-open' : ''}`}>
-      <div className="card-header" onClick={() => !open && setOpen(true)}>
+      <div className="card-header" onClick={() => setOpen(!open)}>
         <span className="card-title">Skills</span>
-        <button className="card-toggle-btn" onClick={(e) => { e.stopPropagation(); setOpen(!open); }}>
-          <span className="card-toggle-icon">{open ? '−' : '+'}</span>
-        </button>
       </div>
       <div className="section-body-wrapper">
         <div className="section-body-inner">

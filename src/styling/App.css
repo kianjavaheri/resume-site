@@ -5,13 +5,13 @@
     --textcolor: #000000;
     --border: #000000;
     --muted: #666666;
-    --card-bg: #ebebeb;
-    --card-bg-hover: #e5e5e5;
+    --card-bg: #f7f7f7;
+    --card-bg-hover: #f1f1f1;
     --card-border: rgba(0, 0, 0, 0.1);
     --sub-card-fill: #ffffff;
     --footer-bg: #000000;
     --footer-text: #ffffff;
-    --card-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+    --card-shadow: 0 0px 2px rgba(0, 0, 0, 0.20);
     --sub-card-shadow: 0 1px 5px rgba(0, 0, 0, 0.07);
     --toggle-btn-bg: rgba(0, 0, 0, 0.09);
     --toggle-btn-bg-hover: rgba(0, 0, 0, 0.13);
@@ -125,8 +125,8 @@ a:visited {
     background: var(--toggle-btn-bg);
 }
 
-/* Pointer on entire header when collapsed */
-.section-card:not(.section-open) .card-header {
+/* Header always clickable to toggle */
+.card-header {
     cursor: pointer;
 }
 
