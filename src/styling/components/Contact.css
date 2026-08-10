@@ -24,6 +24,7 @@
     background: var(--card-bg);
     transition: opacity 0.15s;
     min-height: 72px;
+    box-shadow: var(--card-shadow);
 }
 
 .contact-card:hover {

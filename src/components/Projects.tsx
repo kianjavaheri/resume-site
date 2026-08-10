@@ -15,7 +15,7 @@ const works = [
     tag: 'Barrett Honors Thesis',
     date: 'Aug 2025 – May 2026',
     title: 'Public Perception vs. Actual Economic Effects of U.S.–China Trade Policy',
-    desc: 'Investigated the divergence between the economic outcomes of the 2018–2020 U.S.–China trade war and the public\'s perception of those outcomes. Empirical evidence points to complete tariff pass-through to U.S. importers and consumers, resulting in $1.4B/month in deadweight loss. The paper examines how partisan affiliation and media framing drove public support despite these costs, and offers frameworks for better policy communication.',
+    desc: 'Investigated the divergence between the economic outcomes of the 2018–2020 U.S.–China trade war and the public\'s perception of those outcomes.The thesis utilizes a survey to gather public perception of international trade policy and employs Natural Language Processing (NLP) to identify the key drivers of public perception towards trade. The paper identifies key substructures in the results and finds formal education, price sensitivity, and media influence to be the largest factors affecting trade opinions.',
     link: 'https://keep.lib.asu.edu/items/203948',
     linkLabel: 'Read Paper ↗',
   },
@@ -96,6 +96,7 @@ function Projects() {
       <section id="projects" className={`section-card projects-section ${open ? 'section-open' : ''}`}>
         <div className="card-header" onClick={() => setOpen(!open)}>
           <span className="card-title">Selected Work</span>
+          <span className="card-toggle-icon">{open ? '−' : '+'}</span>
         </div>
         <div className="section-body-wrapper">
           <div className="section-body-inner">

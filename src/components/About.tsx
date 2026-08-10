@@ -5,7 +5,7 @@ import './../styling/components/About.css'
 const images = [
   '/images/img1.jpg',
   '/images/img2.jpg',
-  // '/images/img3.jpg',
+  '/images/img3.jpg',
   // '/images/img4.jpg',
 ]
 
@@ -37,9 +37,17 @@ function Gallery() {
         />
       </div>
       <div className="gallery-controls">
-        <button type="button" className="gallery-arrow" onClick={prev} aria-label="Previous">←</button>
+        <button type="button" className="gallery-arrow" onClick={prev} aria-label="Previous">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
         <span className="gallery-count">{idx + 1} / {images.length}</span>
-        <button type="button" className="gallery-arrow" onClick={next} aria-label="Next">→</button>
+        <button type="button" className="gallery-arrow" onClick={next} aria-label="Next">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M6 3L11 8L6 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
       </div>
     </div>
   )
@@ -63,14 +71,14 @@ function About() {
           <div className="about-text">
             {/* <p className="about-bio">Hi, I'm Kian Javaheri.</p> */}
             <p className="about-bio">
-              I am a recent graduate and aspiring developer based in the Bay Area, California, looking to
-              start my career in software and data engineering. I recently graduated Summa Cum Laude from
+              I am a recent graduate and aspiring data scientist based in the Bay Area, California, looking to
+              start my career in data science and causal inference. I recently graduated Summa Cum Laude from
               Barrett, The Honors College at Arizona State University with a double major in Computer
               Science and Economics.
             </p>
             <p className="about-bio">
-              I'm actively applying for full-time Software Engineering and Data Engineering roles and am
-              open to any opportunities in the area.
+              I'm actively applying for full-time Data Science, Software Engineering and Data Engineering roles. Open to any
+              opportunities in the Bay Area.
             </p>
             <button
               type="button"

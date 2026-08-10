@@ -20,6 +20,7 @@ function Proficiency() {
     <section id="skills" className={`section-card skills-section ${open ? 'section-open' : ''}`}>
       <div className="card-header" onClick={() => setOpen(!open)}>
         <span className="card-title">Skills</span>
+        <span className="card-toggle-icon">{open ? '−' : '+'}</span>
       </div>
       <div className="section-body-wrapper">
         <div className="section-body-inner">

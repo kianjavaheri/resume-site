@@ -5,7 +5,7 @@ const cseCourses = [
   { code: 'CSE 310', name: 'Data Structures & Algorithms' },
   { code: 'CSE 330', name: 'Operating Systems' },
   { code: 'CSE 340', name: 'Principles of Programming Languages' },
-  { code: 'CSE 355', name: 'Intro to Theoretical CS' },
+  { code: 'CSE 355', name: 'Intro to Theoretical Computer Science' },
   { code: 'CSE 434', name: 'Computer Networks' },
   { code: 'CSE 445', name: 'Distributed Software Development' },
   { code: 'CSE 446', name: 'Software Integration & Engineering' },
@@ -30,6 +30,7 @@ function Courses() {
     <section id="courses" className={`section-card courses-section ${open ? 'section-open' : ''}`}>
       <div className="card-header" onClick={() => setOpen(!open)}>
         <span className="card-title">Courses</span>
+        <span className="card-toggle-icon">{open ? '−' : '+'}</span>
       </div>
       <div className="section-body-wrapper">
         <div className="section-body-inner">

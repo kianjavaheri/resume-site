@@ -36,7 +36,11 @@ function PdfModal({ src, onClose }: PdfModalProps) {
     <div className="pdf-overlay" onClick={onClose}>
       <div className="pdf-modal" onClick={e => e.stopPropagation()}>
         <div className="pdf-modal-bar">
-          <button type="button" className="pdf-close" onClick={onClose} aria-label="Close">×</button>
+          <button type="button" className="pdf-close" onClick={onClose} aria-label="Close">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </button>
         </div>
         <iframe src={src} className="pdf-frame" title="Document viewer" />
       </div>

@@ -8,6 +8,7 @@ function Education() {
     <section id="education" className={`section-card education-section ${open ? 'section-open' : ''}`}>
       <div className="card-header" onClick={() => setOpen(!open)}>
         <span className="card-title">Education</span>
+        <span className="card-toggle-icon">{open ? '−' : '+'}</span>
       </div>
       <div className="section-body-wrapper">
         <div className="section-body-inner">

@@ -8,6 +8,7 @@ function Experience() {
     <section id="experience" className={`section-card experience-section ${open ? 'section-open' : ''}`}>
       <div className="card-header" onClick={() => setOpen(!open)}>
         <span className="card-title">Experience</span>
+        <span className="card-toggle-icon">{open ? '−' : '+'}</span>
       </div>
 
       <div className="section-body-wrapper">
@@ -25,15 +26,14 @@ function Experience() {
               <div className="exp-content">
                 <p className="exp-role">R&D Bioresource and Environment Security Year-round Intern</p>
                 <p className="exp-desc">
-                  Developed a standalone tool that optimizes profits in bioresource systems using configurable
-                  optimization algorithms tailored to user inputs. Built a QGIS plugin that analyzes geospatial
-                  data and surfaces optimal feedstock pricing locations based on user-defined material quantities.
-                  Collaborated closely with my mentor to build out both tools and communicate key milestones
-                  through presentations.
+                  At Sandia National Laboratories, I developed a standalone tool that optimizes theoretical cashflow for bioresource systems using configurable
+                  optimization algorithms tailored to user inputs. I also built a QGIS plugin that builds a geospatial
+                  map of county-dependent feedstock (fuel for energy conversion) prices. Users are allowed to select and trial different U.S. counties and to see how energy prices affect project cashflow.
+                  I collaborated closely with my mentor to build out this tool and communicate key milestones and findings through presentations.
                 </p>
                 <ul className="exp-bullets">
-                  <li>Engineered a standalone optimization tool that ingests inputs across multiple bioresource systems and maximizes profit yields using configurable optimization algorithms, reducing manual analysis time for research teams.</li>
-                  <li>Developed a QGIS geospatial plugin that parses spatial datasets and surfaces optimal feedstock sourcing locations based on user-defined material quantities and cost constraints.</li>
+                  <li>Engineered a standalone optimization tool that ingests inputs across multiple bioresource systems and maximizes cashflow using configurable optimization algorithms, reducing manual analysis time for research teams.</li>
+                  <li>Developed a QGIS plugin that parses U.S. county shapefile datasets and overlays them with energy price data to surface different feedstock sourcing.</li>
                 </ul>
               </div>
             </div>
@@ -60,14 +60,14 @@ function Experience() {
                         <p className="exp-date">May 2025 – May 2026</p>
                       </div>
                       <p className="exp-desc">
-                        Supervised by Professor Michael Hanemann. Built a web scraper using Selenium to collect
-                        annual report documents from the Arizona Department of Water Resources (ADWR). Wrote
-                        OCR extraction scripts to parse data from the collected reports and structured the output
-                        into clean CSV files for downstream econometric modeling.
+                        Supervised by Professor Michael Hanemann, I built a web scraper using the Selenium Python library to collect
+                        annual report documents from the Arizona Department of Water Resources (ADWR). I also built
+                        OCR scripts to extract and parse data from the collected reports and structured the output
+                        into clean CSV files for econometric analysis.
                       </p>
                       <ul className="exp-bullets">
                         <li>Automated large-scale document retrieval from the ADWR using Selenium WebDriver, eliminating manual collection across hundreds of annual reports.</li>
-                        <li>Built OCR extraction pipelines to parse and structure tabular data from scanned PDFs, producing clean, analysis-ready datasets for downstream econometric modeling.</li>
+                        <li>Built OCR extraction pipelines to parse and structure tabular data from scanned PDFs, producing clean, analysis-ready datasets for econometric modeling.</li>
                       </ul>
                     </div>
                   </div>
@@ -85,23 +85,23 @@ function Experience() {
                       <div className="exp-ta-rows">
                         <div className="exp-ta-row">
                           <div className="exp-ta-meta">
-                            <span className="exp-ta-course">FSE 150: Intro to Grand Challenges</span>
-                            <span className="exp-ta-date">Aug – Dec. 2023</span>
+                            <span className="exp-ta-course">FSE 150 — Intro to Grand Challenges</span>
+                            <span className="exp-ta-date">Aug – Dec 2023</span>
                           </div>
                           <p className="exp-ta-prof">Prof. Amy Trowbridge</p>
                           <ul className="exp-bullets">
-                            <li>Facilitated weekly engineering discussions for a class of ~30, reinforcing problem-solving frameworks and interdisciplinary thinking.</li>
+                            <li>Facilitated weekly engineering discussions for a class of ~30, reinforcing interdisciplinary thinking within an engineering context.</li>
                           </ul>
                         </div>
                         <div className="exp-ta-row">
                           <div className="exp-ta-meta">
-                            <span className="exp-ta-course">CSE 310: Data Structures & Algorithms</span>
+                            <span className="exp-ta-course">CSE 310 — Data Structures & Algorithms</span>
                             <span className="exp-ta-date">Jan – May 2024</span>
                           </div>
                           <p className="exp-ta-prof">Prof. Xuerong Feng</p>
                           <ul className="exp-bullets">
-                            <li>Led exam review sessions covering red-black trees, dynamic programming, and minimum spanning tree algorithms (Kruskal's and Prim's), improving class comprehension ahead of high-stakes assessments.</li>
-                            <li>Held 5+ office hours per week, guiding students through complex coding assignments and algorithm design challenges.</li>
+                            <li>Led review sessions covering red-black trees, dynamic programming, and minimum spanning tree algorithms (Kruskal's and Prim's), improving class comprehension ahead of the final exam.</li>
+                            <li>Held 5+ office hours weekly, guiding students through complex coding assignments and algorithm design challenges.</li>
                           </ul>
                         </div>
                       </div>

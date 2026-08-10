@@ -1,5 +1,9 @@
 # Kian Javaheri — Resume Site
 
+## Workflow rules
+- **Never push to GitHub.** Make commits locally only. The user pushes to remote themselves.
+
+
 Personal portfolio/resume website for Kian Javaheri, a May 2026 CS & Economics graduate from Barrett, The Honors College at ASU (Summa Cum Laude, 3.93 GPA). He is based in the Bay Area, CA and looking for full-time Software Engineering and Data Engineering roles.
 
 ## Running the project
