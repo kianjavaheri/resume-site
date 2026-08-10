@@ -8,7 +8,19 @@ interface PdfModalProps {
 function PdfModal({ src, onClose }: PdfModalProps) {
   useEffect(() => {
     document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = '' }
+
+    // Prevent page-level pinch-zoom while modal is open (iOS Safari).
+    // The iframe's PDF viewer still handles its own touch gestures.
+    const viewport = document.querySelector('meta[name=viewport]') as HTMLMetaElement | null
+    const prevContent = viewport ? viewport.content : null
+    if (viewport) {
+      viewport.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no'
+    }
+
+    return () => {
+      document.body.style.overflow = ''
+      if (viewport && prevContent !== null) viewport.content = prevContent
+    }
   }, [])
 
   const handleKey = useCallback((e: KeyboardEvent) => {
@@ -23,7 +35,9 @@ function PdfModal({ src, onClose }: PdfModalProps) {
   return (
     <div className="pdf-overlay" onClick={onClose}>
       <div className="pdf-modal" onClick={e => e.stopPropagation()}>
-        <button type="button" className="pdf-close" onClick={onClose} aria-label="Close">×</button>
+        <div className="pdf-modal-bar">
+          <button type="button" className="pdf-close" onClick={onClose} aria-label="Close">×</button>
+        </div>
         <iframe src={src} className="pdf-frame" title="Document viewer" />
       </div>
     </div>
