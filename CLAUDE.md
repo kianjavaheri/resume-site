@@ -26,8 +26,8 @@ The aesthetic is a **card-based editorial design** inspired by Google's Antigrav
 
 ### CSS custom properties (in `src/styling/App.css`)
 - `--bgcolor` / `--textcolor` / `--border` / `--muted` / `--footer-bg` / `--footer-text`
-- `--card-bg`: fill for outer section cards (`#f1f1f1` light / `#141414` dark)
-- `--card-bg-hover`: hover state for outer cards (`#ebebeb` light / `#181818` dark)
+- `--card-bg`: fill for outer section cards (`#f7f7f7` light / `#141414` dark)
+- `--card-bg-hover`: hover state for outer cards (`#f1f1f1` light / `#181818` dark)
 - `--card-border`: used for timeline lines and TA row dividers only — NOT for card borders (`rgba(0,0,0,0.1)` light / `rgba(255,255,255,0.1)` dark)
 - `--card-shadow`: drop shadow for outer section cards
 - `--sub-card-fill`: fill for inner item cards (`#ffffff` light / `#252525` dark)
@@ -88,10 +88,10 @@ src/
     components/
       About.css        # Hero, photo gallery (aspect-ratio 4/3, border-radius 75px !important, slide animations)
       Contact.css      # .contact-section: title above, .contact-cards 3-col grid of .contact-card links (no border)
-      Courses.css      # .courses-grid: 5-col grid of compact tag-like .course-card (no aspect-ratio, small padding)
+      Courses.css      # .courses-grid: 7-col grid of compact .course-card (aspect-ratio 3/2, centered content, hover effect)
       Footer.css
       Nav.css          # Fixed nav, normal-casing links, pill hover effect, hamburger mobile overlay
-      Proficiency.css  # .skills-grid: flex-wrap of .skill-item; each icon inside .skill-icon-wrap (72px dark rounded square, background #1e1e1e)
+      Proficiency.css  # .skills-grid: flex-wrap of .skill-item; each icon inside .skill-icon-wrap (72px rounded square, #efefef light / #1e1e1e dark)
       Projects.css     # .projects-grid: 3-col sub-card grid; .project-card-meta row (tag left, date right); .project-wip red badge
       Scroll.css
   index.tsx            # React 18 createRoot entry point
@@ -118,7 +118,7 @@ public/
 | Education   | Yes         | **Open** | ASU Barrett sub-card with ASU logo |
 | Experience  | Yes         | **Open** | Sandia sub-card + combined ASU sub-card with timeline |
 | Selected Work | Yes       | Closed   | 3-col sub-card grid; PDF modal for CS Capstone + Economics Capstone; dates top-right of each card; red WIP badge on Independent Research |
-| Skills      | Yes         | Closed   | 9 skill icons each in a dark rounded-square bg |
+| Skills      | Yes         | Closed   | 9 skill icons each in a rounded-square bg (#efefef light / #1e1e1e dark) |
 | Courses     | Yes         | Closed   | CSE (11 courses) + ECN (5 courses) as compact tag-like card grids |
 | Contact     | No (not a card) | Always open | Title outside card; LinkedIn/GitHub/YouTube each a contact-card (no border) |
 
@@ -127,7 +127,8 @@ public/
 Each card in the 3-column grid has:
 - **`.project-card-meta`**: flex row — tag (left) and date (right)
 - **`.project-wip`**: red badge (`#e03e3e`) inline after the tag text — only on Independent Research
-- Dates: CS Capstone Aug. 2025–May 2026 · Barrett Honors Thesis Aug. 2025–May 2026 · Economics Capstone Aug.–Dec. 2025 · Independent Research Jun. 2026–Current
+- Dates: CS Capstone Aug 2025–May 2026 · Barrett Honors Thesis Aug 2025–May 2026 · Economics Capstone Aug–Dec 2025 · Independent Research Jun 2026–Current
+- **Month abbreviations**: never add a trailing period (use `Aug` not `Aug.`, `Jan` not `Jan.`, etc.) — applies site-wide
 
 ## Experience section
 
@@ -143,15 +144,15 @@ Each card in the 3-column grid has:
 
 - 9 skills in a flex-wrap grid: Python, Java, JavaScript, React, Stata, SQL, PostgreSQL, Flask, Pandas
 - All icons are `<img src="/svgs/name.svg">` from `public/svgs/` — no Vite SVG imports
-- Each icon wrapped in `.skill-icon-wrap`: 72×72px, `border-radius: 16px !important`, `background: #1e1e1e` (same in light and dark mode)
+- Each icon wrapped in `.skill-icon-wrap`: 72×72px, `border-radius: 16px !important`, `background: #efefef` in light mode / `#1e1e1e` in dark mode (theme-aware via `[data-theme='dark'] .skill-icon-wrap`)
 - Flask icon has `invertDark: true` → gets `filter: invert(1) brightness(0.85)` in dark mode via `.skill-icon-invert`
 - Icon images are 38px square inside the wrapper
 
 ## Courses section
 
-- Two labeled groups: **Computer Science** (11 courses) and **Economics** (5 courses)
-- Each course is a compact `.course-card`: `border-radius: 8px !important`, `padding: 7px 11px`, no aspect-ratio
-- Grid: `repeat(5, 1fr)` on desktop → 4 cols on tablet → 2 cols on mobile
+- Two labeled groups: **Computer Science** (11 courses) and **Economics** (5 courses) — labels in normal casing (not uppercase)
+- Each course is a compact `.course-card`: `border-radius: 8px !important`, `aspect-ratio: 3/2`, content centered, hover changes to `--card-bg-hover` with pointer cursor
+- Grid: `repeat(7, 1fr)` with `gap: 14px` on desktop → 4 cols on tablet → 2 cols on mobile
 - Course code (e.g. `CSE 310`) in `--textcolor` at 0.68rem, course name in `--muted` at 0.65rem
 
 ## PDF modal (`src/components/PdfModal.tsx`)

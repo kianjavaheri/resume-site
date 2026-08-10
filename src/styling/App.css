@@ -166,9 +166,13 @@ a:visited {
 /* ── Sub-card (inner item card) ──────────────── */
 .sub-card {
     border-radius: 14px !important;
-    background: var(--sub-card-fill);
+    background: linear-gradient(145deg, #ffffff 0%, #eff1f8 100%);
     box-shadow: var(--sub-card-shadow);
     padding: 20px 26px;
+}
+
+[data-theme='dark'] .sub-card {
+    background: linear-gradient(145deg, #252525 0%, #1a1c24 100%);
 }
 
 /* ── PDF Modal (shared) ──────────────────────── */
@@ -194,6 +198,7 @@ a:visited {
     display: flex;
     flex-direction: column;
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+    overflow: visible;
 }
 
 .pdf-close {
@@ -285,11 +290,13 @@ a:visited {
         max-width: 100%;
         height: 92vh;
         box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.3);
+        padding-top: 48px;
     }
 
     .pdf-close {
-        top: -44px;
-        right: 16px;
+        top: 10px;
+        right: 12px;
+        border-radius: 50% !important;
     }
 
     .pdf-pages {

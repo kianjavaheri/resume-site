@@ -192,7 +192,7 @@
 /* ── Responsive ───────────────────────────────── */
 @media (max-width: 1024px) {
     .experience-item {
-        grid-template-columns: 120px 1fr;
+        grid-template-columns: clamp(80px, 14%, 130px) 1fr;
         gap: 20px;
     }
 }
