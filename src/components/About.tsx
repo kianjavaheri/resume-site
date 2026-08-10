@@ -75,7 +75,13 @@ function About() {
             <button
               type="button"
               className="resume-link"
-              onClick={() => setResumeOpen(true)}
+              onClick={() => {
+                if (window.innerWidth <= 768) {
+                  window.open('/pdfs/resume.pdf', '_blank', 'noopener,noreferrer')
+                } else {
+                  setResumeOpen(true)
+                }
+              }}
             >
               View Resume ↗
             </button>

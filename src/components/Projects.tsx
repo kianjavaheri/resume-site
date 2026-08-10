@@ -82,7 +82,13 @@ function Projects() {
   const [open, setOpen] = useState(false)
   const [activePdf, setActivePdf] = useState<string | null>(null)
 
-  const openPdf = (src: string) => setActivePdf(src)
+  const openPdf = (src: string) => {
+    if (window.innerWidth <= 768) {
+      window.open(src, '_blank', 'noopener,noreferrer')
+    } else {
+      setActivePdf(src)
+    }
+  }
   const closePdf = () => setActivePdf(null)
 
   return (
