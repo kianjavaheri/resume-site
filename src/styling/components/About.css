@@ -63,7 +63,7 @@
     aspect-ratio: 4 / 3;
     overflow: hidden;
     border-radius: 75px !important;
-    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.09);
 }
 
 .gallery-img {

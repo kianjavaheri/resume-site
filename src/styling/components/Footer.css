@@ -10,8 +10,6 @@ footer {
 footer p {
     font-size: 0.7rem;
     font-weight: 400;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
 }
 
 @media (max-width: 768px) {

@@ -53,7 +53,7 @@ All sections live inside `.cards-wrapper` in `Home.tsx`, which is a vertical fle
 
 - **`.section-card`**: Outer card — `border-radius: 20px !important`, no border, `box-shadow: var(--card-shadow)`, `background: var(--card-bg)`. Hover transitions to `var(--card-bg-hover)`.
 - **`.card-title`**: Section label in the top-left of each card (0.95rem, 500 weight, normal casing).
-- **`.card-header`**: `<div>` flex row for the section header — contains only `.card-title` (no toggle button). `padding: 18px 28px`. Always `cursor: pointer` — clicking anywhere toggles open/close.
+- **`.card-header`**: `<div>` flex row for the section header — contains `.card-title` on the left and a non-clickable `.card-toggle-icon` span on the right (`+` when closed, `−` when open). `padding: 18px 28px`. Always `cursor: pointer` — clicking anywhere toggles open/close.
 - **`.card-header-static`**: `<div>` for non-collapsible section headers (About). `padding: 18px 28px 0`.
 - **`.section-body-wrapper` / `.section-body-inner`**: CSS `grid-template-rows: 0fr → 1fr` animation for smooth expand/collapse (0.35s ease). Always in DOM.
 - **`.sub-cards-stack`**: Container for inner item cards. `padding: 10px 22px 22px`, `gap: 8px`.
@@ -61,9 +61,10 @@ All sections live inside `.cards-wrapper` in `Home.tsx`, which is a vertical fle
 - **`.section-open`**: Class added to the section element when expanded. Triggers `grid-template-rows: 1fr` on `.section-body-wrapper`.
 
 ### Collapsible section interaction pattern
-- **Clicking `.card-header` always toggles** open/close — no separate +/− button.
+- **Clicking `.card-header` always toggles** open/close — no separate clickable button.
 - The `onClick` on `.card-header` calls `setOpen(!open)` (toggles unconditionally).
-- No visible indicator for open/closed state — only the cursor changes to pointer.
+- A non-clickable `<span className="card-toggle-icon">` in each `.card-header` shows `−` when open and `+` when closed. It has `pointer-events: none` and `user-select: none`.
+- All 5 collapsible sections (Education, Experience, Selected Work, Skills, Courses) have this indicator.
 - `.card-toggle-btn` CSS class still exists in App.css but is **not rendered** in any component.
 
 ## File structure
@@ -164,7 +165,8 @@ Each card in the 3-column grid has:
 Shared component imported by `About.tsx` and `Projects.tsx`. CSS lives in `src/styling/App.css`. Uses `<iframe>` for PDF rendering. Features:
 - Blurred backdrop (`backdrop-filter: blur(10px)`)
 - Centered modal up to 860px wide, 88vh tall
-- `×` close button top-right, outside the modal box
+- Close button: **desktop** — `position: fixed; top: 24px; right: 24px` (screen-corner, not relative to modal), 44×44px, `border-radius: 14px !important`, SVG X icon, `z-index: 1001`
+- Close button: **mobile** — `position: static` inside the `.pdf-modal-bar` header bar, 36×36px, `border-radius: 10px !important`
 - Click backdrop to close, Escape key to close
 - Body scroll locked while open (`document.body.style.overflow = 'hidden'`)
 - On mobile (≤768px): slides up from bottom as a sheet (92vh)
@@ -175,8 +177,9 @@ Shared component imported by `About.tsx` and `Projects.tsx`. CSS lives in `src/s
 - Currently: `img1.jpg`, `img2.jpg`
 - Aspect ratio: `4/3`, `object-fit: cover`, `object-position: center top`
 - `border-radius: 75px !important` (needs `!important` to override the global `border-radius: 0` reset)
+- Drop shadow: `0 8px 32px rgba(0, 0, 0, 0.09)` — intentionally soft/blended
 - Slide animation: tracks direction (`'left'` | `'right'`), applies `@keyframes gallery-slide-right/left` via `key={idx}` remount trick
-- Arrow buttons use `type="button"` + `e.preventDefault()` + `e.stopPropagation()` to prevent page scroll
+- Arrow buttons use inline SVG chevrons (not unicode `←`/`→` — those render as emoji on some mobile browsers). Use `type="button"` + `e.preventDefault()` + `e.stopPropagation()` to prevent page scroll
 
 ## Education section layout
 
