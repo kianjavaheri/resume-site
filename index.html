@@ -7,6 +7,19 @@
     <meta name="theme-color" content="#000000" />
     <meta name="description" content="Kian Javaheri — Software Developer" />
     <title>Kian Javaheri</title>
+    <script>
+      // Paint the correct background before React mounts, so switching to the
+      // system theme doesn't flash white on a dark-mode device.
+      (function () {
+        try {
+          var pref = JSON.parse(localStorage.getItem('theme-pref') || '"system"');
+        } catch (e) { var pref = 'system'; }
+        var dark = pref === 'dark' || (pref !== 'light' &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+        document.documentElement.style.background = dark ? '#0a0a0a' : '#ffffff';
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

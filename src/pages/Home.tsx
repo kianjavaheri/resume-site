@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import useLocalStorage from 'use-local-storage';
 import './../styling/pages/Home.css'
 
@@ -13,10 +13,24 @@ import Projects from '../components/Projects';
 import Courses from '../components/Courses';
 import Footer from '../components/Footer';
 
+const query = () => window.matchMedia('(prefers-color-scheme: dark)');
+
 function Home() {
-  const [theme, setTheme] = useLocalStorage('theme', 'light');
+  // 'system' follows the OS setting; 'light'/'dark' are explicit user overrides.
+  const [preference, setPreference] = useLocalStorage('theme-pref', 'system');
+  const [systemTheme, setSystemTheme] = useState(() => query().matches ? 'dark' : 'light');
+
+  useEffect(() => {
+    const mq = query();
+    const onChange = (e: MediaQueryListEvent) => setSystemTheme(e.matches ? 'dark' : 'light');
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  const theme = preference === 'system' ? systemTheme : preference;
+
   const switchTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
+    setPreference(theme === 'light' ? 'dark' : 'light');
   }
   const isChecked = () => theme === 'dark';
 
