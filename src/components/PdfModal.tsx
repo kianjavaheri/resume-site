@@ -1,5 +1,11 @@
 import React, { useEffect, useCallback } from 'react'
 
+// PDF open parameters: `pagemode=none` asks for neither the outline nor the
+// thumbnail panel; `navpanes=0` is Adobe's equivalent. Viewers that don't
+// recognise them ignore the fragment, so this degrades harmlessly.
+export const withViewerParams = (src: string) =>
+  `${src.split('#')[0]}#pagemode=none&navpanes=0`
+
 interface PdfModalProps {
   src: string
   onClose: () => void
@@ -42,7 +48,7 @@ function PdfModal({ src, onClose }: PdfModalProps) {
             </svg>
           </button>
         </div>
-        <iframe src={src} className="pdf-frame" title="Document viewer" />
+        <iframe src={withViewerParams(src)} className="pdf-frame" title="Document viewer" />
       </div>
     </div>
   )

@@ -5,31 +5,79 @@
     --textcolor: #000000;
     --border: #000000;
     --muted: #666666;
+
+    --page-base: #ffffff;
     --card-bg: #f7f7f7;
-    --card-bg-hover: #f1f1f1;
     --card-border: rgba(0, 0, 0, 0.1);
     --sub-card-fill: #ffffff;
-    --footer-bg: #000000;
-    --footer-text: #ffffff;
+    --sub-card-grad: linear-gradient(145deg, #ffffff 0%, #eff1f8 100%);
+
+    /* A recessed well for cards nested inside a sub-card. Deliberately DARKER
+       than --sub-card-grad, not lighter: stacking another raised, lighter panel
+       on an already-light card washes the whole stack out. Going down a step
+       instead keeps the nested course cards reading as raised objects. */
+    --well-bg: #e6e9f1;
+    --well-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+    /* --hover-tint is calibrated against the page and its cards. Inside a well
+       it barely registers, so surfaces sitting on --well-bg use this instead. */
+    --well-hover-tint: rgba(0, 0, 0, 0.045);
+
+    --hover-tint: rgba(0, 0, 0, 0.032);
+    /* For surfaces filled with --textcolor, which the normal tint can't shift. */
+    --hover-tint-inverse: rgba(255, 255, 255, 0.16);
     --card-shadow: 0 0px 2px rgba(0, 0, 0, 0.20);
     --sub-card-shadow: 0 1px 5px rgba(0, 0, 0, 0.07);
+
+    /* Sits on a white page, so the fill has to be clearly off-white or the
+       pill dissolves into the background. Composites to ~#e5e7ec. */
+    --nav-glass: rgba(222, 224, 232, 0.82);
+    /* Two-part: a soft cast for float, a tight one to define the edge. */
+    --nav-shadow: 0 6px 24px rgba(0, 0, 0, 0.10), 0 1px 3px rgba(0, 0, 0, 0.07);
+
+    --footer-bg: #000000;
+    --footer-text: #ffffff;
     --toggle-btn-bg: rgba(0, 0, 0, 0.09);
     --toggle-btn-bg-hover: rgba(0, 0, 0, 0.13);
 }
 
 [data-theme='dark'] {
-    --bgcolor: #0a0a0a;
+    --bgcolor: #000000;
     --textcolor: #ffffff;
     --border: #ffffff;
     --muted: #999999;
-    --card-bg: #141414;
-    --card-bg-hover: #181818;
+
+    --page-base: #000000;
+    --card-bg: #101012;
     --card-border: rgba(255, 255, 255, 0.1);
     --sub-card-fill: #252525;
+    /* #1a1c24 is intentionally blue-leaning (B is 10 above R) — that cool cast
+       toward the bottom-right is what gives the cards their depth. */
+    --sub-card-grad: linear-gradient(145deg, #252525 0%, #1a1c24 100%);
+
+    /* Darker than the sub-card it sits in — see the light-mode note — but only
+       just. Near black, a step the size of the light-mode one reads as a hole
+       punched through to the page rather than a recess, so the fill sits a few
+       points under --sub-card-grad's dark end (#1a1c24) and the inset shadow
+       does the rest of the work. */
+    --well-bg: #17181f;
+    --well-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
+    /* Roughly double --hover-tint: that value is held down for the pure-black
+       page, and on a well it is invisible. */
+    --well-hover-tint: rgba(255, 255, 255, 0.05);
+
+    /* Kept low: on a pure-black page even a faint white tint reads as a jump. */
+    --hover-tint: rgba(255, 255, 255, 0.022);
+    --hover-tint-inverse: rgba(0, 0, 0, 0.14);
+    --card-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
+    --sub-card-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+
+    /* Deliberately lighter than the page so the pill has a visible edge
+       without needing a border. */
+    --nav-glass: rgba(44, 44, 50, 0.78);
+    --nav-shadow: 0 6px 28px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.5);
+
     --footer-bg: #ffffff;
     --footer-text: #000000;
-    --card-shadow: 0 1px 8px rgba(0, 0, 0, 0.22);
-    --sub-card-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
     --toggle-btn-bg: rgba(255, 255, 255, 0.12);
     --toggle-btn-bg-hover: rgba(255, 255, 255, 0.18);
 }
@@ -61,24 +109,29 @@ a:visited {
 }
 
 /* ── Cards page wrapper ───────────────────────── */
+/* Inset from the page edges, with each section a separate framed block rather
+   than one continuous run. The gutters also let the colour field show, which
+   is what the nav refracts. */
 .cards-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 56px 36px 44px;
+    gap: 12px;
+    padding: 0 36px 44px;
 }
 
-/* ── Outer section card ───────────────────────── */
+
+
+/* ── Outer section band ───────────────────────── */
 .section-card {
     border-radius: 20px !important;
     background: var(--card-bg);
     box-shadow: var(--card-shadow);
     overflow: hidden;
-    transition: background 0.2s ease, box-shadow 0.2s ease;
+    transition: background 0.2s ease;
 }
 
 .section-card:hover {
-    background: var(--card-bg-hover);
+    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
 }
 
 /* ── Card title (large top-left label) ────────── */
@@ -147,7 +200,9 @@ a:visited {
     transition: grid-template-rows 0.35s ease;
 }
 
-.section-open .section-body-wrapper {
+/* Child combinator, not descendant: a nested .section-body-wrapper (the
+   coursework blocks inside Education) must not inherit the outer open state. */
+.section-open > .section-body-wrapper {
     grid-template-rows: 1fr;
 }
 
@@ -166,13 +221,10 @@ a:visited {
 /* ── Sub-card (inner item card) ──────────────── */
 .sub-card {
     border-radius: 14px !important;
-    background: linear-gradient(145deg, #ffffff 0%, #eff1f8 100%);
+    background-color: var(--sub-card-fill);
+    background-image: var(--sub-card-grad);
     box-shadow: var(--sub-card-shadow);
     padding: 20px 26px;
-}
-
-[data-theme='dark'] .sub-card {
-    background: linear-gradient(145deg, #252525 0%, #1a1c24 100%);
 }
 
 /* ── PDF Modal (shared) ──────────────────────── */
@@ -267,16 +319,16 @@ a:visited {
 /* ── Mobile ──────────────────────────────────── */
 @media (max-width: 768px) {
     .cards-wrapper {
-        padding: 68px 16px 48px;
-        gap: 12px;
+        gap: 10px;
+        padding: 0 16px 32px;
     }
 
     .card-header {
-        padding: 22px 28px;
+        padding: 20px 20px;
     }
 
     .card-header-static {
-        padding: 22px 28px 0;
+        padding: 20px 20px 0;
     }
 
     .sub-cards-stack {
@@ -337,4 +389,14 @@ a:visited {
 
 ::-webkit-scrollbar-thumb {
     background: var(--card-border);
+}
+/* Outbound-link arrow (components/ArrowOut.tsx). Sized in em so it scales with
+   the label it follows; `currentColor` lets each caller set the color. */
+.arrow-out {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    /* Nudged up: the glyph's visual mass sits high, so baseline-aligning the
+       box would leave it looking dropped next to uppercase text. */
+    margin-top: -0.08em;
 }

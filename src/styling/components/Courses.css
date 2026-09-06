@@ -1,84 +1,63 @@
-.courses-wrapper {
-    padding: 12px 22px 22px;
-    display: flex;
-    flex-direction: column;
-    gap: 22px;
-}
-
-.course-section {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.course-section-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0;
-    color: var(--muted);
-}
-
+/* Four wide rather than seven: names get room to sit on one or two lines
+   instead of wrapping into a narrow column. */
 .courses-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
 }
 
+/* No fixed aspect ratio — the card hugs its text instead of centring two short
+   lines inside a tall empty box, which is what made these read as flashcards. */
 .course-card {
-    background: linear-gradient(145deg, #ffffff 0%, #eff1f8 100%);
-    border-radius: 8px !important;
+    border-radius: 10px !important;
+    background-color: var(--sub-card-fill);
+    background-image: var(--sub-card-grad);
     box-shadow: var(--sub-card-shadow);
-    aspect-ratio: 2 / 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    padding: 4px;
-    text-align: center;
-    cursor: pointer;
-    transition: background 0.15s ease;
+    align-items: flex-start;
+    gap: 5px;
+    padding: 14px 16px;
+    text-align: left;
+    cursor: default;
+    transition: background-image 0.15s ease;
 }
 
 .course-card:hover {
-    background: var(--card-bg-hover);
+    background-image:
+        linear-gradient(var(--hover-tint), var(--hover-tint)),
+        var(--sub-card-grad);
 }
 
-[data-theme='dark'] .course-card {
-    background: linear-gradient(145deg, #252525 0%, #1a1c24 100%);
-}
-
-[data-theme='dark'] .course-card:hover {
-    background: var(--card-bg-hover);
-}
-
+/* Hierarchy inverted: the course name is what you actually read, the code is
+   a label above it. Previously the code was the loudest thing on the card. */
 .course-card-code {
-    font-size: 0.58rem;
+    font-size: 0.6rem;
     font-weight: 600;
-    color: var(--textcolor);
-    letter-spacing: 0.03em;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
 }
 
 .course-card-name {
-    font-size: 0.55rem;
-    font-weight: 400;
-    color: var(--muted);
-    line-height: 1.35;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--textcolor);
+    line-height: 1.4;
 }
 
 @media (max-width: 1024px) {
     .courses-grid {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
 @media (max-width: 768px) {
-    .courses-wrapper {
-        padding: 20px 20px 28px;
-        gap: 32px;
-    }
-
     .courses-grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .course-card {
+        padding: 13px 14px;
     }
 }

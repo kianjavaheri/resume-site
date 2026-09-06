@@ -1,4 +1,5 @@
 import React from 'react'
+import ArrowOut from './ArrowOut'
 import './../styling/components/Contact.css'
 
 const links = [
@@ -21,7 +22,7 @@ function Contact() {
             className="contact-card"
           >
             <span className="contact-card-label">{l.label}</span>
-            <span className="contact-card-arrow">↗</span>
+            <ArrowOut className="contact-card-arrow" />
           </a>
         ))}
       </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import PdfModal from './PdfModal'
+import PdfModal, { withViewerParams } from './PdfModal'
+import ArrowOut from './ArrowOut'
 import './../styling/components/About.css'
 
 const images = [
@@ -71,13 +72,10 @@ function About() {
           <div className="about-text">
             {/* <p className="about-bio">Hi, I'm Kian Javaheri.</p> */}
             <p className="about-bio">
-              I am a recent graduate and aspiring data scientist based in the Bay Area, California, looking to
-              start my career in data science and causal inference. I recently graduated Summa Cum Laude from
-              Barrett, The Honors College at Arizona State University with a double major in Computer
-              Science and Economics.
+              I am a recent graduate based in the Bay Area, California, looking to start my career in software engineering or data science. I graduated Summa Cum Laude from Barrett, The Honors College at Arizona State University with dual B.S. degrees in Computer Science and Economics.
             </p>
             <p className="about-bio">
-              I'm actively applying for full-time Data Science, Software Engineering and Data Engineering roles. Open to any
+              I'm actively applying for full-time Data Science, Software Engineering and ML/AI roles. Open to any
               opportunities in the Bay Area.
             </p>
             <button
@@ -85,13 +83,13 @@ function About() {
               className="resume-link"
               onClick={() => {
                 if (window.innerWidth <= 768) {
-                  window.open('/pdfs/resume.pdf', '_blank', 'noopener,noreferrer')
+                  window.open(withViewerParams('/pdfs/resume.pdf'), '_blank', 'noopener,noreferrer')
                 } else {
                   setResumeOpen(true)
                 }
               }}
             >
-              View Resume ↗
+              View Resume<ArrowOut />
             </button>
           </div>
           <Gallery />

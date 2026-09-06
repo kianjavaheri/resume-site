@@ -1,5 +1,60 @@
 import React, { useState } from 'react'
 import './../styling/Education.css'
+import './../styling/components/Courses.css'
+
+const cseCourses = [
+  { code: 'CSE 310', name: 'Data Structures & Algorithms' },
+  { code: 'CSE 330', name: 'Operating Systems' },
+  { code: 'CSE 340', name: 'Principles of Programming Languages' },
+  { code: 'CSE 355', name: 'Intro to Theoretical Computer Science' },
+  { code: 'CSE 434', name: 'Computer Networks' },
+  { code: 'CSE 445', name: 'Distributed Software Development' },
+  { code: 'CSE 446', name: 'Software Integration & Engineering' },
+  { code: 'CSE 460', name: 'Software Analysis and Design' },
+  { code: 'CSE 463', name: 'Human Computer Interaction' },
+  { code: 'CSE 464', name: 'Software QA and Testing' },
+  { code: 'CSE 471', name: 'Intro to Artificial Intelligence' },
+]
+
+const ecnCourses = [
+  { code: 'ECN 306', name: 'Survey of International Economics' },
+  { code: 'ECN 416', name: 'Game Theory & Economic Behavior' },
+  { code: 'ECN 423', name: 'Economics of Education' },
+  { code: 'ECN 425', name: 'Introduction to Econometrics' },
+  { code: 'ECN 445', name: 'Environmental Economics' },
+]
+
+type Course = { code: string; name: string }
+
+// One collapsible coursework block per degree. Reuses the section-body-wrapper
+// grid-rows animation, gated on `coursework-open` instead of `section-open`.
+function Coursework({ label, courses }: { label: string; courses: Course[] }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div className={`coursework-block ${open ? 'coursework-open' : ''}`}>
+      <div className="coursework-header" onClick={() => setOpen(!open)}>
+        <span className="coursework-label">
+          <span className="coursework-title">{label}</span>
+          <span className="coursework-sub">Coursework · {courses.length} courses</span>
+        </span>
+        <span className="card-toggle-icon">{open ? '−' : '+'}</span>
+      </div>
+      <div className="section-body-wrapper">
+        <div className="section-body-inner">
+          <div className="courses-grid">
+            {courses.map((c) => (
+              <div key={c.code} className="course-card">
+                <span className="course-card-code">{c.code}</span>
+                <span className="course-card-name">{c.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function Education() {
   const [open, setOpen] = useState(true)
@@ -14,16 +69,26 @@ function Education() {
         <div className="section-body-inner">
           <div className="sub-cards-stack">
             <div className="sub-card education-item">
-              <img src="/svgs/asu.svg" alt="Arizona State University" className="edu-logo" />
-              <div className="edu-meta">
-                <p className="edu-institution">Arizona State University</p>
-                <p className="edu-location">Tempe, AZ</p>
-                <p className="edu-date">Aug 2022 – May 2026</p>
+              <div className="edu-main">
+                <img src="/svgs/asu.svg" alt="Arizona State University" className="edu-logo" />
+                <div className="edu-meta">
+                  <p className="edu-institution">Arizona State University</p>
+                  <p className="edu-location">Tempe, AZ</p>
+                  <p className="edu-date">Aug 2022 – May 2026</p>
+                </div>
+                <div className="edu-content">
+                  <p className="edu-college">Barrett, The Honors College</p>
+                  <div className="edu-degrees">
+                    <p className="edu-degree">B.S. Computer Science</p>
+                    <p className="edu-degree">B.S. Economics</p>
+                  </div>
+                  <p className="edu-honors">Summa Cum Laude · GPA: 3.93</p>
+                </div>
               </div>
-              <div className="edu-content">
-                <p className="edu-college">Barrett, The Honors College</p>
-                <p className="edu-degree">B.S. Computer Science & Economics</p>
-                <p className="edu-honors">Summa Cum Laude · GPA: 3.93</p>
+
+              <div className="edu-coursework">
+                <Coursework label="Computer Science" courses={cseCourses} />
+                <Coursework label="Economics" courses={ecnCourses} />
               </div>
             </div>
           </div>

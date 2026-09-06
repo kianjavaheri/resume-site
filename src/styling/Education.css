@@ -1,8 +1,89 @@
+/* The card is now a column: the details row, then the coursework toggles. */
 .education-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.edu-main {
     display: grid;
-    grid-template-columns: auto 180px 1fr;
+    grid-template-columns: auto 210px 1fr;
     gap: 28px;
     align-items: center;
+}
+
+/* ── Nested coursework ───────────────────────── */
+/* Two rounded blocks inset within the education sub-card, rather than the
+   square full-bleed rows this used to be — those were the only hard corners
+   left on the site. Inset, not stacked on top: see --well-bg. */
+.edu-coursework {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+/* A recessed well, not a third raised card. The course cards inside keep the
+   sub-card gradient, so they read as raised against it. */
+.coursework-block {
+    border-radius: 14px !important;
+    background-color: var(--well-bg);
+    box-shadow: var(--well-shadow);
+}
+
+/* The header carries its OWN radius rather than being clipped to the block's
+   by `overflow: hidden`. Two reasons:
+     - The hover then reads as a full pill on all four corners, open or closed,
+       instead of a rect with a square bottom edge.
+     - Clipping a child at a rounded corner leaves the parent's antialiased
+       edge and inset shadow showing through as a hairline the tint never
+       covers. Painting the header's own rounded background removes that seam.
+   Keep this radius in step with .coursework-block's. */
+.coursework-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 18px;
+    border-radius: 14px !important;
+    cursor: pointer;
+    transition: background-image 0.15s ease;
+}
+
+/* --well-hover-tint, not --hover-tint: the latter is calibrated against the
+   page and is effectively invisible on --well-bg. */
+.coursework-header:hover {
+    background-image: linear-gradient(var(--well-hover-tint), var(--well-hover-tint));
+}
+
+/* Degree name on top, "Coursework" as a muted subtitle beneath — running them
+   together on one line read as a single clumsy phrase. */
+.coursework-label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.coursework-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--textcolor);
+}
+
+.coursework-sub {
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    color: var(--muted);
+}
+
+/* Same 0fr → 1fr animation as the outer sections, gated on its own class. */
+.coursework-open > .section-body-wrapper {
+    grid-template-rows: 1fr;
+}
+
+.coursework-block .courses-grid {
+    padding: 8px 18px 18px;
 }
 
 .edu-logo {
@@ -20,23 +101,24 @@
 }
 
 .edu-institution {
-    font-size: 0.75rem;
+    font-size: 1rem;
     font-weight: 600;
-    letter-spacing: 0.1em;
-    /* text-transform: uppercase; */
+    /* Heavy tracking reads as spaced-out caps at this size — pull it back in. */
+    letter-spacing: -0.01em;
+    line-height: 1.3;
 }
 
 .edu-location {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 400;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.02em;
     color: var(--muted);
 }
 
 .edu-date {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 400;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.02em;
     color: var(--muted);
     margin-top: 4px;
 }
@@ -55,10 +137,18 @@
     color: var(--muted);
 }
 
+/* The two degrees group tighter to each other than to the surrounding lines,
+   so they read as a pair of separate awards rather than one run-on title. */
+.edu-degrees {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
 .edu-degree {
     font-size: 0.9rem;
     font-weight: 600;
-    line-height: 1.3;
+    line-height: 1.35;
 }
 
 .edu-honors {
@@ -69,10 +159,9 @@
 }
 
 @media (max-width: 1024px) {
-    .education-item {
-        grid-template-columns: auto 140px 1fr;
+    .edu-main {
+        grid-template-columns: auto 170px 1fr;
         gap: 20px;
-        padding: 28px 24px;
     }
 
     .edu-logo {
@@ -81,10 +170,21 @@
 }
 
 @media (max-width: 768px) {
-    .education-item {
+    .edu-main {
         grid-template-columns: 1fr;
         gap: 20px;
-        padding: 32px 20px;
+    }
+
+    .edu-coursework {
+        margin-top: 18px;
+    }
+
+    .coursework-header {
+        padding: 15px 16px;
+    }
+
+    .coursework-block .courses-grid {
+        padding: 8px 16px 16px;
     }
 
     .edu-logo {

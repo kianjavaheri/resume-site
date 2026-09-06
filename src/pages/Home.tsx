@@ -10,7 +10,6 @@ import Navbar from '../components/Navbar';
 import Proficiency from '../components/Proficiency';
 import ScrollButton from '../components/Scroll';
 import Projects from '../components/Projects';
-import Courses from '../components/Courses';
 import Footer from '../components/Footer';
 
 const query = () => window.matchMedia('(prefers-color-scheme: dark)');
@@ -43,7 +42,6 @@ function Home() {
         <Experience />
         <Projects />
         <Proficiency />
-        <Courses />
         <Contact />
       </div>
       <Footer />

@@ -5,7 +5,7 @@ function Footer() {
   return (
     <footer>
       <p>Kian Javaheri</p>
-      <p>© {new Date().getFullYear()}</p>
+      <p>©︎ {new Date().getFullYear()}</p>
     </footer>
   )
 }

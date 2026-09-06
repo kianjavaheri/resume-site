@@ -1,5 +1,7 @@
 .home {
-    background-color: var(--bgcolor);
+    background: var(--page-base);
     color: var(--textcolor);
-    padding-top: 52px;
+    /* Clears the floating pill (12px top + 56px tall) by the section gap. */
+    padding-top: 80px;
+    min-height: 100vh;
 }

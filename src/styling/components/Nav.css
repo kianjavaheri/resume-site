@@ -1,17 +1,30 @@
 .nav {
-    background-color: var(--bgcolor);
-    border-bottom: 1px solid var(--card-border);
-    padding: 0 32px;
+    /* Floating glass pill. Frosted but deliberately low-hue: heavy saturate()
+       pulls the blue/orange wash straight into the bar. */
+    background: var(--nav-glass);
+    -webkit-backdrop-filter: blur(28px) saturate(105%);
+    backdrop-filter: blur(28px) saturate(105%);
+    box-shadow: var(--nav-shadow);
+    /* Beats the global `border-radius: 0 !important` reset. */
+    border-radius: 999px !important;
+    padding: 0 14px 0 26px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: var(--textcolor);
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 12px;
+    left: 16px;
+    right: 16px;
     z-index: 100;
     height: 56px;
+    transition: opacity 0.35s ease;
+}
+
+/* Faded past the page midpoint; pointer-events off so it can't eat clicks. */
+.nav-hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
 .nav .name {
@@ -31,13 +44,13 @@
     font-weight: 500;
     letter-spacing: 0;
     padding: 6px 14px;
-    border-radius: 20px !important;
-    transition: background 0.15s;
+    border-radius: 999px !important;
+    transition: background-image 0.15s;
     color: var(--textcolor);
 }
 
 .nav-links a:hover {
-    background: var(--card-bg-hover);
+    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
 }
 
 .theme-toggle {
@@ -47,13 +60,13 @@
     cursor: pointer;
     user-select: none;
     padding: 6px 14px;
-    border-radius: 20px !important;
-    transition: background 0.15s;
+    border-radius: 999px !important;
+    transition: background-image 0.15s;
     color: var(--muted);
 }
 
 .theme-toggle:hover {
-    background: var(--card-bg-hover);
+    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
 }
 
 /* Hamburger — hidden on desktop */
@@ -66,12 +79,12 @@
     letter-spacing: 0;
     cursor: pointer;
     padding: 6px 12px;
-    border-radius: 20px !important;
-    transition: background 0.15s;
+    border-radius: 999px !important;
+    transition: background-image 0.15s;
 }
 
 .hamburger:hover {
-    background: var(--card-bg-hover);
+    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
 }
 
 /* Full-screen mobile menu */
@@ -82,7 +95,9 @@
 /* ── Mobile ─────────────────────────────────── */
 @media (max-width: 768px) {
     .nav {
-        padding: 0 20px;
+        left: 12px;
+        right: 12px;
+        padding: 0 8px 0 18px;
     }
 
     .nav-links {
@@ -97,14 +112,19 @@
         display: flex;
         flex-direction: column;
         position: fixed;
-        top: 56px;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: var(--bgcolor);
-        border-top: 1px solid var(--card-border);
+        top: 78px;
+        left: 12px;
+        right: 12px;
+        bottom: auto;
+        max-height: calc(100vh - 92px);
+        background: var(--nav-glass);
+        -webkit-backdrop-filter: blur(28px) saturate(105%);
+        backdrop-filter: blur(28px) saturate(105%);
+        border: 1px solid var(--card-border);
+        border-radius: 26px !important;
+        box-shadow: var(--nav-shadow);
         z-index: 99;
-        padding: 0 20px;
+        padding: 6px 24px;
         overflow-y: auto;
     }
 
@@ -129,5 +149,10 @@
     .mobile-menu a:hover,
     .mobile-theme-toggle:hover {
         opacity: 0.5;
+    }
+
+    /* No trailing rule against the panel's rounded bottom edge */
+    .mobile-menu > *:last-child {
+        border-bottom: none;
     }
 }

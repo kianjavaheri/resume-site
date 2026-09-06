@@ -19,16 +19,15 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px 22px;
-    border: none !important;
     border-radius: 14px !important;
     background: var(--card-bg);
-    transition: opacity 0.15s;
-    min-height: 72px;
     box-shadow: var(--card-shadow);
+    min-height: 72px;
+    transition: background-image 0.15s ease;
 }
 
 .contact-card:hover {
-    opacity: 0.6;
+    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
 }
 
 .contact-card-label {
@@ -39,7 +38,8 @@
 }
 
 .contact-card-arrow {
-    font-size: 0.9rem;
+    /* .arrow-out is sized in em, so font-size is what sets the glyph box. */
+    font-size: 1rem;
     color: var(--muted);
 }
 

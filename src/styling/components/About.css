@@ -34,7 +34,9 @@
 }
 
 .resume-link {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
     font-size: 0.75rem;
     font-weight: 500;
     letter-spacing: 0.12em;
@@ -138,13 +140,13 @@
 /* ── Mobile: stack gallery below bio ─────────── */
 @media (max-width: 768px) {
     .about-hero {
-        padding: 32px 20px 28px;
+        padding: 28px 20px 24px;
     }
 
     .about-content-area {
         flex-direction: column;
         gap: 32px;
-        padding: 28px 20px;
+        padding: 24px 20px 28px;
     }
 
     .about-gallery {

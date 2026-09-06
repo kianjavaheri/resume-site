@@ -1,29 +1,56 @@
 .scroll-top {
-    background-color: var(--textcolor);
-    cursor: pointer;
     position: fixed;
     bottom: 32px;
     right: 32px;
-    width: 44px;
-    height: 44px;
-    display: none;
-    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px !important;
+    /* Inverted against the theme — black button on the light page, white on
+       the dark one — so it reads clearly over any content it floats above. */
+    background-color: var(--textcolor);
+    color: var(--bgcolor);
+    box-shadow: var(--nav-shadow);
+    cursor: pointer;
+    display: flex;
     align-items: center;
-    border: 1px solid var(--border);
-    transition: opacity 0.15s;
+    justify-content: center;
+    z-index: 90;
+
+    /* Hidden state — fades and lifts rather than snapping via display. */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease,
+        visibility 0.3s,
+        background-image 0.15s ease;
+}
+
+.scroll-top-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+/* Shade change like the cards — not an opacity fade. Uses the inverse tint:
+   the normal one is keyed to the page, and would be invisible on this fill. */
+.scroll-top:hover {
+    background-image:
+        linear-gradient(var(--hover-tint-inverse), var(--hover-tint-inverse));
 }
 
 .scroll-top .arrow {
-    color: var(--bgcolor);
-    font-size: 0.85rem;
+    display: block;
 }
 
-.scroll-top:hover {
-    opacity: 0.7;
-}
-
-@media (hover:hover) {
+@media (max-width: 768px) {
     .scroll-top {
-        display: flex;
+        bottom: 20px;
+        right: 20px;
+        width: 42px;
+        height: 42px;
     }
 }
