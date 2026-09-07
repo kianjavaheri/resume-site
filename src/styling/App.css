@@ -28,9 +28,15 @@
     --card-shadow: 0 0px 2px rgba(0, 0, 0, 0.20);
     --sub-card-shadow: 0 1px 5px rgba(0, 0, 0, 0.07);
 
-    /* Sits on a white page, so the fill has to be clearly off-white or the
-       pill dissolves into the background. Composites to ~#e5e7ec. */
-    --nav-glass: rgba(222, 224, 232, 0.82);
+    /* Tuned as a PAIR: a low alpha so content reads through the pill, and a
+       fill dark enough that it still composites to ~#e2e5ec over the white
+       page. Raising the alpha to keep it visible is what killed the glass. */
+    --nav-glass: rgba(197, 203, 217, 0.50);
+    /* The rim is what sells glass at this alpha — a bright top edge plus a
+       fainter ring, standing in for the specular highlight on a real bevel.
+       It carries the pill's edge over photos, where the shadow is lost. */
+    --nav-rim: inset 0 1px 0 rgba(255, 255, 255, 0.65),
+               inset 0 0 0 1px rgba(255, 255, 255, 0.30);
     /* Two-part: a soft cast for float, a tight one to define the edge. */
     --nav-shadow: 0 6px 24px rgba(0, 0, 0, 0.10), 0 1px 3px rgba(0, 0, 0, 0.07);
 
@@ -71,9 +77,13 @@
     --card-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
     --sub-card-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
 
-    /* Deliberately lighter than the page so the pill has a visible edge
-       without needing a border. */
-    --nav-glass: rgba(44, 44, 50, 0.78);
+    /* Same pairing as light: low alpha, fill lifted to compensate so it still
+       composites to ~#222227 over the black page. */
+    --nav-glass: rgba(68, 68, 78, 0.50);
+    /* Much fainter than light mode — a bright rim on a dark pill reads as a
+       drawn border rather than a highlight. */
+    --nav-rim: inset 0 1px 0 rgba(255, 255, 255, 0.14),
+               inset 0 0 0 1px rgba(255, 255, 255, 0.06);
     --nav-shadow: 0 6px 28px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.5);
 
     --footer-bg: #ffffff;

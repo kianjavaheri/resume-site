@@ -64,7 +64,8 @@ Defined on `[data-theme='light']` / `[data-theme='dark']`:
 | `--hover-tint-inverse` | `rgba(255,255,255,.16)` | `rgba(0,0,0,.14)` | Hover tint for `--textcolor`-filled surfaces |
 | `--card-shadow` | — | — | Outer card elevation |
 | `--sub-card-shadow` | — | — | Inner card elevation |
-| `--nav-glass` | `rgba(222,224,232,.82)` | `rgba(44,44,50,.78)` | Nav pill fill |
+| `--nav-glass` | `rgba(197,203,217,.50)` | `rgba(68,68,78,.50)` | Nav pill fill |
+| `--nav-rim` | white `.65`/`.30` insets | white `.14`/`.06` insets | Specular rim on the glass |
 | `--nav-shadow` | — | — | Floating elements (nav pill, scroll button) |
 | `--footer-bg` / `--footer-text` | inverted | inverted | Footer |
 
@@ -180,11 +181,20 @@ There is **no top-level Courses section** — it lives inside Education (see bel
 ## Navbar
 
 - **Floating glass pill**: `position: fixed; top: 12px; left/right: 16px`, height 56px, `border-radius: 999px !important`, **no border**, `box-shadow: var(--nav-shadow)`.
-- Glass: `background: var(--nav-glass)` + `backdrop-filter: blur(28px) saturate(105%)`. Saturation is deliberately low — higher values pull color out of the page and tint the bar.
-- **The light fill has to be clearly off-white.** It composites over a white page, so a near-white value makes the pill dissolve. `rgba(222,224,232,.82)` lands at ~`#e5e7ec`, which reads against both `--page-base` (`#fff`) and `--card-bg` (`#f7f7f7`). `--nav-shadow` is two-part in both themes — a soft cast for float plus a tight `0 1px 3px` that defines the edge.
+### The glass is four things at once
+
+`background: var(--nav-glass)` + `backdrop-filter: blur(24px) saturate(180%)` + `box-shadow: var(--nav-rim), var(--nav-shadow)`. **Tune them together — each one alone fails.**
+
+- **Alpha must stay low** (`.50`). This is the whole effect: at `.80`+ the pill is an opaque slab and nothing reads through it.
+- **The fill compensates for the alpha.** It still has to composite to ~`#e2e5ec` over the white page, or the pill dissolves against `--page-base` (`#fff`) and `--card-bg` (`#f7f7f7`). So as alpha drops, the fill gets *darker*, not lighter. Solve `a·F + (1−a)·255 = target` when changing either. Raising the alpha to fix visibility is the mistake that killed the glass the first time.
+- **Blur stays at 24px.** 40px averages whatever is behind into one flat tone and you lose the light/dark structure that tells you anything is back there.
+- **Saturation is 180%.** Blur alone leaves a grey slab; the boost puts the color back. (This *was* held at 105% when the fill was near-opaque, where saturation only tinted the bar. At `.50` it's what makes the material read as glass.)
+- **`--nav-rim` carries the edge over photos**, where the drop shadow is invisible — a bright top inset plus a fainter full ring, standing in for a specular highlight. Dark mode's is much fainter; a bright rim on a dark pill reads as a drawn border. `--nav-shadow` stays two-part: a soft cast for float, a tight `0 1px 3px` for the edge on flat backgrounds.
+
+Contrast holds over the photo: at `.50` over the darkest part of the gallery image the composite is ~`#808486`, ~4.9:1 against the near-black nav text.
 - `.home` has `padding-top: 80px` so content clears the pill by 12px (matching the section gap).
 - **Fades out past 50% of scrollable height** (`.nav-hidden`: `opacity: 0` + `pointer-events: none`, 0.35s). The scroll handler only reads `scrollY`; page height is remeasured on `resize` **and** via a `ResizeObserver` on `body`, because expanding a section changes document height without firing a resize. It never fades while the mobile menu is open.
-- Mobile (≤768px): logo + Menu/Close; the menu is a rounded glass panel inset under the pill.
+- Mobile (≤768px): logo + Menu/Close; the menu is a rounded glass panel inset under the pill. It uses the **same material** — same fill, blur, saturation and rim. It carries no `border`; the rim replaced it, since a solid line on glass reads as drawn rather than lit. Menu text stays legible because the 24px blur destroys whatever is underneath.
 
 ## Education section
 

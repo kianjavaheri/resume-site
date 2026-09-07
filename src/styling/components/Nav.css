@@ -1,10 +1,15 @@
 .nav {
-    /* Floating glass pill. Frosted but deliberately low-hue: heavy saturate()
-       pulls the blue/orange wash straight into the bar. */
+    /* Floating glass pill. The three parts work together and shouldn't be
+       tuned in isolation: a low-alpha fill so content reads through, a blur
+       that smears it into an unreadable wash, and a saturation boost that puts
+       the colour back — blurring alone leaves a flat grey slab.
+       Blur stays at 24px. Pushing it to 40 averages whatever is behind into a
+       single flat tone, which loses the light/dark structure that tells you
+       there is something back there at all. */
     background: var(--nav-glass);
-    -webkit-backdrop-filter: blur(28px) saturate(105%);
-    backdrop-filter: blur(28px) saturate(105%);
-    box-shadow: var(--nav-shadow);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    box-shadow: var(--nav-rim), var(--nav-shadow);
     /* Beats the global `border-radius: 0 !important` reset. */
     border-radius: 999px !important;
     padding: 0 14px 0 26px;
@@ -118,11 +123,12 @@
         bottom: auto;
         max-height: calc(100vh - 92px);
         background: var(--nav-glass);
-        -webkit-backdrop-filter: blur(28px) saturate(105%);
-        backdrop-filter: blur(28px) saturate(105%);
-        border: 1px solid var(--card-border);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        backdrop-filter: blur(24px) saturate(180%);
         border-radius: 26px !important;
-        box-shadow: var(--nav-shadow);
+        /* Same material as the pill — the rim replaces the solid border the
+           panel used to carry, which read as a drawn line on glass. */
+        box-shadow: var(--nav-rim), var(--nav-shadow);
         z-index: 99;
         padding: 6px 24px;
         overflow-y: auto;
