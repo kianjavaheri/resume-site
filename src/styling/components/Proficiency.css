@@ -1,5 +1,28 @@
 .skills-wrapper {
     padding: 14px 24px 22px;
+    display: flex;
+    flex-direction: column;
+    /* Must stay clearly larger than .skills-grid's 24px row gap, or a group
+       break reads the same as a wrap inside one group. */
+    gap: 34px;
+}
+
+.skill-group {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Same micro-label type as .skill-name — size and tracking are identical, so
+   this adds no new step to the type scale. The hierarchy is carried by colour
+   alone: group labels take --textcolor, the skill names under the tiles stay
+   --muted. Making the label bigger is what would turn this section noisy. */
+.skill-group-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--textcolor);
 }
 
 .skills-grid {
@@ -58,6 +81,11 @@
 @media (max-width: 768px) {
     .skills-wrapper {
         padding: 20px 20px 28px;
+        gap: 28px;
+    }
+
+    .skill-group {
+        gap: 14px;
     }
 
     .skills-grid {

@@ -134,7 +134,7 @@ src/
     Education.tsx      # Collapsible, default OPEN. ASU sub-card + course data + nested <Coursework> blocks
     Experience.tsx     # Collapsible, default OPEN. Sandia sub-card + combined ASU sub-card w/ timeline
     Projects.tsx       # Collapsible, default CLOSED. 3-col sub-card grid; PDF modal; WIP badge
-    Proficiency.tsx    # Collapsible, default CLOSED. 23 skills, flex-wrap of rounded icon tiles
+    Proficiency.tsx    # Collapsible, default CLOSED. 23 skills in 4 labelled groups of rounded icon tiles
     Contact.tsx        # NOT a section-card; label above, 3 contact-card links
     PdfModal.tsx       # Shared PDF modal (iframe); exports withViewerParams()
     Navbar.tsx         # Floating glass pill; fades past 50% scroll; hamburger ≤768px
@@ -155,7 +155,7 @@ src/
       Courses.css      # .courses-grid + .course-card — imported by Education.tsx
       Footer.css
       Nav.css          # Floating pill, glass, .nav-hidden fade
-      Proficiency.css  # .skills-grid flex-wrap; 72px .skill-icon-wrap; .skill-monogram
+      Proficiency.css  # .skill-group + label; .skills-grid flex-wrap; 72px .skill-icon-wrap; .skill-monogram
       Projects.css     # 3-col grid; hover re-declares --sub-card-grad
       Scroll.css       # Inverted fill, rounded square, fade in/out
   index.tsx
@@ -173,7 +173,7 @@ public/
 | Education | Yes | **Open** | ASU sub-card + two nested coursework expandables |
 | Experience | Yes | **Open** | Sandia + combined ASU timeline |
 | Selected Work | Yes | Closed | 3-col grid, PDF modals, WIP badge |
-| Skills | Yes | Closed | 23 icon tiles |
+| Skills | Yes | Closed | 23 icon tiles in 4 labelled groups |
 | Contact | No (not a card) | Always open | Title outside, 3 link cards |
 
 There is **no top-level Courses section** — it lives inside Education (see below). The navbar has **six** links: About, Education, Experience, Work, Skills, Contact.
@@ -221,7 +221,18 @@ Keep the two radii in step. Nothing needs the block-level clip — `.section-bod
 
 ## Skills section
 
-23 skills in `Proficiency.tsx`, ordered languages → frameworks → tools. Flex-wrap grid of `.skill-item`; each icon sits in a 72px `.skill-icon-wrap` (`border-radius: 16px !important`, sub-card gradient + shadow).
+23 skills in `Proficiency.tsx`, in **four labelled groups**: Languages (7), Frameworks & Libraries (5), Developer Tools (6), Data & Research (5). Each group is its own `.skill-group` — a `.skill-group-label` above a `.skills-grid` flex-wrap of `.skill-item`; each icon sits in a 72px `.skill-icon-wrap` (`border-radius: 16px !important`, sub-card gradient + shadow).
+
+**The groups have to be render structure, not just array order.** This was previously one flat array ordered languages → frameworks → tools with blank lines between the runs. `.skills-grid` is `flex-wrap`, so rows reflowed straight across those boundaries and the ordering was invisible — all the maintenance cost, none of the benefit.
+
+**Data & Research is deliberately not folded into Developer Tools.** Stata, QGIS, Qualtrics, MATLAB and JupyterHub are the tooling behind the econometrics and the thesis, and they are the clearest evidence in the site that the Economics degree is a second credential rather than a line item. Filing them under "Developer Tools" both mislabels them (Qualtrics is a survey platform) and buries the point. It also keeps the buckets even — 7/5/6/5 instead of 7/5/11.
+
+`skillGroups` is **explicitly annotated** `{ label: string; skills: Skill[] }[]`. Without the annotation each group's array gets its own narrow element type and `s.invertDark` errors in the groups that have no inverted icon.
+
+### Group labels reuse the skill-name micro-label
+`.skill-group-label` is the same 0.65rem uppercase letterspaced type as `.skill-name` — **no new step in the type scale**. The hierarchy is carried by weight and color alone: labels are 600/`--textcolor`, the names under the tiles stay 500/`--muted`. Enlarging the label is what would make this section noisy.
+
+Spacing has to keep a group break louder than a row wrap: `.skills-wrapper` gap `34px` (28 mobile) against `.skills-grid`'s `24px` row gap (20 mobile), plus the label and its `16px` (14 mobile) offset. Narrow the wrapper gap toward the grid's and the groups stop reading as groups.
 
 - Icons are `<img src="/svgs/name.svg">` from `public/svgs/` — **not** Vite imports.
 - Most are **simple-icons** glyphs with the brand hex added as a `fill` attribute on the `<svg>` tag (matching how `react.svg` was already built).
