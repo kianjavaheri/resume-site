@@ -62,11 +62,16 @@
 
     /* Darker than the sub-card it sits in — see the light-mode note — but only
        just. Near black, a step the size of the light-mode one reads as a hole
-       punched through to the page rather than a recess, so the fill sits a few
-       points under --sub-card-grad's dark end (#1a1c24) and the inset shadow
-       does the rest of the work. */
-    --well-bg: #17181f;
-    --well-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45);
+       punched through to the page rather than a recess. Sits between
+       --sub-card-grad's dark end (#1a1c24) and --card-bg (#101012).
+       NO inset shadow in dark. An inset darkens the perimeter, so on a fill
+       this close to black the rim composited darker than BOTH the well and the
+       sub-card outside it — a line darker than both its neighbours reads as a
+       drawn border, which is exactly what it looked like. The fill step alone
+       carries the recess here; light mode keeps its shadow, where 0.06 alpha
+       is gentle enough to read as depth rather than an edge. */
+    --well-bg: #15161d;
+    --well-shadow: none;
     /* Roughly double --hover-tint: that value is held down for the pure-black
        page, and on a well it is invisible. */
     --well-hover-tint: rgba(255, 255, 255, 0.05);

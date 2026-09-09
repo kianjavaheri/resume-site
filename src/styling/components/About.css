@@ -62,6 +62,9 @@
 }
 
 .gallery-frame {
+    /* Positioning context for the two stacked slides; the aspect-ratio gives
+       the frame its height, so both images can be taken out of flow. */
+    position: relative;
     aspect-ratio: 4 / 3;
     overflow: hidden;
     border-radius: 75px !important;
@@ -69,6 +72,8 @@
 }
 
 .gallery-img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -76,23 +81,63 @@
     display: block;
 }
 
-/* Slide-in animations */
-@keyframes gallery-slide-right {
-    from { opacity: 0; transform: translateX(40px); }
-    to   { opacity: 1; transform: translateX(0); }
+/* Both slides travel a full frame width in step, clipped by the frame's
+   overflow — a real carousel slide. No fade: at 100% travel a cross-fade just
+   muddies the middle of the transition. "right" is the Next direction, so the
+   strip moves leftward and the new photo enters from the right edge. */
+@keyframes gallery-enter-right {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0); }
 }
 
-@keyframes gallery-slide-left {
-    from { opacity: 0; transform: translateX(-40px); }
-    to   { opacity: 1; transform: translateX(0); }
+@keyframes gallery-exit-right {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-100%); }
 }
 
-.gallery-img-enter-right {
-    animation: gallery-slide-right 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+@keyframes gallery-enter-left {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(0); }
 }
 
-.gallery-img-enter-left {
-    animation: gallery-slide-left 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+@keyframes gallery-exit-left {
+    from { transform: translateX(0); }
+    to   { transform: translateX(100%); }
+}
+
+.gallery-img-enter-right,
+.gallery-img-enter-left,
+.gallery-img-exit-right,
+.gallery-img-exit-left {
+    animation-duration: 0.45s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    animation-fill-mode: forwards;
+}
+
+.gallery-img-enter-right { animation-name: gallery-enter-right; }
+.gallery-img-exit-right { animation-name: gallery-exit-right; }
+.gallery-img-enter-left { animation-name: gallery-enter-left; }
+.gallery-img-exit-left { animation-name: gallery-exit-left; }
+
+/* A full-width slide is exactly the kind of large-area motion this setting is
+   meant to suppress. Swap it for a short fade — the photo still changes
+   visibly, so the control keeps its feedback. */
+@media (prefers-reduced-motion: reduce) {
+    @keyframes gallery-fade {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    .gallery-img-enter-right,
+    .gallery-img-enter-left {
+        animation: gallery-fade 0.2s ease forwards;
+    }
+
+    .gallery-img-exit-right,
+    .gallery-img-exit-left {
+        animation: none;
+        opacity: 0;
+    }
 }
 
 .gallery-controls {

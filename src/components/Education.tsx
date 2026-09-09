@@ -2,7 +2,9 @@ import React, { useState } from 'react'
 import './../styling/Education.css'
 import './../styling/components/Courses.css'
 
-const cseCourses = [
+type Course = { code: string; name: string }
+
+const cseCourses: Course[] = [
   { code: 'CSE 310', name: 'Data Structures & Algorithms' },
   { code: 'CSE 330', name: 'Operating Systems' },
   { code: 'CSE 340', name: 'Principles of Programming Languages' },
@@ -16,15 +18,13 @@ const cseCourses = [
   { code: 'CSE 471', name: 'Intro to Artificial Intelligence' },
 ]
 
-const ecnCourses = [
+const ecnCourses: Course[] = [
   { code: 'ECN 306', name: 'Survey of International Economics' },
   { code: 'ECN 416', name: 'Game Theory & Economic Behavior' },
   { code: 'ECN 423', name: 'Economics of Education' },
   { code: 'ECN 425', name: 'Introduction to Econometrics' },
   { code: 'ECN 445', name: 'Environmental Economics' },
 ]
-
-type Course = { code: string; name: string }
 
 // One collapsible coursework block per degree. Reuses the section-body-wrapper
 // grid-rows animation, gated on `coursework-open` instead of `section-open`.
@@ -45,8 +45,16 @@ function Coursework({ label, courses }: { label: string; courses: Course[] }) {
           <div className="courses-grid">
             {courses.map((c) => (
               <div key={c.code} className="course-card">
-                <span className="course-card-code">{c.code}</span>
-                <span className="course-card-name">{c.name}</span>
+                <span className="course-card-text">
+                  <span className="course-card-code">{c.code}</span>
+                  <span className="course-card-name">{c.name}</span>
+                </span>
+                {/* Decorative watermark. The catalogue number is already in
+                    .course-card-code above, so this is aria-hidden rather than
+                    a second thing for a screen reader to read out. */}
+                <span className="course-card-num" aria-hidden="true">
+                  {c.code.split(' ')[1]}
+                </span>
               </div>
             ))}
           </div>

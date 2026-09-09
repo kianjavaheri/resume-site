@@ -26,7 +26,7 @@ Deployed on **Vercel** via git push to `master`. The build command is `vite buil
 ### Unused dependencies (declared but never imported)
 `package.json` still lists `@mui/material`, `@emotion/react`, `@emotion/styled`, `react-pdf`, and four `@fortawesome/*` packages. **None are imported anywhere in `src/`** — verify with a grep before assuming otherwise. They are safe to uninstall; they only bloat `node_modules`. Do not start using them without a deliberate decision: the design has no UI-library dependency, and all icons are inline SVG or files in `public/svgs/`.
 
-`src/components/Resume.tsx` is likewise **dead** — it is not imported by anything and points at an old Google Doc.
+`src/components/Resume.tsx` and `src/util/svgs/` are likewise dead — see *Dead code and assets* under File structure.
 
 ## Theme
 
@@ -57,10 +57,10 @@ Defined on `[data-theme='light']` / `[data-theme='dark']`:
 | `--card-border` | `rgba(0,0,0,.1)` | `rgba(255,255,255,.1)` | Internal dividers only |
 | `--sub-card-fill` | `#ffffff` | `#252525` | Inner card fill (fallback under the gradient) |
 | `--sub-card-grad` | `#ffffff → #eff1f8` | `#252525 → #1a1c24` | 145° gradient on inner cards |
-| `--well-bg` | `#e6e9f1` | `#121216` | Recessed well *inside* a sub-card |
-| `--well-shadow` | — | — | Inset shadow on that well |
+| `--well-bg` | `#e6e9f1` | `#15161d` | Recessed well *inside* a sub-card |
+| `--well-shadow` | `inset 0 1px 3px rgba(0,0,0,.06)` | **`none`** | Inset shadow on that well |
 | `--well-hover-tint` | `rgba(0,0,0,.045)` | `rgba(255,255,255,.05)` | Hover tint for surfaces on `--well-bg` |
-| `--hover-tint` | `rgba(0,0,0,.032)` | `rgba(255,255,255,.038)` | Hover tint for page-colored surfaces |
+| `--hover-tint` | `rgba(0,0,0,.032)` | `rgba(255,255,255,.022)` | Hover tint for page-colored surfaces |
 | `--hover-tint-inverse` | `rgba(255,255,255,.16)` | `rgba(0,0,0,.14)` | Hover tint for `--textcolor`-filled surfaces |
 | `--card-shadow` | — | — | Outer card elevation |
 | `--sub-card-shadow` | — | — | Inner card elevation |
@@ -69,7 +69,7 @@ Defined on `[data-theme='light']` / `[data-theme='dark']`:
 | `--nav-shadow` | — | — | Floating elements (nav pill, scroll button) |
 | `--footer-bg` / `--footer-text` | inverted | inverted | Footer |
 
-`--toggle-btn-bg` / `--toggle-btn-bg-hover` exist but only feed `.card-toggle-btn`, which is **not rendered** anywhere.
+`--toggle-btn-bg` / `--toggle-btn-bg-hover` feed only `.card-toggle-btn`, which is never rendered — see *Dead code and assets*.
 
 ### Hover is a layered tint, never a replacement fill
 
@@ -98,7 +98,11 @@ A card inside a card does **not** get another raised, lighter fill. Stacking `--
 
 The third level is a **recessed well** — `--well-bg` (darker than the sub-card that contains it) plus the `--well-shadow` inset. Cards placed inside the well keep the normal `--sub-card-grad`, so they read as raised against it. Currently used by `.coursework-block`.
 
-**Dark mode takes a much smaller step down than light.** `--sub-card-grad` already ends near black at `#1a1c24`, so matching light mode's ~9-point drop lands the well on top of `--card-bg` and it reads as a hole punched through to the page rather than a recess. `#17181f` is only a few points under, and `--well-shadow` carries the rest.
+**Dark mode takes a much smaller step down than light.** `--sub-card-grad` already ends near black at `#1a1c24`, so matching light mode's ~9-point drop lands the well on top of `--card-bg` (`#101012`) and it reads as a hole punched through to the page rather than a recess. `#15161d` sits between the two.
+
+**Dark mode has NO inset shadow — `--well-shadow` is `none` there.** An inset darkens the perimeter, and on a fill this close to black the rim composited darker than *both* the well interior and the sub-card outside it. A line darker than both its neighbours reads as a drawn border, and that is precisely what it looked like. The fill step alone carries the recess in dark. Light keeps its `0.06` inset, where the rim is gentle enough to read as depth rather than an edge.
+
+The general rule: **an inset shadow needs enough headroom below the fill to fall into.** Near black there isn't any, so reach for fill contrast instead.
 
 ### Global reset
 `src/styling/App.css` applies `border-radius: 0 !important` globally — intentional. Anything that needs rounding must use `!important` (`.section-card`, `.sub-card`, `.coursework-block`, `.course-card`, `.contact-card`, `.gallery-frame`, `.nav`, `.scroll-top`, `.skill-icon-wrap`, `.project-wip`, `.pdf-close`).
@@ -144,26 +148,39 @@ src/
     Resume.tsx         # DEAD — not imported anywhere
   pages/
     Home.tsx           # Root; .cards-wrapper; owns theme state (system-following)
+  App.tsx              # <Routes> with the single "/" route → Home
+  index.tsx            # createRoot + <BrowserRouter>
+  react-app-env.d.ts   # vite/client types + the *.svg module shim
+  util/svgs/           # DEAD — 8 SVGs, referenced nowhere. See below.
   styling/
     App.css            # Reset, tokens, card system, PDF modal, scrollbar
     Education.css      # .edu-main 3-col grid + nested coursework rows
     Experience.css     # .experience-item 2-col grid; ASU timeline
     pages/Home.css
     components/
-      About.css        # Hero, gallery (4/3, border-radius 75px, slide animations)
+      About.css        # Hero, gallery (4/3, border-radius 75px, two-way slide)
       Contact.css      # 3-col grid of .contact-card
-      Courses.css      # .courses-grid + .course-card — imported by Education.tsx
+      Courses.css      # .courses-grid + .course-card + .course-card-num — imported by Education.tsx
       Footer.css
-      Nav.css          # Floating pill, glass, .nav-hidden fade
+      Nav.css          # Floating pill, glass, .nav-collapsed monogram + easings
       Proficiency.css  # .skill-group + label; .skills-grid flex-wrap; 72px .skill-icon-wrap; .skill-monogram
       Projects.css     # 3-col grid; hover re-declares --sub-card-grad
       Scroll.css       # Inverted fill, rounded square, fade in/out
-  index.tsx
 public/
-  images/              # Gallery: img1.jpg … (array lives in About.tsx)
-  svgs/                # asu, sandia + 22 skill icons (see Skills)
+  images/              # img1–3.jpg used by the gallery (array in About.tsx);
+                       #   img_dep*.jpg (4) are unreferenced
+  svgs/                # 24 files: asu, sandia + 22 skill icons (see Skills)
   pdfs/                # resume.pdf, cs-capstone.pdf, basic-income.pdf
 ```
+
+### Dead code and assets
+Verified unreferenced — safe to delete, and worth knowing about before you go looking for something:
+
+- **`src/components/Resume.tsx`** — not imported anywhere; points at an old Google Doc.
+- **`src/util/svgs/`** — 8 SVGs (`asulogo`, `cpp`, `gcp`, `go`, `java`, `js`, `python`, `react`) from before the move to `public/svgs/`. Nothing imports them. This is the trap the *SVGs live in `public/svgs/`* rule exists to avoid: there are two svg directories and only one is live.
+- **`public/images/img_dep*.jpg`** — 4 files, not in the gallery array.
+- The unused npm packages listed above.
+- **`.card-toggle-btn`** in `App.css` (plus `--toggle-btn-bg` / `--toggle-btn-bg-hover`, which feed nothing else) — styles for a button that is never rendered; headers toggle on the whole `.card-header` row.
 
 ## Sections and defaults
 
@@ -180,7 +197,12 @@ There is **no top-level Courses section** — it lives inside Education (see bel
 
 ## Navbar
 
-- **Floating glass pill**: `position: fixed; top: 12px; left/right: 16px`, height 56px, `border-radius: 999px !important`, **no border**, `box-shadow: var(--nav-shadow)`.
+**Floating glass pill**: `position: fixed; top: 12px; left: 16px`, `width: calc(100% - 32px)`, height 56px, `border-radius: 999px !important`, **no border**, `overflow: hidden`.
+
+`.home` has `padding-top: 80px` so content clears the pill by 12px, matching the section gap.
+
+Mobile (≤768px) swaps the links for a `Menu`/`Close` hamburger; the menu is a rounded glass panel inset under the pill. It uses the **same material** — same fill, blur, saturation and rim — and carries no `border`, since a solid line on glass reads as drawn rather than lit. Its text stays legible because the 24px blur destroys whatever is underneath.
+
 ### The glass is four things at once
 
 `background: var(--nav-glass)` + `backdrop-filter: blur(24px) saturate(180%)` + `box-shadow: var(--nav-rim), var(--nav-shadow)`. **Tune them together — each one alone fails.**
@@ -192,9 +214,35 @@ There is **no top-level Courses section** — it lives inside Education (see bel
 - **`--nav-rim` carries the edge over photos**, where the drop shadow is invisible — a bright top inset plus a fainter full ring, standing in for a specular highlight. Dark mode's is much fainter; a bright rim on a dark pill reads as a drawn border. `--nav-shadow` stays two-part: a soft cast for float, a tight `0 1px 3px` for the edge on flat backgrounds.
 
 Contrast holds over the photo: at `.50` over the darkest part of the gallery image the composite is ~`#808486`, ~4.9:1 against the near-black nav text.
-- `.home` has `padding-top: 80px` so content clears the pill by 12px (matching the section gap).
-- **Fades out past 50% of scrollable height** (`.nav-hidden`: `opacity: 0` + `pointer-events: none`, 0.35s). The scroll handler only reads `scrollY`; page height is remeasured on `resize` **and** via a `ResizeObserver` on `body`, because expanding a section changes document height without firing a resize. It never fades while the mobile menu is open.
-- Mobile (≤768px): logo + Menu/Close; the menu is a rounded glass panel inset under the pill. It uses the **same material** — same fill, blur, saturation and rim. It carries no `border`; the rim replaced it, since a solid line on glass reads as drawn rather than lit. Menu text stays legible because the 24px blur destroys whatever is underneath.
+
+### Collapses to a "KJ" monogram past 50% scroll
+
+`.nav-collapsed` shrinks the pill to 60px and crossfades "Kian Javaheri" to "KJ" (it used to fade the whole bar to `opacity: 0`). The scroll handler only reads `scrollY`; page height is remeasured on `resize` **and** via a `ResizeObserver` on `body`, because expanding a section changes document height without firing a resize. It never collapses while the mobile menu is open.
+
+- **`.nav` is sized with `width`, not `right`** — the collapse animates width, and `left` + `width` + `right` is over-constrained (`right` gets dropped and the pill sits off-centre). The mobile query must override `width` too, for the same reason. Rendered geometry is identical to the old `right: 16px` version: left 16, width 1244, 16px right gap at a 1280 viewport.
+- **The mobile `.nav-collapsed` is restated inside the media query.** It has the same specificity as the `.nav` rule there, so on source order alone the mobile width would win and the pill would never collapse on a phone.
+- `overflow: hidden` clips the full name and the links as the pill closes over them. The links keep their layout width while collapsed, so they need an explicit `pointer-events: none`.
+- Both labels stay mounted. `.name-full` only goes transparent, which keeps the link's accessible name intact; `.name-mark` is `aria-hidden` and absolutely positioned at `.name`'s left edge, so the monogram lands where the "K" already was.
+- The 60px width and its `22px` padding are a pair: "KJ" measures 15.3px at 0.9rem/600, so `22 + 15.3 + 22 ≈ 60` centres it. Retune both together if the mark's type changes.
+
+#### Two easing curves, not one
+`--ease-settle` and `--ease-spring` are both sampled from a damped oscillation, `1 − e^(−ct)·cos(ωt)` at `ω = 2.5π`, expressed as CSS `linear()`. They differ only in damping, and **the pair is necessary**:
+
+- The pill's **width** travels ~1184px to reach a 60px destination. Overshoot on a transition is a percentage of the *travel*, so even a 6% overshoot drives the width below zero — the pill would visibly collapse to nothing and pop back. `--ease-settle` (`c = 14`) peaks at ~1.2%, about 14px, which reads as a settle.
+- The monogram's **scale** has no such constraint, so `--ease-spring` (`c = 6`) peaks at ~12% and shows two decaying lobes. That is where the oscillation is actually legible.
+
+Retuning one without the other is the trap: raising `--ease-settle`'s amplitude to match the spring breaks the geometry.
+
+`linear()` needs Chrome 113+ / Safari 17.2+ / Firefox 112+. Older engines drop the declaration and fall back to the transition's default easing — the collapse still works, just without the settle.
+
+#### Mobile
+The collapse runs on mobile too, at a shorter **0.42s** (desktop is 0.55s), with the monogram's spring matched to the same duration so the two don't desync.
+
+Duration is the only performance lever that doesn't change how the glass looks. `width` is a layout property and the pill carries a `backdrop-filter`, so every frame re-rasterises a 24px blur over a changing area — fewer frames, less work. It is not a *new* class of cost: a fixed blurred element over scrolling content already re-blurs on every scroll frame. The monogram's spring is a `transform` and stays composited either way. If a real device still janks, the next lever is dropping the mobile blur radius (24px → ~16px), which does trade away some of the glass.
+
+**Why not `clip-path` instead of `width`,** which would avoid layout entirely: `clip-path` clips the element's drop shadow, so the pill loses `--nav-shadow` and stops floating. Moving the shadow to a parent as `filter: drop-shadow()` doesn't rescue it either — a `filter` on an ancestor creates a new backdrop root, which kills `backdrop-filter` on the child and takes the glass with it.
+
+**Known gap:** on mobile the hamburger is clipped away while collapsed, so the menu is unreachable past the halfway mark. That was equally true when the whole bar faded out, but the pill is now visible and looks interactive. Making a tap on "KJ" expand the bar again would close it.
 
 ## Education section
 
@@ -207,7 +255,7 @@ The two degrees render as **two separate `B.S.` lines** inside `.edu-degrees` (3
 ### Nested coursework
 Course data (`cseCourses`, `ecnCourses`) lives in `Education.tsx`. A local `<Coursework>` component renders one collapsible block per degree, **both closed by default**, toggling independently. The header shows the degree name with a muted `Coursework · N courses` subtitle beneath.
 
-Each block is a **rounded recessed well** inset within the education sub-card — `border-radius: 14px !important`, `--well-bg`, `--well-shadow`. The course cards inside keep `--sub-card-grad`, so they read as raised against the well. See *Nesting goes DOWN, not up*.
+Each block is a **rounded recessed well** inset within the education sub-card — `border-radius: 14px !important`, `--well-bg`, `--well-shadow` (which is `none` in dark; see *Nesting goes DOWN, not up* for why). The course cards inside keep `--sub-card-grad`, so they read as raised against the well.
 
 `.coursework-header` carries **its own matching `border-radius: 14px !important`**, and the block has **no `overflow: hidden`**. Both matter:
 - The hover tint is then a full pill on all four corners, open or closed, rather than a rect with a square bottom edge.
@@ -217,7 +265,14 @@ Keep the two radii in step. Nothing needs the block-level clip — `.section-bod
 
 `.edu-coursework` is a plain flex column, `gap: 8px`, `margin-top: 20px` — the blocks are inset by the card's own padding, so nothing is full-bleed and `.education-item` needs no `overflow: hidden`.
 
-**This used to be square full-bleed rows** (negative margins `20px -26px -20px` plus `border-top` dividers) — the only hard corners left on the site, and the course cards sat only 2px below the header. Don't reintroduce that.
+### Course card watermark number
+Each `.course-card` is a flex row: a `.course-card-text` column (code above name) and a `.course-card-num` watermark on the right carrying the catalogue number — `310`, `445`, and so on, sliced off the code in `Education.tsx`.
+
+**The treatment is identical on all sixteen cards; only the digits change.** That is the whole point. This started as per-course topic icons (a small shared glyph set — tree, network, layers…) and it was wrong: every card ended up with a different silhouette and the grid stopped reading as one set of things. Uniformity of *form* is what makes a grid of sixteen cards feel deliberate. Don't reintroduce per-card artwork.
+
+- Tinted from `--textcolor` at `opacity: 0.11` (rising to `0.2` on card hover) rather than a fixed grey, so it inverts with the theme and needs no dark-mode rule.
+- It duplicates `.course-card-code`, so it is texture rather than information and is **`aria-hidden`** in the markup — a screen reader should not read the number twice. That also means its low contrast is not an accessibility problem: the accessible copy is the full `CSE 310` label above it.
+- **Hidden below 520px.** Two columns on a phone leaves ~90px for the course name once the watermark and its gap are taken out, which wraps the longer titles to four lines.
 
 ## Skills section
 
@@ -239,6 +294,25 @@ Spacing has to keep a group break louder than a row wrap: `.skills-wrapper` gap 
 - **Skills without an SVG fall back to an `abbr` monogram.** Currently only **MATLAB** (`ML`) — simple-icons has no MATLAB glyph. To promote one: drop the file in `public/svgs/` and swap `abbr` for `src`.
 - `invertDark: true` applies `filter: invert(1) brightness(0.85)` in dark mode. Used by **Flask** and **GitHub** (GitHub's brand hex `#181717` is invisible on black).
 - C++ uses the lighter logo blue `#659AD2` rather than `#00599C` for dark-mode legibility.
+
+## About gallery
+
+`<Gallery>` in `About.tsx`. Three photos from the `images` array, prev/next arrows and an `n / N` counter. The frame is `aspect-ratio: 4 / 3`, `border-radius: 75px !important`, `overflow: hidden`.
+
+### Both slides animate, not just the incoming one
+The transition keeps **two** images mounted: `idx` (incoming) and `outgoing`. They animate in step — the old one exits a full frame width while the new one enters — and the frame's `overflow: hidden` clips both. `outgoing` is cleared in `onAnimationEnd` on the incoming image.
+
+This previously animated only the incoming image, over 40px with a fade, and swapped the old one out instantly via `key={idx}`. That reads as a pop, not a slide.
+
+Details that matter:
+- **`.gallery-img` is `position: absolute; inset: 0`** so the two slides stack. The frame keeps its height from `aspect-ratio`, so nothing collapses when both images leave the flow.
+- **No enter class on first paint** (`sliding` is false until the first click), or the opening photo slides in on every page load.
+- **No fade under the slide.** At a full 100% travel a cross-fade only muddies the midpoint.
+- **`prefers-reduced-motion: reduce`** swaps the slide for a 0.2s fade — a full-width move is exactly the motion that setting exists to suppress. The enter still animates, so `onAnimationEnd` still fires and the cleanup path is unchanged.
+
+**Why not a `translateX(-idx * 100%)` track?** Simpler CSS, but wrapping from the last photo back to the first slides the whole strip backwards — the wrong direction. With three images you hit that wrap every third click. The two-layer approach keeps the direction correct on wrap in both directions.
+
+Note when testing: an animation's clock does not advance while `document.visibilityState === 'hidden'`, so in a hidden preview pane the transforms jump straight to their `forwards` fill state and `animationend` never fires. Check `element.getAnimations()` rather than sampled transforms if playback looks broken.
 
 ## Selected Work (Projects)
 
@@ -275,9 +349,20 @@ iOS Safari renders codepoints that carry an *emoji presentation* as color emoji 
 
 ## Responsive breakpoints
 
-- **≤1024px** — reduced padding, `.edu-main` at `auto 170px 1fr`
-- **≤768px** — single-column layouts, hamburger nav, gallery below bio, education logo on top, contact cards stack, PDFs open in a new tab
-- **≤480px** — further font/padding reductions
+`768px` is the main one; the rest are local to a single grid that needed to break earlier or later than the others.
+
+| Query | Where | What |
+|---|---|---|
+| **≤1024px** | Experience, Education, About, Courses | Reduced padding; `.edu-main` → `auto 170px 1fr`; courses → 3 columns |
+| **≤900px** | Projects only | Selected Work → 2 columns |
+| **≤768px** | everywhere | Single-column layouts, hamburger nav, gallery below bio, education logo on top, contact cards stack, courses → 2 columns, nav collapse shortens to 0.42s, PDFs open in a new tab |
+| **≤600px** | Projects only | Selected Work → 1 column |
+| **≤520px** | Courses only | `.course-card-num` watermark drops out |
+| **≤480px** | About only | Further font/padding reductions |
+
+Projects keeps its own 900/600 pair rather than using 768, so Selected Work is still two-up on a tablet where the rest of the page has already gone single-column.
+
+There are also two **`prefers-reduced-motion: reduce`** blocks — `Nav.css` (drops the collapse's spring overshoot) and `About.css` (swaps the gallery's full-width slide for a fade). Both are at the end of their files so they win on source order.
 
 ## Key technical decisions
 
@@ -288,4 +373,4 @@ iOS Safari renders codepoints that carry an *emoji presentation* as color emoji 
 - **No card borders** — outer cards, sub-cards and contact cards use drop shadows only. `--card-border` is for internal dividers (timeline lines, TA rows, coursework rows).
 - **No toggle button** — collapsible headers have no `<button>`; the whole `.card-header` toggles.
 - **Inline SVG for icons** — the back-to-top arrow, gallery chevrons and outbound-link arrow are inline SVG. Unicode arrows render as emoji on some mobile browsers; FontAwesome was removed from the bundle (it cost ~67 kB for one arrow).
-- **No emoji-capable codepoints in copy** — see below.
+- **No emoji-capable codepoints in copy** — see *No emoji glyphs in copy* above.

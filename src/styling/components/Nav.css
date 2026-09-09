@@ -20,28 +20,99 @@
     position: fixed;
     top: 12px;
     left: 16px;
-    right: 16px;
+    /* Width rather than `right`, because the collapse animates it. Resolves
+       against the initial containing block, so this equals the old
+       `right: 16px` exactly. */
+    width: calc(100% - 32px);
     z-index: 100;
     height: 56px;
-    transition: opacity 0.35s ease;
+    /* Clips the full name and the links as the pill closes over them. */
+    overflow: hidden;
+
+    /* Two sampled damped oscillations of 1 − e^(−ct)·cos(ωt), ω = 2.5π.
+       They exist as a PAIR because one amplitude cannot serve both:
+
+       --ease-settle (c = 14, ~1.2% overshoot) drives the pill width. The
+       overshoot here is a percentage of the TRAVEL, and the travel is ~1184px
+       against a 60px destination — so even a 6% overshoot would drive the
+       width below zero and the pill would visibly collapse to nothing and pop
+       back. 1.2% is ~14px, which reads as a settle.
+
+       --ease-spring (c = 6, ~12% overshoot) drives the monogram's scale, where
+       overshoot costs nothing geometrically. That is where the oscillation is
+       actually legible: two decaying lobes. */
+    --ease-settle: linear(
+        0 0%, .541 5%, .826 10%, .953 15%, 1 20%, 1.012 25%, 1.011 30%,
+        1.007 35%, 1.004 40%, 1.002 45%, 1.001 50%, 1 60%, 1 100%
+    );
+    --ease-spring: linear(
+        0 0%, .316 5%, .612 10%, .844 15%, 1 20%, 1.085 25%, 1.117 30%,
+        1.113 35%, 1.091 40%, 1.062 45%, 1.035 50%, 1.014 55%, 1 60%,
+        .992 65%, .989 70%, .990 75%, .992 80%, .994 85%, .997 90%, .999 95%, 1 100%
+    );
+
+    transition:
+        width 0.55s var(--ease-settle),
+        padding 0.55s var(--ease-settle);
 }
 
-/* Faded past the page midpoint; pointer-events off so it can't eat clicks. */
-.nav-hidden {
-    opacity: 0;
-    pointer-events: none;
+/* Collapsed to the monogram. "KJ" measures 15.3px at 0.9rem/600, so 22px of
+   padding either side lands it centred in a 60px pill (22 + 15.3 + 22 ≈ 60).
+   Retune the width alongside the padding if the mark's type ever changes. */
+.nav-collapsed {
+    width: 60px;
+    padding: 0 22px;
 }
 
 .nav .name {
+    position: relative;
     font-size: 0.9rem;
     font-weight: 600;
     letter-spacing: 0;
+    white-space: nowrap;
+    /* Never squeezed: the pill clips it instead, so the crossfade happens at a
+       fixed type size rather than the name reflowing on the way down. */
+    flex-shrink: 0;
+}
+
+.name-full {
+    transition: opacity 0.2s ease;
+}
+
+/* Out of flow so it doesn't widen .name, and pinned to the same left edge the
+   full name starts at — so the monogram lands where the "K" already was. */
+.name-mark {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform-origin: left center;
+    transform: translateY(-50%) scale(0.62);
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.55s var(--ease-spring);
+}
+
+.nav-collapsed .name-full {
+    opacity: 0;
+}
+
+.nav-collapsed .name-mark {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
 }
 
 .nav-links {
     display: flex;
     align-items: center;
     gap: 2px;
+    transition: opacity 0.2s ease;
+}
+
+/* Still in the layout (and clipped) while collapsed, so they must be made
+   unclickable explicitly. */
+.nav-collapsed .nav-links,
+.nav-collapsed .hamburger {
+    opacity: 0;
+    pointer-events: none;
 }
 
 .nav-links a {
@@ -101,8 +172,38 @@
 @media (max-width: 768px) {
     .nav {
         left: 12px;
-        right: 12px;
+        /* Width, not `right` — with `left` and `width` both set, `right` is
+           dropped as over-constrained and the pill ends up off-centre. */
+        width: calc(100% - 24px);
         padding: 0 8px 0 18px;
+    }
+
+    /* Must be restated inside the query: it has the same specificity as the
+       .nav rule above, so without this the mobile width would win on source
+       order and the pill would never collapse on a phone. */
+    .nav-collapsed {
+        width: 60px;
+        padding: 0 22px;
+    }
+
+    /* Shorter on mobile, purely for cost. `width` is a layout property, and
+       this pill carries a backdrop-filter — so every frame of the collapse
+       re-rasterises a 24px blur over a changing area, which is the expensive
+       part on a phone. Fewer frames is the one lever that doesn't change how
+       the glass looks. (It is not a new class of work: a fixed blurred element
+       over scrolling content already re-blurs on every scroll frame.)
+       The monogram's spring is a `transform`, so it stays composited and free
+       either way — the character of the animation survives the shorter time. */
+    .nav {
+        transition:
+            width 0.42s var(--ease-settle),
+            padding 0.42s var(--ease-settle);
+    }
+
+    /* Matched to the pill so the two don't desync — otherwise the bar lands
+       and the monogram is still oscillating for another 130ms. */
+    .name-mark {
+        transition: opacity 0.2s ease, transform 0.42s var(--ease-spring);
     }
 
     .nav-links {
@@ -160,5 +261,18 @@
     /* No trailing rule against the panel's rounded bottom edge */
     .mobile-menu > *:last-child {
         border-bottom: none;
+    }
+}
+
+/* The spring overshoot is the part worth suppressing here. The pill still
+   collapses so the state change stays legible, just without the oscillation. */
+@media (prefers-reduced-motion: reduce) {
+    .nav {
+        transition: width 0.2s ease, padding 0.2s ease;
+    }
+
+    .name-mark {
+        transition: opacity 0.2s ease;
+        transform: translateY(-50%) scale(1);
     }
 }

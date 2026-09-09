@@ -5,7 +5,7 @@ function Navbar({ switchTheme, isChecked }: any) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [pastHalfway, setPastHalfway] = useState(false)
 
-  // Fade the pill out past the halfway mark of the page. The scroll handler
+  // Collapse the pill to a "KJ" monogram past the halfway mark. The scroll handler
   // only reads scrollY (no layout); page height is remeasured on resize and
   // whenever a section expands or collapses, which a resize event won't catch.
   useEffect(() => {
@@ -27,8 +27,8 @@ function Navbar({ switchTheme, isChecked }: any) {
     }
   }, [])
 
-  // Never fade while the mobile menu is open — its close button lives in the bar.
-  const navHidden = pastHalfway && !menuOpen
+  // Never collapse while the mobile menu is open — its close button lives in the bar.
+  const collapsed = pastHalfway && !menuOpen
 
   const close = () => setMenuOpen(false)
 
@@ -41,8 +41,14 @@ function Navbar({ switchTheme, isChecked }: any) {
 
   return (
     <>
-      <nav className={`nav ${navHidden ? 'nav-hidden' : ''}`}>
-        <a href="/" className="name" onClick={close}>Kian Javaheri</a>
+      <nav className={`nav ${collapsed ? 'nav-collapsed' : ''}`}>
+        {/* Both labels stay mounted and crossfade. .name-full keeps the
+            accessible name intact while collapsed — it is only transparent,
+            not removed — and the monogram is decorative. */}
+        <a href="/" className="name" onClick={close}>
+          <span className="name-full">Kian Javaheri</span>
+          <span className="name-mark" aria-hidden="true">KJ</span>
+        </a>
 
         <div className="nav-links">
           <a href="#about" onClick={scrollTo('about')}>About</a>

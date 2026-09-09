@@ -14,13 +14,46 @@
     background-image: var(--sub-card-grad);
     box-shadow: var(--sub-card-shadow);
     display: flex;
-    flex-direction: column;
     align-items: flex-start;
-    gap: 5px;
+    justify-content: space-between;
+    gap: 12px;
     padding: 14px 16px;
     text-align: left;
     cursor: default;
     transition: background-image 0.15s ease;
+}
+
+.course-card-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    min-width: 0;
+}
+
+/* The catalogue number as a watermark. Identical treatment on all sixteen
+   cards — only the digits change — which is the point: per-card topic icons
+   gave every card a different silhouette and the grid stopped reading as one
+   set of things.
+
+   Tinted from --textcolor at low alpha rather than a fixed grey, so it inverts
+   with the theme and needs no dark-mode rule. Kept faint enough to sit behind
+   the name in the reading order; it duplicates .course-card-code, so it is
+   texture, not information, and is aria-hidden in the markup. */
+.course-card-num {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--textcolor);
+    opacity: 0.11;
+    flex-shrink: 0;
+    user-select: none;
+    transition: opacity 0.15s ease;
+}
+
+.course-card:hover .course-card-num {
+    opacity: 0.2;
 }
 
 .course-card:hover {
@@ -59,5 +92,19 @@
 
     .course-card {
         padding: 13px 14px;
+        gap: 10px;
+    }
+
+    .course-card-num {
+        font-size: 1.5rem;
+    }
+}
+
+/* Two columns on a phone leaves ~90px for the name once the watermark and its
+   gap are taken out, which wraps the longer titles to four lines. The text
+   wins; the watermark drops out. */
+@media (max-width: 520px) {
+    .course-card-num {
+        display: none;
     }
 }
