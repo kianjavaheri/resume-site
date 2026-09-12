@@ -1,15 +1,19 @@
-.projects-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    padding: 12px 18px 18px;
-}
+/* Full-width rows, stacked. Each card is a two-column row — meta and link on
+   the left, title and description on the right — so an entry is wide and
+   short rather than a tall grid tile. The stack itself reuses .sub-cards-stack. */
 
-/* Cards also carry .sub-card, which supplies radius, fill, shadow and padding. */
+/* Cards also carry .sub-card, which supplies radius, fill, shadow and padding.
+   The link sits in the aside, pinned to its bottom, so it costs the row no
+   height; below 768px the areas restack into meta → body → link. */
 .project-card {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "meta body"
+        "link body";
+    column-gap: 40px;
+    row-gap: 16px;
     transition: background-image 0.15s ease;
 }
 
@@ -22,10 +26,18 @@
 }
 
 .project-card-meta {
+    grid-area: meta;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.project-body {
+    grid-area: body;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .project-tag {
@@ -59,24 +71,52 @@
 }
 
 .project-title {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-weight: 600;
     line-height: 1.3;
     letter-spacing: 0.01em;
 }
 
+.project-card-expandable {
+    cursor: pointer;
+}
+
+.project-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+}
+
+/* Rows start collapsed to COLLAPSED_LINES (Projects.tsx) of description and
+   expand in place. The open height is measured in JS and set inline, because
+   max-height can't transition to `auto`. */
 .project-desc {
     font-size: 0.9rem;
     font-weight: 400;
     line-height: 1.65;
     color: var(--muted);
-    flex: 1;
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+}
+
+/* 2 lines × line-height 1.65. */
+.project-desc-clamped {
+    max-height: calc(2 * 1.65em);
+}
+
+/* Fades the last visible line so the cut reads as "there's more" rather than
+   a clipped sentence. */
+.project-desc-faded {
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 1.65em), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 1.65em), transparent);
 }
 
 .project-links {
+    grid-area: link;
+    align-self: end;
     display: flex;
     gap: 24px;
-    margin-top: 8px;
 }
 
 .project-link {
@@ -99,14 +139,33 @@
     opacity: 0.45;
 }
 
-@media (max-width: 900px) {
-    .projects-grid {
-        grid-template-columns: repeat(2, 1fr);
+@media (max-width: 1024px) {
+    .project-card {
+        grid-template-columns: 170px 1fr;
+        column-gap: 28px;
     }
 }
 
-@media (max-width: 600px) {
-    .projects-grid {
+@media (max-width: 768px) {
+    .project-card {
         grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        grid-template-areas:
+            "meta"
+            "body"
+            "link";
+        row-gap: 14px;
+    }
+
+    /* Tag left, date right — the aside turns into a header strip. */
+    .project-card-meta {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .project-links {
+        margin-top: 4px;
     }
 }

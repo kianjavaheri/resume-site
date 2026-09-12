@@ -137,7 +137,7 @@ src/
     About.tsx          # section-card, card-header-static; hero + bio + photo gallery; "View Resume"
     Education.tsx      # Collapsible, default OPEN. ASU sub-card + course data + nested <Coursework> blocks
     Experience.tsx     # Collapsible, default OPEN. Sandia sub-card + combined ASU sub-card w/ timeline
-    Projects.tsx       # Collapsible, default CLOSED. 3-col sub-card grid; PDF modal; WIP badge
+    Projects.tsx       # Collapsible, default CLOSED. Stacked full-width row sub-cards; PDF modal; WIP badge
     Proficiency.tsx    # Collapsible, default CLOSED. 23 skills in 4 labelled groups of rounded icon tiles
     Contact.tsx        # NOT a section-card; label above, 3 contact-card links
     PdfModal.tsx       # Shared PDF modal (iframe); exports withViewerParams()
@@ -164,7 +164,7 @@ src/
       Footer.css
       Nav.css          # Floating pill, glass, .nav-collapsed monogram + easings
       Proficiency.css  # .skill-group + label; .skills-grid flex-wrap; 72px .skill-icon-wrap; .skill-monogram
-      Projects.css     # 3-col grid; hover re-declares --sub-card-grad
+      Projects.css     # Row cards (grid areas meta/body/link); hover re-declares --sub-card-grad
       Scroll.css       # Inverted fill, rounded square, fade in/out
 public/
   images/              # img1–3.jpg used by the gallery (array in About.tsx);
@@ -189,7 +189,7 @@ Verified unreferenced — safe to delete, and worth knowing about before you go 
 | About | No | Always open | `card-header-static` |
 | Education | Yes | **Open** | ASU sub-card + two nested coursework expandables |
 | Experience | Yes | **Open** | Sandia + combined ASU timeline |
-| Selected Work | Yes | Closed | 3-col grid, PDF modals, WIP badge |
+| Selected Work | Yes | Closed | Stacked full-width rows, PDF modals, WIP badges |
 | Skills | Yes | Closed | 23 icon tiles in 4 labelled groups |
 | Contact | No (not a card) | Always open | Title outside, 3 link cards |
 
@@ -316,7 +316,16 @@ Note when testing: an animation's clock does not advance while `document.visibil
 
 ## Selected Work (Projects)
 
-3-column grid of cards that carry **both** `sub-card` and `project-card` classes — `.sub-card` supplies radius, fill, gradient, shadow and padding. Each card has `.project-card-meta` (tag left, date right), title, description, link. Red `.project-wip` badge on Independent Research only.
+A vertical stack (`.sub-cards-stack`) of **wide, short rows**. It replaced a 3-column grid of tall tiles. Each card carries **both** `sub-card` and `project-card` — `.sub-card` supplies radius, fill, gradient, shadow and padding.
+
+Each row is a CSS grid with three areas: `meta` (tag, WIP badge, date) and `link` stacked in a 200px left column, and `body` (title + description) filling the right. The link is pinned to the bottom of the left column, so it adds no height. At ≤768px the areas restack to `meta → body → link`, and the meta turns into a tag-left/date-right strip.
+
+**Rows start collapsed** to two lines of description, with the last line faded by a `mask-image`, and a `+`/`−` indicator beside the title. Clicking anywhere on the row expands it in place. Each row toggles independently.
+- The expanded height is **measured in JS** (`scrollHeight`, kept current by a `ResizeObserver`) and set inline as `max-height`, because `max-height` can't transition to `auto`. The collapsed height is CSS, `calc(2 * 1.65em)` on `.project-desc-clamped`. It must stay in step with `COLLAPSED_LINES` in `Projects.tsx` and with `.project-desc`'s `line-height`.
+- A description that already fits in two lines gets no indicator, fade or pointer cursor.
+- `.project-links` stops click propagation, so opening a PDF or GitHub link doesn't also toggle the row.
+
+The link is **optional**. A project with no `link` or `pdfSrc` renders no link row. Red `.project-wip` badge on Independent Research and Materials GUI.
 
 **Month abbreviations never take a trailing period** (`Aug`, not `Aug.`) — site-wide.
 
@@ -353,14 +362,10 @@ iOS Safari renders codepoints that carry an *emoji presentation* as color emoji 
 
 | Query | Where | What |
 |---|---|---|
-| **≤1024px** | Experience, Education, About, Courses | Reduced padding; `.edu-main` → `auto 170px 1fr`; courses → 3 columns |
-| **≤900px** | Projects only | Selected Work → 2 columns |
-| **≤768px** | everywhere | Single-column layouts, hamburger nav, gallery below bio, education logo on top, contact cards stack, courses → 2 columns, nav collapse shortens to 0.42s, PDFs open in a new tab |
-| **≤600px** | Projects only | Selected Work → 1 column |
+| **≤1024px** | Experience, Education, About, Courses, Projects | Reduced padding; `.edu-main` → `auto 170px 1fr`; courses → 3 columns; project rows' left column → 170px |
+| **≤768px** | everywhere | Single-column layouts, hamburger nav, gallery below bio, education logo on top, contact cards stack, courses → 2 columns, project rows restack, nav collapse shortens to 0.42s, PDFs open in a new tab |
 | **≤520px** | Courses only | `.course-card-num` watermark drops out |
 | **≤480px** | About only | Further font/padding reductions |
-
-Projects keeps its own 900/600 pair rather than using 768, so Selected Work is still two-up on a tablet where the rest of the page has already gone single-column.
 
 There are also two **`prefers-reduced-motion: reduce`** blocks — `Nav.css` (drops the collapse's spring overshoot) and `About.css` (swaps the gallery's full-width slide for a fade). Both are at the end of their files so they win on source order.
 
