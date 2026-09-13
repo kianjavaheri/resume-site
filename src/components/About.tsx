@@ -80,12 +80,11 @@ function About() {
           <span className="card-title">About</span>
         </div>
 
-        <div className="about-hero">
-          <h1 className="about-hero-name">Hi, I'm Kian Javaheri!</h1>
-        </div>
-
+        {/* The title lives in the text column, not a full-width row above it,
+            so the gallery starts level with the title instead of below it. */}
         <div className="about-content-area">
           <div className="about-text">
+            <h1 className="about-hero-name">Hi, I'm Kian Javaheri!</h1>
             {/* <p className="about-bio">Hi, I'm Kian Javaheri.</p> */}
             <p className="about-bio">
               I am a recent graduate based in the Bay Area, California, looking to start my career in software engineering or data science. I graduated Summa Cum Laude from Barrett, The Honors College at Arizona State University with dual B.S. degrees in Computer Science and Economics.

@@ -123,6 +123,67 @@ a:visited {
     color: inherit;
 }
 
+/* ── Expandable cards (useClampedExpand) ──────── */
+/* Experience cards and Selected Work rows. Tint layered ABOVE the sub-card
+   gradient — a bare background-image would replace it and flatten the card. */
+.expandable-card {
+    cursor: pointer;
+    transition: background-image 0.15s ease;
+}
+
+.expandable-card:hover {
+    background-image:
+        linear-gradient(var(--hover-tint), var(--hover-tint)),
+        var(--sub-card-grad);
+}
+
+.card-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+}
+
+/* max-height is set inline by the hook — measured, since it can't transition
+   to `auto`. --clamp-line is the measured line height of the previewed text. */
+.clamp {
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+}
+
+/* Fades the last visible line, so the cut reads as "there's more" rather than
+   a clipped sentence. */
+.clamp-faded {
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--clamp-line)), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - var(--clamp-line)), transparent);
+}
+
+/* ── Tech tags ────────────────────────────────── */
+/* Recessed chips on the sub-card — nesting goes down, so --well-bg rather than
+   another raised fill. Normal case: tech names like PostgreSQL read wrong in
+   caps, so these are not the uppercase micro-label.
+   Boxy to match .project-wip rather than full pills: 6px on a ~23px chip is
+   the same proportion as the badge's 4px on 15px, so the two read as one
+   shape at different sizes. Scale the radius with the height if either
+   changes. */
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.tag {
+    font-size: 0.7rem;
+    font-weight: 500;
+    line-height: 1;
+    padding: 6px 10px;
+    border-radius: 6px !important;
+    background: var(--well-bg);
+    color: var(--textcolor);
+    white-space: nowrap;
+}
+
 /* ── Cards page wrapper ───────────────────────── */
 /* Inset from the page edges, with each section a separate framed block rather
    than one continuous run. The gutters also let the colour field show, which

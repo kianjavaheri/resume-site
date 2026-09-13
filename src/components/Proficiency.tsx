@@ -64,7 +64,7 @@ const skillGroups: { label: string; skills: Skill[] }[] = [
 ]
 
 function Proficiency() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
 
   return (
     <section id="skills" className={`section-card skills-section ${open ? 'section-open' : ''}`}>

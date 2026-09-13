@@ -66,6 +66,9 @@ function Coursework({ label, courses }: { label: string; courses: Course[] }) {
 
 function Education() {
   const [open, setOpen] = useState(true)
+  // The ASU card itself: collapsed shows school, degrees and honors; expanding
+  // reveals the two coursework tabs, which then open individually.
+  const [cardOpen, setCardOpen] = useState(false)
 
   return (
     <section id="education" className={`section-card education-section ${open ? 'section-open' : ''}`}>
@@ -76,7 +79,11 @@ function Education() {
       <div className="section-body-wrapper">
         <div className="section-body-inner">
           <div className="sub-cards-stack">
-            <div className="sub-card education-item">
+            <div
+              className={`sub-card education-item expandable-card ${cardOpen ? 'edu-open' : ''}`}
+              onClick={() => setCardOpen(!cardOpen)}
+            >
+              <span className="card-toggle-icon edu-toggle">{cardOpen ? '−' : '+'}</span>
               <div className="edu-main">
                 <img src="/svgs/asu.svg" alt="Arizona State University" className="edu-logo" />
                 <div className="edu-meta">
@@ -94,9 +101,16 @@ function Education() {
                 </div>
               </div>
 
-              <div className="edu-coursework">
-                <Coursework label="Computer Science" courses={cseCourses} />
-                <Coursework label="Economics" courses={ecnCourses} />
+              {/* Same 0fr → 1fr wrapper as the sections, gated on .edu-open.
+                  Clicks inside stop here: the tabs and course cards must not
+                  also toggle the card they sit in. */}
+              <div className="section-body-wrapper">
+                <div className="section-body-inner">
+                  <div className="edu-coursework" onClick={(e) => e.stopPropagation()}>
+                    <Coursework label="Computer Science" courses={cseCourses} />
+                    <Coursework label="Economics" courses={ecnCourses} />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -1,6 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import PdfModal, { withViewerParams } from './PdfModal'
 import ArrowOut from './ArrowOut'
+import Tags from './Tags'
+import { useClampedExpand } from './useClampedExpand'
 import './../styling/components/Projects.css'
 
 const works = [
@@ -9,6 +11,7 @@ const works = [
     date: 'Aug 2025 – May 2026',
     title: 'Shipment Quoting Microservice',
     desc: 'Architected a high-throughput relational caching layer using PostgreSQL and Flask within a Dockerized microservice environment, intercepting and caching external carrier API responses to reduce redundant network calls. Achieved a 64.4% reduction in processing latency (334ms →︎ 119ms) — a 2.8x speedup over live API calls.',
+    tags: ['Python', 'Flask', 'PostgreSQL', 'Docker'],
     pdfSrc: '/pdfs/cs-capstone.pdf',
     linkLabel: 'View Poster',
   },
@@ -17,6 +20,7 @@ const works = [
     date: 'Aug 2025 – May 2026',
     title: 'Public Perception vs. Actual Economic Effects of U.S.–China Trade Policy',
     desc: 'Investigated the divergence between the economic outcomes of the 2018–2020 U.S.–China trade war and the public\'s perception of those outcomes.The thesis utilizes a survey to gather public perception of international trade policy and employs Natural Language Processing (NLP) to identify the key drivers of public perception towards trade. The paper identifies key substructures in the results and finds formal education, price sensitivity, and media influence to be the largest factors affecting trade opinions.',
+    tags: ['NLP', 'Survey Research', 'Qualtrics'],
     link: 'https://keep.lib.asu.edu/items/203948',
     linkLabel: 'Read Paper',
   },
@@ -25,6 +29,7 @@ const works = [
     date: 'Aug – Dec 2025',
     title: 'Universal Basic Income vs. Targeted Welfare: A Macroeconomic Assessment',
     desc: 'Analyzed the macroeconomic feasibility and behavioral trade-offs of UBI versus targeted welfare systems. Drawing on empirical data and policy models from five recent global studies across developing nations (South Africa, Indonesia, Peru) and developed economies (U.S., Finland, New Zealand), the paper evaluates how funding mechanisms — consumption vs. income taxes — affect GDP growth, employment incentives, and long-term fiscal sustainability.',
+    tags: ['Macroeconomics', 'Policy Analysis'],
     pdfSrc: '/pdfs/basic-income.pdf',
     linkLabel: 'Read Paper',
   },
@@ -34,6 +39,7 @@ const works = [
     wip: true,
     title: 'Estimating the Wage Effects of a Universal Basic Income',
     desc: 'Applied Double Machine Learning (LinearDML and CausalForestDML) to longitudinal CPS ASEC microdata to estimate the causal effect of unconditional cash transfers on future labor income, then used the model to simulate the predicted wage impact of a $6,000/year UBI program. Used XGBoost within the DoubleML framework to control for nonlinear confounding across demographic and socioeconomic variables.',
+    tags: ['Python', 'EconML', 'XGBoost', 'Causal Inference'],
     link: 'https://github.com/kianjavaheri/welfare-model',
     linkLabel: 'View GitHub',
   },
@@ -42,7 +48,8 @@ const works = [
     date: 'Current',
     wip: true,
     title: 'Materials GUI',
-    desc: 'Materials GUI is a client-side Fabric mod for Minecraft 26.2 that makes gathering materials for a build easier, and it works on servers that don\'t have it installed. You import a material list by pasting text, loading a Litematica export, or dropping in a screenshot that Claude reads. Then you mark chests, barrels or shulker boxes as Material Boxes. Items already in them count toward the list and are crossed off when complete. Empty slots show faded icons of what\'s still missing, and slots are colour-coded: red for empty, yellow for partly filled, green for full. Hovering a slot shows its progress, like “3/5”, plus the total across all boxes. Shift-clicking an item from your inventory sends it straight to its highlighted slots, but you can still put items anywhere and the highlights rearrange to match. Broken boxes are removed automatically, and a Boxes screen lets you remove any box yourself.',
+    desc: 'Built a client-side Fabric mod for Minecraft 26.2 that tracks the materials needed for a build, and works on servers that don\'t have it installed. Players import a material list by pasting text, loading a Litematica export, or dropping in a screenshot that Claude reads. Chests, barrels and shulker boxes marked as Material Boxes then count what\'s already stored, color-code each slot by progress, and route shift-clicked items straight to the slots that still need them.',
+    tags: ['Fabric', 'Minecraft Modding', 'Claude API'],
   },
 ]
 
@@ -52,68 +59,38 @@ interface WorkProps {
   wip?: boolean
   title: string
   desc: string
+  tags?: string[]
   pdfSrc?: string
   link?: string
   linkLabel?: string
   onOpenPdf?: (src: string) => void
 }
 
-// Collapsed rows show this many lines of the description. Keep in step with
-// the max-height in .project-desc-clamped.
-const COLLAPSED_LINES = 2
-
-function WorkCard({ tag, date, wip, title, desc, pdfSrc, link, linkLabel, onOpenPdf }: WorkProps) {
-  const [open, setOpen] = useState(false)
-  const [fullHeight, setFullHeight] = useState(0)
-  const [canExpand, setCanExpand] = useState(false)
-  const descRef = useRef<HTMLParagraphElement>(null)
-
-  // The expanded height is measured rather than set to `auto`, which max-height
-  // can't transition to. Remeasured on resize, since rewrapping changes it.
-  useEffect(() => {
-    const el = descRef.current
-    if (!el) return
-    const measure = () => {
-      const clamp = parseFloat(getComputedStyle(el).lineHeight) * COLLAPSED_LINES
-      setFullHeight(el.scrollHeight)
-      setCanExpand(el.scrollHeight > clamp + 1)
-    }
-    measure()
-    const ro = new ResizeObserver(measure)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [])
-
-  const expanded = open && canExpand
-
-  // Measured again at click time: the observer's last reading can lag a resize
-  // by a frame, and opening to a stale height would clip the text.
-  const toggle = () => {
-    if (descRef.current) setFullHeight(descRef.current.scrollHeight)
-    setOpen(!open)
-  }
+function WorkCard({ tag, date, wip, title, desc, tags, pdfSrc, link, linkLabel, onOpenPdf }: WorkProps) {
+  const { innerRef, expanded, canExpand, toggle, style, clampClass } = useClampedExpand()
 
   return (
     <div
-      className={`sub-card project-card ${canExpand ? 'project-card-expandable' : ''}`}
+      className={`sub-card project-card ${canExpand ? 'expandable-card' : ''}`}
       onClick={canExpand ? toggle : undefined}
     >
       <div className="project-card-meta">
-        <span className="project-tag">{tag}{wip && <span className="project-wip">WIP</span>}</span>
+        <span className="project-tag">{tag}</span>
         <span className="project-date">{date}</span>
       </div>
       <div className="project-body">
-        <div className="project-title-row">
-          <h2 className="project-title">{title}</h2>
+        <div className="card-title-row">
+          {/* Badge is inline in the title, so on a wrapping title it follows
+              the last word rather than floating beside the first line. */}
+          <h2 className="project-title">{title}{wip && <span className="project-wip">WIP</span>}</h2>
           {canExpand && <span className="card-toggle-icon">{expanded ? '−' : '+'}</span>}
         </div>
-        <p
-          ref={descRef}
-          className={`project-desc ${expanded ? '' : 'project-desc-clamped'} ${canExpand && !expanded ? 'project-desc-faded' : ''}`}
-          style={expanded ? { maxHeight: fullHeight } : undefined}
-        >
-          {desc}
-        </p>
+        <div className={clampClass} style={style}>
+          <div ref={innerRef}>
+            <p className="project-desc">{desc}</p>
+          </div>
+        </div>
+        <Tags tags={tags} />
       </div>
       {/* Optional — a project with nothing to link to yet renders no link row. */}
       {(pdfSrc || link) && (
@@ -139,7 +116,7 @@ function WorkCard({ tag, date, wip, title, desc, pdfSrc, link, linkLabel, onOpen
 }
 
 function Projects() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   const [activePdf, setActivePdf] = useState<string | null>(null)
 
   const openPdf = (src: string) => {

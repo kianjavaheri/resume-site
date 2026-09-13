@@ -1,14 +1,16 @@
+/* One role per card, same 200px / 1fr row as Selected Work so the two
+   sections line up. Collapse/expand is shared: see useClampedExpand and
+   .expandable-card in App.css. */
 .experience-item {
     display: grid;
-    grid-template-columns: 20% 60%;
-    gap: 28px;
+    grid-template-columns: 200px 1fr;
+    column-gap: 40px;
 }
 
 .exp-meta {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    padding: 10px 0;
 }
 
 .exp-company {
@@ -31,6 +33,29 @@
     margin-top: 2px;
 }
 
+/* The logo only appears once the card is expanded. At full size it set the
+   collapsed card's height by itself (~250px against ~150px of content), and
+   shrinking it just looked undecided. It grows in with the same 0fr → 1fr row
+   trick and 0.35s timing as the clamp, so the two land together. */
+.exp-logo-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.35s ease, opacity 0.35s ease;
+}
+
+.exp-expanded .exp-logo-wrap {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+/* overflow: hidden also makes this a BFC, so the logo's top margin stays
+   inside it and collapses away with the row. */
+.exp-logo-inner {
+    overflow: hidden;
+    min-height: 0;
+}
+
 .exp-org-logo {
     width: 50%;
     height: auto;
@@ -42,14 +67,21 @@
 .exp-content {
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    padding: 10px 0;
+    gap: 12px;
 }
 
 .exp-role {
     font-size: 0.95rem;
     font-weight: 400;
     line-height: 1.35;
+}
+
+/* Inside the clamp. The first child is what the collapsed preview counts
+   lines of — the description, or the first TA row on the TA card. */
+.exp-details {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
 .exp-desc {
@@ -81,67 +113,6 @@
     position: absolute;
     left: 0;
     color: var(--muted);
-}
-
-/* ── Timeline (combined ASU card) ─────────────── */
-.exp-timeline {
-    display: flex;
-    flex-direction: column;
-}
-
-.exp-timeline-item {
-    display: flex;
-    gap: 16px;
-}
-
-.exp-tl-left {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex-shrink: 0;
-    width: 18px;
-}
-
-.exp-tl-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50% !important;
-    border: 2px solid var(--textcolor) !important;
-    background: var(--bgcolor);
-    flex-shrink: 0;
-    margin-top: 5px;
-}
-
-.exp-tl-line {
-    width: 1px;
-    flex: 1;
-    background: var(--card-border);
-    margin: 6px 0;
-    min-height: 24px;
-}
-
-.exp-tl-body {
-    flex: 1;
-    padding-bottom: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.exp-timeline-item:last-child .exp-tl-body {
-    padding-bottom: 0;
-}
-
-.exp-tl-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 16px;
-}
-
-.exp-tl-header .exp-date {
-    white-space: nowrap;
-    flex-shrink: 0;
 }
 
 /* ── Teaching Assistant sub-rows ─────────────── */
@@ -192,26 +163,21 @@
 /* ── Responsive ───────────────────────────────── */
 @media (max-width: 1024px) {
     .experience-item {
-        grid-template-columns: clamp(80px, 14%, 130px) 1fr;
-        gap: 20px;
+        grid-template-columns: 170px 1fr;
+        column-gap: 28px;
     }
 }
 
 @media (max-width: 768px) {
     .experience-item {
         grid-template-columns: 1fr;
-        gap: 20px;
+        row-gap: 12px;
     }
 
     .exp-org-logo {
         max-height: 120px;
         max-width: 160px;
         margin-top: 12px;
-    }
-
-    .exp-tl-header {
-        flex-direction: column;
-        gap: 2px;
     }
 
     .exp-ta-meta {

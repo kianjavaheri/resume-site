@@ -1,7 +1,24 @@
-/* The card is now a column: the details row, then the coursework toggles. */
+/* The card is a column: the details row, then the coursework toggles — which
+   stay hidden until the card itself is expanded (.edu-open). */
 .education-item {
     display: flex;
     flex-direction: column;
+    position: relative;
+}
+
+/* Pinned to the card's top-right corner, level with the first line, rather
+   than added as a grid column — the three-column .edu-main and its
+   breakpoints stay exactly as they were. */
+.edu-toggle {
+    position: absolute;
+    top: 22px;
+    right: 26px;
+}
+
+/* Child combinator, like .section-open and .coursework-open: the coursework
+   blocks nested inside reuse .section-body-wrapper and must not inherit this. */
+.edu-open > .section-body-wrapper {
+    grid-template-rows: 1fr;
 }
 
 .edu-main {

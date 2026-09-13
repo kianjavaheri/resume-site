@@ -1,10 +1,26 @@
+/* 2×2 on wide screens — Languages | Frameworks over Developer Tools | Data &
+   Research, in source order. Stacked, the four groups left most of the card
+   empty to the right and made the section twice as tall as it needed to be.
+   Columns are `auto` so each is only as wide as its longest row of tiles; the
+   64px column gap is what separates the two groups side by side, so it has to
+   stay well clear of the 20px gap between tiles. */
 .skills-wrapper {
     padding: 14px 24px 22px;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: start;
+    column-gap: 64px;
     /* Must stay clearly larger than .skills-grid's 24px row gap, or a group
        break reads the same as a wrap inside one group. */
-    gap: 34px;
+    row-gap: 34px;
+}
+
+/* Below this, seven Languages tiles and five Frameworks tiles no longer fit
+   side by side on one row each, so the groups stack again. */
+@media (max-width: 1100px) {
+    .skills-wrapper {
+        grid-template-columns: 1fr;
+    }
 }
 
 .skill-group {
@@ -25,10 +41,12 @@
     color: var(--textcolor);
 }
 
+/* Column gap is 20px, not 36: it's what lets seven Languages tiles sit on one
+   row inside half the card. */
 .skills-grid {
     display: flex;
     flex-wrap: wrap;
-    gap: 24px 36px;
+    gap: 24px 20px;
 }
 
 .skill-item {

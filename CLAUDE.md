@@ -105,7 +105,7 @@ The third level is a **recessed well** — `--well-bg` (darker than the sub-card
 The general rule: **an inset shadow needs enough headroom below the fill to fall into.** Near black there isn't any, so reach for fill contrast instead.
 
 ### Global reset
-`src/styling/App.css` applies `border-radius: 0 !important` globally — intentional. Anything that needs rounding must use `!important` (`.section-card`, `.sub-card`, `.coursework-block`, `.course-card`, `.contact-card`, `.gallery-frame`, `.nav`, `.scroll-top`, `.skill-icon-wrap`, `.project-wip`, `.pdf-close`).
+`src/styling/App.css` applies `border-radius: 0 !important` globally — intentional. Anything that needs rounding must use `!important` (`.section-card`, `.sub-card`, `.coursework-block`, `.course-card`, `.contact-card`, `.gallery-frame`, `.nav`, `.scroll-top`, `.skill-icon-wrap`, `.project-wip`, `.tag`, `.pdf-close`).
 
 ### Typography
 **Plus Jakarta Sans** from Google Fonts. Section card titles are 0.95rem / 500. Normal casing everywhere — no `text-transform: uppercase` on nav links or section headers. Small uppercase letterspaced labels are used only for micro-labels (project tags, skill names, link buttons).
@@ -127,7 +127,7 @@ Sections live in `.cards-wrapper` in `Home.tsx`: vertical flex, `gap: 12px`, `pa
 .section-open > .section-body-wrapper { grid-template-rows: 1fr; }
 ```
 
-The `>` is **required**. Education contains nested collapsibles that reuse `.section-body-wrapper`; with a descendant selector, an open outer section forces every nested body permanently open and unclosable. The nested rule is `.coursework-open > .section-body-wrapper`.
+The `>` is **required**. Education contains nested collapsibles that reuse `.section-body-wrapper`; with a descendant selector, an open outer section forces every nested body permanently open and unclosable. The nested rules are `.edu-open > .section-body-wrapper` (the ASU card) and `.coursework-open > .section-body-wrapper` (each coursework tab).
 
 ## File structure
 
@@ -136,9 +136,11 @@ src/
   components/
     About.tsx          # section-card, card-header-static; hero + bio + photo gallery; "View Resume"
     Education.tsx      # Collapsible, default OPEN. ASU sub-card + course data + nested <Coursework> blocks
-    Experience.tsx     # Collapsible, default OPEN. Sandia sub-card + combined ASU sub-card w/ timeline
-    Projects.tsx       # Collapsible, default CLOSED. Stacked full-width row sub-cards; PDF modal; WIP badge
-    Proficiency.tsx    # Collapsible, default CLOSED. 23 skills in 4 labelled groups of rounded icon tiles
+    Experience.tsx     # Collapsible, default OPEN. Three expandable role cards (Sandia, ASU RA, ASU TA) w/ tags
+    Projects.tsx       # Collapsible, default OPEN. Stacked expandable row sub-cards w/ tags; PDF modal; WIP badge
+    Proficiency.tsx    # Collapsible, default OPEN. 23 skills in 4 labelled groups of rounded icon tiles
+    useClampedExpand.ts # Shared clamp-and-expand hook for Experience cards + Selected Work rows
+    Tags.tsx           # Tech tag pills, shown below the clamp on Experience + Selected Work
     Contact.tsx        # NOT a section-card; label above, 3 contact-card links
     PdfModal.tsx       # Shared PDF modal (iframe); exports withViewerParams()
     Navbar.tsx         # Floating glass pill; fades past 50% scroll; hamburger ≤768px
@@ -153,9 +155,9 @@ src/
   react-app-env.d.ts   # vite/client types + the *.svg module shim
   util/svgs/           # DEAD — 8 SVGs, referenced nowhere. See below.
   styling/
-    App.css            # Reset, tokens, card system, PDF modal, scrollbar
+    App.css            # Reset, tokens, card system, expandable cards + tags, PDF modal, scrollbar
     Education.css      # .edu-main 3-col grid + nested coursework rows
-    Experience.css     # .experience-item 2-col grid; ASU timeline
+    Experience.css     # .experience-item 200px/1fr grid; TA sub-rows
     pages/Home.css
     components/
       About.css        # Hero, gallery (4/3, border-radius 75px, two-way slide)
@@ -187,11 +189,13 @@ Verified unreferenced — safe to delete, and worth knowing about before you go 
 | Section | Collapsible | Default | Notes |
 |---|---|---|---|
 | About | No | Always open | `card-header-static` |
-| Education | Yes | **Open** | ASU sub-card + two nested coursework expandables |
-| Experience | Yes | **Open** | Sandia + combined ASU timeline |
-| Selected Work | Yes | Closed | Stacked full-width rows, PDF modals, WIP badges |
-| Skills | Yes | Closed | 23 icon tiles in 4 labelled groups |
+| Education | Yes | **Open** | ASU sub-card, collapsed; expanding it reveals the two coursework expandables |
+| Experience | Yes | **Open** | Three role cards, each collapsed to a 2-line preview |
+| Selected Work | Yes | **Open** | Stacked rows collapsed to a 2-line preview, PDF modals, WIP badges |
+| Skills | Yes | **Open** | 23 icon tiles in 4 labelled groups |
 | Contact | No (not a card) | Always open | Title outside, 3 link cards |
+
+**Every section starts open. What's collapsed is the detail *inside* the cards.** Hiding whole sections by default made the site feel like it had little in it. The model is Brittany Chiang's portfolio: every entry is visible on arrival, and depth is on demand. Section toggles are kept for now. See *Expandable cards and tags*.
 
 There is **no top-level Courses section** — it lives inside Education (see below). The navbar has **six** links: About, Education, Experience, Work, Skills, Contact.
 
@@ -244,6 +248,25 @@ Duration is the only performance lever that doesn't change how the glass looks. 
 
 **Known gap:** on mobile the hamburger is clipped away while collapsed, so the menu is unreachable past the halfway mark. That was equally true when the whole bar faded out, but the pill is now visible and looks interactive. Making a tap on "KJ" expand the bar again would close it.
 
+## Expandable cards and tags
+
+Experience cards and Selected Work rows share one hook, **`useClampedExpand`** (`src/components/useClampedExpand.ts`).
+
+- A card starts clamped to **two lines** of its first text block, with the last line faded by a `mask-image`. A `+`/`−` sits beside the title. Clicking anywhere on the card toggles it, and each card is independent.
+- **The markup is two boxes.** An outer `.clamp` takes `clampClass` + `style`, around an inner wrapper that takes `innerRef`. The inner wrapper is measured and observed: it keeps its natural height inside the clamped box, so any reflow (a resize, the web font arriving) fires the `ResizeObserver`.
+- **The line height comes from the inner wrapper's first child**, so put the text you want previewed first. If that child has no explicit `line-height`, the hook falls back to `1.4 × font-size`.
+- Heights go inline as `max-height`, because it can't transition to `auto`. They're **re-measured on click**, since the observer can lag a resize by a frame and a stale height clips the text.
+- **No inline `max-height` until the first measurement.** `none` → length doesn't transition, so cards don't visibly animate shut on page load.
+- Content that already fits in two lines gets no indicator, fade, hover tint or pointer cursor.
+- `.expandable-card` (`App.css`) carries the pointer and the hover tint. Per the hover convention, the tint re-declares `--sub-card-grad` beneath it.
+
+**Tech tags** (`Tags.tsx`; `.tag-list` / `.tag` in `App.css`) sit **below** the clamp, so they stay visible while a card is collapsed. They're chips filled with `--well-bg` and set in `--textcolor`: recessed rather than raised, per *Nesting goes DOWN*, in the site's neutral palette. They're **boxy, not pills**: `border-radius: 6px` on a ~23px chip is the same proportion as `.project-wip`'s 4px on 15px, so the tags and the badge read as one shape at two sizes. Scale the radius with the height if either changes. They're deliberately **normal case**, not the uppercase micro-label, because names like `PostgreSQL` read wrong in caps. Tags are drawn only from what each entry's text states. Don't add a language the copy doesn't mention without checking with Kian.
+
+### Experience
+Three cards: Sandia, ASU Undergraduate Research Assistant and ASU Undergraduate Teaching Assistant. The two ASU roles used to share one card with a timeline. They were split so each role collapses on its own. Cards use the same `200px 1fr` grid as the Selected Work rows (170px at ≤1024px, stacked at ≤768px), so the two sections line up. The TA card has no summary paragraph, so its preview is the first course row. **CSE 310 is deliberately first**, ahead of the earlier FSE 150. It's the role that matters most to employers, so it's the one visible while the card is collapsed.
+
+**Logos appear only when a card is expanded.** At full size (50% of the column) the logo alone set each collapsed card's height: about 250px on desktop and 450px on a phone, against about 150px of content. Shrinking it to 56px was tried and read as an awkward middle size. So the logo sits in `.exp-logo-wrap`, which uses the same `0fr → 1fr` row trick and 0.35s timing as the clamp, gated on `.exp-expanded`. It's decorative (`alt=""`), because the company name sits right above it. A card that could never expand would never show its logo; none currently can't.
+
 ## Education section
 
 `.education-item` is a flex **column**:
@@ -251,6 +274,12 @@ Duration is the only performance lever that doesn't change how the glass looks. 
 2. `.edu-coursework` — the nested coursework rows
 
 The two degrees render as **two separate `B.S.` lines** inside `.edu-degrees` (3px apart, tighter than surrounding lines) so they read as two credentials.
+
+### The card itself collapses
+The ASU sub-card starts **collapsed**, showing school, dates, degrees and honors. Clicking it reveals the coursework tabs. It matches the Experience cards, but it is **not** `useClampedExpand`: there's no text to preview, only a whole region to show or hide. So it reuses the sections' `0fr → 1fr` `.section-body-wrapper`, gated on `.edu-open > .section-body-wrapper`. That's a **child combinator**, for the same reason as `.section-open`: the coursework blocks nested inside reuse the wrapper.
+- `.edu-coursework` **stops click propagation**, so opening a tab or clicking a course card doesn't also collapse the card.
+- The `+`/`−` (`.edu-toggle`) is **absolutely positioned** in the card's top-right corner rather than added as a grid column, so the three-column `.edu-main` and its breakpoints are unchanged.
+- It carries `.expandable-card`, so it gets the same pointer and hover tint as Experience and Selected Work.
 
 ### Nested coursework
 Course data (`cseCourses`, `ecnCourses`) lives in `Education.tsx`. A local `<Coursework>` component renders one collapsible block per degree, **both closed by default**, toggling independently. The header shows the degree name with a muted `Coursework · N courses` subtitle beneath.
@@ -287,13 +316,23 @@ Each `.course-card` is a flex row: a `.course-card-text` column (code above name
 ### Group labels reuse the skill-name micro-label
 `.skill-group-label` is the same 0.65rem uppercase letterspaced type as `.skill-name` — **no new step in the type scale**. The hierarchy is carried by weight and color alone: labels are 600/`--textcolor`, the names under the tiles stay 500/`--muted`. Enlarging the label is what would make this section noisy.
 
-Spacing has to keep a group break louder than a row wrap: `.skills-wrapper` gap `34px` (28 mobile) against `.skills-grid`'s `24px` row gap (20 mobile), plus the label and its `16px` (14 mobile) offset. Narrow the wrapper gap toward the grid's and the groups stop reading as groups.
+Spacing has to keep a group break louder than a row wrap: `.skills-wrapper` row gap `34px` (28 mobile) against `.skills-grid`'s `24px` row gap (20 mobile), plus the label and its `16px` (14 mobile) offset. Narrow the wrapper gap toward the grid's and the groups stop reading as groups.
+
+### 2×2 above 1100px
+`.skills-wrapper` is a grid, `auto auto`. Source order gives Languages | Frameworks & Libraries on top and Developer Tools | Data & Research below. Stacked, the section was twice as tall as it needed to be and left most of the card empty on the right.
+- Columns are **`auto`**, so each is only as wide as its longest row of tiles. `justify-content: start` keeps the pair left-aligned rather than spread across the card.
+- The **64px column gap** is what separates two groups sitting side by side. It has to stay well clear of `.skills-grid`'s **20px** tile gap, which was cut from 36px so seven Languages tiles fit on one row inside half the card.
+- **≤1100px** stacks the groups again, because the two top-row groups no longer fit side by side on one line each.
 
 - Icons are `<img src="/svgs/name.svg">` from `public/svgs/` — **not** Vite imports.
 - Most are **simple-icons** glyphs with the brand hex added as a `fill` attribute on the `<svg>` tag (matching how `react.svg` was already built).
 - **Skills without an SVG fall back to an `abbr` monogram.** Currently only **MATLAB** (`ML`) — simple-icons has no MATLAB glyph. To promote one: drop the file in `public/svgs/` and swap `abbr` for `src`.
 - `invertDark: true` applies `filter: invert(1) brightness(0.85)` in dark mode. Used by **Flask** and **GitHub** (GitHub's brand hex `#181717` is invisible on black).
 - C++ uses the lighter logo blue `#659AD2` rather than `#00599C` for dark-mode legibility.
+
+## About layout
+
+The **title sits at the top of the text column** (`.about-text`), not in a full-width hero row above it. The gallery starts level with the title rather than below it, which removes that row's height from the card. `.about-content-area` is top-aligned (`align-items: flex-start`) and carries the top padding the old `.about-hero` row had at each breakpoint. On mobile the column stacks as title → bio → resume link → gallery, the same order as before.
 
 ## About gallery
 
@@ -320,12 +359,9 @@ A vertical stack (`.sub-cards-stack`) of **wide, short rows**. It replaced a 3-c
 
 Each row is a CSS grid with three areas: `meta` (tag, WIP badge, date) and `link` stacked in a 200px left column, and `body` (title + description) filling the right. The link is pinned to the bottom of the left column, so it adds no height. At ≤768px the areas restack to `meta → body → link`, and the meta turns into a tag-left/date-right strip.
 
-**Rows start collapsed** to two lines of description, with the last line faded by a `mask-image`, and a `+`/`−` indicator beside the title. Clicking anywhere on the row expands it in place. Each row toggles independently.
-- The expanded height is **measured in JS** (`scrollHeight`, kept current by a `ResizeObserver`) and set inline as `max-height`, because `max-height` can't transition to `auto`. The collapsed height is CSS, `calc(2 * 1.65em)` on `.project-desc-clamped`. It must stay in step with `COLLAPSED_LINES` in `Projects.tsx` and with `.project-desc`'s `line-height`.
-- A description that already fits in two lines gets no indicator, fade or pointer cursor.
-- `.project-links` stops click propagation, so opening a PDF or GitHub link doesn't also toggle the row.
+Rows start collapsed to a two-line preview and expand in place, with tags below. See *Expandable cards and tags*. `.project-links` stops click propagation, so opening a PDF or GitHub link doesn't also toggle the row.
 
-The link is **optional**. A project with no `link` or `pdfSrc` renders no link row. Red `.project-wip` badge on Independent Research and Materials GUI.
+The link is **optional**. A project with no `link` or `pdfSrc` renders no link row. Red `.project-wip` badge on Independent Research and Materials GUI. It sits **inline at the end of the project title**, not on the type label, so on a wrapping title it follows the last word.
 
 **Month abbreviations never take a trailing period** (`Aug`, not `Aug.`) — site-wide.
 
@@ -362,7 +398,8 @@ iOS Safari renders codepoints that carry an *emoji presentation* as color emoji 
 
 | Query | Where | What |
 |---|---|---|
-| **≤1024px** | Experience, Education, About, Courses, Projects | Reduced padding; `.edu-main` → `auto 170px 1fr`; courses → 3 columns; project rows' left column → 170px |
+| **≤1100px** | Skills only | Skill groups go from 2×2 back to stacked |
+| **≤1024px** | Experience, Education, About, Courses, Projects | Reduced padding; `.edu-main` → `auto 170px 1fr`; courses → 3 columns; experience and project rows' left column → 170px |
 | **≤768px** | everywhere | Single-column layouts, hamburger nav, gallery below bio, education logo on top, contact cards stack, courses → 2 columns, project rows restack, nav collapse shortens to 0.42s, PDFs open in a new tab |
 | **≤520px** | Courses only | `.course-card-num` watermark drops out |
 | **≤480px** | About only | Further font/padding reductions |

@@ -1,19 +1,20 @@
-.about-hero {
-    padding: 28px 28px 20px;
-}
-
+/* Sits at the top of the text column rather than in a full-width row above
+   it, so the gallery starts level with the title. The margin plus the
+   column's 16px gap gives 28px down to the bio. */
 .about-hero-name {
     font-size: clamp(1.6rem, 3.5vw, 3rem);
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.05;
+    margin-bottom: 12px;
 }
 
-/* About content: bio left, gallery right */
+/* About content: title + bio left, gallery right, both top-aligned. The top
+   padding is what the old hero row carried at each breakpoint. */
 .about-content-area {
     display: flex;
     gap: 32px;
-    padding: 20px 28px 28px;
+    padding: 28px 28px 28px;
     align-items: flex-start;
 }
 
@@ -172,26 +173,18 @@
 
 /* ── Tablet ──────────────────────────────────── */
 @media (max-width: 1024px) {
-    .about-hero {
-        padding: 40px 28px 36px;
-    }
-
     .about-content-area {
         gap: 36px;
-        padding: 36px 28px;
+        padding: 40px 28px 36px;
     }
 }
 
 /* ── Mobile: stack gallery below bio ─────────── */
 @media (max-width: 768px) {
-    .about-hero {
-        padding: 28px 20px 24px;
-    }
-
     .about-content-area {
         flex-direction: column;
         gap: 32px;
-        padding: 24px 20px 28px;
+        padding: 28px 20px 28px;
     }
 
     .about-gallery {
@@ -201,7 +194,7 @@
 }
 
 @media (max-width: 480px) {
-    .about-hero {
-        padding: 36px 20px 32px;
+    .about-content-area {
+        padding-top: 36px;
     }
 }
