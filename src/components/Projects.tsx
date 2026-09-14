@@ -8,7 +8,6 @@ import './../styling/components/Projects.css'
 const works = [
   {
     tag: 'CS Capstone',
-    date: 'Aug 2025 – May 2026',
     title: 'Shipment Quoting Microservice',
     desc: 'Architected a high-throughput relational caching layer using PostgreSQL and Flask within a Dockerized microservice environment, intercepting and caching external carrier API responses to reduce redundant network calls. Achieved a 64.4% reduction in processing latency (334ms →︎ 119ms) — a 2.8x speedup over live API calls.',
     tags: ['Python', 'Flask', 'PostgreSQL', 'Docker'],
@@ -17,7 +16,6 @@ const works = [
   },
   {
     tag: 'Barrett Honors Thesis',
-    date: 'Aug 2025 – May 2026',
     title: 'Public Perception vs. Actual Economic Effects of U.S.–China Trade Policy',
     desc: 'Investigated the divergence between the economic outcomes of the 2018–2020 U.S.–China trade war and the public\'s perception of those outcomes.The thesis utilizes a survey to gather public perception of international trade policy and employs Natural Language Processing (NLP) to identify the key drivers of public perception towards trade. The paper identifies key substructures in the results and finds formal education, price sensitivity, and media influence to be the largest factors affecting trade opinions.',
     tags: ['NLP', 'Survey Research', 'Qualtrics'],
@@ -26,7 +24,6 @@ const works = [
   },
   {
     tag: 'Economics Capstone',
-    date: 'Aug – Dec 2025',
     title: 'Universal Basic Income vs. Targeted Welfare: A Macroeconomic Assessment',
     desc: 'Analyzed the macroeconomic feasibility and behavioral trade-offs of UBI versus targeted welfare systems. Drawing on empirical data and policy models from five recent global studies across developing nations (South Africa, Indonesia, Peru) and developed economies (U.S., Finland, New Zealand), the paper evaluates how funding mechanisms — consumption vs. income taxes — affect GDP growth, employment incentives, and long-term fiscal sustainability.',
     tags: ['Macroeconomics', 'Policy Analysis'],
@@ -35,7 +32,6 @@ const works = [
   },
   {
     tag: 'Independent Research',
-    date: 'Jun 2026 – Current',
     wip: true,
     title: 'Estimating the Wage Effects of a Universal Basic Income',
     desc: 'Applied Double Machine Learning (LinearDML and CausalForestDML) to longitudinal CPS ASEC microdata to estimate the causal effect of unconditional cash transfers on future labor income, then used the model to simulate the predicted wage impact of a $6,000/year UBI program. Used XGBoost within the DoubleML framework to control for nonlinear confounding across demographic and socioeconomic variables.',
@@ -45,7 +41,6 @@ const works = [
   },
   {
     tag: 'Personal Project',
-    date: 'Current',
     wip: true,
     title: 'Materials GUI',
     desc: 'Built a client-side Fabric mod for Minecraft 26.2 that tracks the materials needed for a build, and works on servers that don\'t have it installed. Players import a material list by pasting text, loading a Litematica export, or dropping in a screenshot that Claude reads. Chests, barrels and shulker boxes marked as Material Boxes then count what\'s already stored, color-code each slot by progress, and route shift-clicked items straight to the slots that still need them.',
@@ -55,7 +50,6 @@ const works = [
 
 interface WorkProps {
   tag: string
-  date: string
   wip?: boolean
   title: string
   desc: string
@@ -66,7 +60,7 @@ interface WorkProps {
   onOpenPdf?: (src: string) => void
 }
 
-function WorkCard({ tag, date, wip, title, desc, tags, pdfSrc, link, linkLabel, onOpenPdf }: WorkProps) {
+function WorkCard({ tag, wip, title, desc, tags, pdfSrc, link, linkLabel, onOpenPdf }: WorkProps) {
   const { innerRef, expanded, canExpand, toggle, style, clampClass } = useClampedExpand()
 
   return (
@@ -76,7 +70,6 @@ function WorkCard({ tag, date, wip, title, desc, tags, pdfSrc, link, linkLabel, 
     >
       <div className="project-card-meta">
         <span className="project-tag">{tag}</span>
-        <span className="project-date">{date}</span>
       </div>
       <div className="project-body">
         <div className="card-title-row">

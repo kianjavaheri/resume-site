@@ -357,7 +357,9 @@ Note when testing: an animation's clock does not advance while `document.visibil
 
 A vertical stack (`.sub-cards-stack`) of **wide, short rows**. It replaced a 3-column grid of tall tiles. Each card carries **both** `sub-card` and `project-card` — `.sub-card` supplies radius, fill, gradient, shadow and padding.
 
-Each row is a CSS grid with three areas: `meta` (tag, WIP badge, date) and `link` stacked in a 200px left column, and `body` (title + description) filling the right. The link is pinned to the bottom of the left column, so it adds no height. At ≤768px the areas restack to `meta → body → link`, and the meta turns into a tag-left/date-right strip.
+Each row is a CSS grid with three areas: `meta` (the project type, e.g. "CS Capstone") and `link` stacked in a 200px left column, and `body` (title + description) filling the right. The link is pinned to the bottom of the left column, so it adds no height. At ≤768px the areas restack to `meta → body → link`.
+
+**Projects carry no dates.** They were removed deliberately. Don't reintroduce a `date` field without checking with Kian.
 
 Rows start collapsed to a two-line preview and expand in place, with tags below. See *Expandable cards and tags*. `.project-links` stops click propagation, so opening a PDF or GitHub link doesn't also toggle the row.
 

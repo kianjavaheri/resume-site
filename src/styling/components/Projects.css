@@ -62,14 +62,6 @@
     vertical-align: 0.15em;
 }
 
-.project-date {
-    font-size: 0.65rem;
-    font-weight: 400;
-    color: var(--muted);
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
 .project-title {
     font-size: 0.95rem;
     font-weight: 600;
@@ -127,14 +119,6 @@
             "body"
             "link";
         row-gap: 14px;
-    }
-
-    /* Tag left, date right — the aside turns into a header strip. */
-    .project-card-meta {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        gap: 8px;
     }
 
     .project-links {
