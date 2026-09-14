@@ -5,21 +5,44 @@
    useClampedExpand and .expandable-card in App.css. */
 
 /* Cards also carry .sub-card, which supplies radius, fill, shadow and padding.
-   The link sits in the aside, pinned to its bottom, so it costs the row no
-   height; below 768px the areas restack into meta → body → link. */
+   The aside splits the card into two equal halves, the type centred in the
+   top half and the link in the bottom — so they sit on the card's 1/4 and 3/4
+   lines. (Type at the top with the link pinned to the bottom left an empty
+   column; the link alone at the centre read as stranded.) For those to be the
+   CARD's quarters rather than its content box's, the vertical padding moves
+   onto .project-body on desktop — see the min-width query below. Below 768px
+   the areas restack into meta → body → link. */
 .project-card {
     display: grid;
     grid-template-columns: 200px 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: 1fr 1fr;
     grid-template-areas:
         "meta body"
         "link body";
     column-gap: 40px;
-    row-gap: 16px;
+    /* Zero, or the two halves stop being equal. */
+    row-gap: 0;
+}
+
+/* The card's own top/bottom padding sits outside the grid, which would pull
+   both items 10px toward the middle. Moving it onto the body lets the aside
+   span the full card height. Desktop only: mobile keeps the stacked layout
+   and the sub-card's normal padding. */
+@media (min-width: 769px) {
+    .sub-card.project-card {
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+
+    .project-body {
+        padding: 20px 0;
+    }
 }
 
 .project-card-meta {
     grid-area: meta;
+    /* Centred in the top half: the card's 1/4 line. */
+    align-self: center;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -78,7 +101,8 @@
 
 .project-links {
     grid-area: link;
-    align-self: end;
+    /* Centred in the bottom half: the card's 3/4 line. */
+    align-self: center;
     display: flex;
     gap: 24px;
 }

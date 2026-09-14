@@ -42,9 +42,11 @@ const works = [
   {
     tag: 'Personal Project',
     wip: true,
-    title: 'Materials GUI',
+    title: 'Material Boxes',
     desc: 'Built a client-side Fabric mod for Minecraft 26.2 that tracks the materials needed for a build, and works on servers that don\'t have it installed. Players import a material list by pasting text, loading a Litematica export, or dropping in a screenshot that Claude reads. Chests, barrels and shulker boxes marked as Material Boxes then count what\'s already stored, color-code each slot by progress, and route shift-clicked items straight to the slots that still need them.',
-    tags: ['Fabric', 'Minecraft Modding', 'Claude API'],
+    tags: ['Java', 'Fabric', 'Minecraft Modding', 'Claude API'],
+    link: 'https://github.com/kianjavaheri/material-boxes',
+    linkLabel: 'View GitHub',
   },
 ]
 

@@ -191,7 +191,7 @@ Verified unreferenced — safe to delete, and worth knowing about before you go 
 | About | No | Always open | `card-header-static` |
 | Education | Yes | **Open** | ASU sub-card, collapsed; expanding it reveals the two coursework expandables |
 | Experience | Yes | **Open** | Three role cards, each collapsed to a 2-line preview |
-| Selected Work | Yes | **Open** | Stacked rows collapsed to a 2-line preview, PDF modals, WIP badges |
+| Selected Work | Yes | **Open** | Stacked rows collapsed to a 2-line preview, type and link on the card's 1/4 and 3/4 lines, PDF modals, WIP badges |
 | Skills | Yes | **Open** | 23 icon tiles in 4 labelled groups |
 | Contact | No (not a card) | Always open | Title outside, 3 link cards |
 
@@ -263,7 +263,9 @@ Experience cards and Selected Work rows share one hook, **`useClampedExpand`** (
 **Tech tags** (`Tags.tsx`; `.tag-list` / `.tag` in `App.css`) sit **below** the clamp, so they stay visible while a card is collapsed. They're chips filled with `--well-bg` and set in `--textcolor`: recessed rather than raised, per *Nesting goes DOWN*, in the site's neutral palette. They're **boxy, not pills**: `border-radius: 6px` on a ~23px chip is the same proportion as `.project-wip`'s 4px on 15px, so the tags and the badge read as one shape at two sizes. Scale the radius with the height if either changes. They're deliberately **normal case**, not the uppercase micro-label, because names like `PostgreSQL` read wrong in caps. Tags are drawn only from what each entry's text states. Don't add a language the copy doesn't mention without checking with Kian.
 
 ### Experience
-Three cards: Sandia, ASU Undergraduate Research Assistant and ASU Undergraduate Teaching Assistant. The two ASU roles used to share one card with a timeline. They were split so each role collapses on its own. Cards use the same `200px 1fr` grid as the Selected Work rows (170px at ≤1024px, stacked at ≤768px), so the two sections line up. The TA card has no summary paragraph, so its preview is the first course row. **CSE 310 is deliberately first**, ahead of the earlier FSE 150. It's the role that matters most to employers, so it's the one visible while the card is collapsed.
+Three cards: Sandia, ASU Junior Researcher and ASU Undergraduate Teaching Assistant.
+
+**Wording:** the **bullets follow Kian's resume** (`~/Library/CloudStorage/Dropbox/resume.pdf`), lightly adapted into sentences. The **paragraphs above them are hand-written**, so keep edits to them minimal and never smooth them into generic resume-speak. No buzzwords, and no outcome claims the resume doesn't make. (To read the PDF here: `pdftotext` and Python PDF libraries aren't installed, but macOS PDFKit via `osascript -l JavaScript` works.) The two ASU roles used to share one card with a timeline. They were split so each role collapses on its own. Cards use the same `200px 1fr` grid as the Selected Work rows (170px at ≤1024px, stacked at ≤768px), so the two sections line up. The TA card has no summary paragraph, so its preview is the first course row. **CSE 310 is deliberately first**, ahead of the earlier FSE 150. It's the role that matters most to employers, so it's the one visible while the card is collapsed.
 
 **Logos appear only when a card is expanded.** At full size (50% of the column) the logo alone set each collapsed card's height: about 250px on desktop and 450px on a phone, against about 150px of content. Shrinking it to 56px was tried and read as an awkward middle size. So the logo sits in `.exp-logo-wrap`, which uses the same `0fr → 1fr` row trick and 0.35s timing as the clamp, gated on `.exp-expanded`. It's decorative (`alt=""`), because the company name sits right above it. A card that could never expand would never show its logo; none currently can't.
 
@@ -357,13 +359,18 @@ Note when testing: an animation's clock does not advance while `document.visibil
 
 A vertical stack (`.sub-cards-stack`) of **wide, short rows**. It replaced a 3-column grid of tall tiles. Each card carries **both** `sub-card` and `project-card` — `.sub-card` supplies radius, fill, gradient, shadow and padding.
 
-Each row is a CSS grid with three areas: `meta` (the project type, e.g. "CS Capstone") and `link` stacked in a 200px left column, and `body` (title + description) filling the right. The link is pinned to the bottom of the left column, so it adds no height. At ≤768px the areas restack to `meta → body → link`.
+Each row is a CSS grid. The 200px left column holds `meta` (the project type, e.g. "CS Capstone") on the card's **1/4 line** and the `link` on its **3/4 line**; `body` (title, description, tags) fills the right. At ≤768px the areas restack to `meta → body → link`.
+
+- **Why the quarters:** type at the top with the link pinned to the bottom left an empty column. The link alone at the vertical centre, with the type at the top, read as stranded. Splitting the card into halves spaces the two evenly.
+- **How:** rows are `1fr 1fr` with **`row-gap: 0`** (any gap makes the halves unequal). `meta` and `link` are each `align-self: center` in their half.
+- **The card's vertical padding moves onto `.project-body`** on desktop (`@media (min-width: 769px)`: `.sub-card.project-card` gets `padding-top/bottom: 0`, and `.project-body` gets `padding: 20px 0`). The card's own padding sits outside the grid, so without this both items land 10px toward the middle, on the content box's quarters rather than the card's. Phones keep the sub-card's normal padding.
+- **Tried and rejected:** moving the tags into the left column to fill it, with a three-line preview to balance the height. It balanced, but Kian didn't like it. The tags stay under the description, as on Experience.
 
 **Projects carry no dates.** They were removed deliberately. Don't reintroduce a `date` field without checking with Kian.
 
 Rows start collapsed to a two-line preview and expand in place, with tags below. See *Expandable cards and tags*. `.project-links` stops click propagation, so opening a PDF or GitHub link doesn't also toggle the row.
 
-The link is **optional**. A project with no `link` or `pdfSrc` renders no link row. Red `.project-wip` badge on Independent Research and Materials GUI. It sits **inline at the end of the project title**, not on the type label, so on a wrapping title it follows the last word.
+The link is **optional**. A project with no `link` or `pdfSrc` renders no link row. Red `.project-wip` badge on Independent Research and Material Boxes. It sits **inline at the end of the project title**, not on the type label, so on a wrapping title it follows the last word.
 
 **Month abbreviations never take a trailing period** (`Aug`, not `Aug.`) — site-wide.
 

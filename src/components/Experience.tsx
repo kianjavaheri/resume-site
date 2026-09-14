@@ -70,17 +70,17 @@ function Experience() {
               date="May 2023 – Aug 2024"
               logo="/svgs/sandia.svg"
               role="R&D Bioresource and Environment Security Year-round Intern"
-              tags={['QGIS', 'Optimization', 'Geospatial Data']}
+              tags={['Python', 'Pandas', 'QGIS', 'Optimization', 'Geospatial Data']}
             >
               <p className="exp-desc">
-                At Sandia National Laboratories, I developed a standalone tool that optimizes theoretical cashflow for bioresource systems using configurable
+                At Sandia National Laboratories, I developed a standalone tool that optimizes theoretical cash flow for bioresource systems using configurable
                 optimization algorithms tailored to user inputs. I also built a QGIS plugin that builds a geospatial
-                map of county-dependent feedstock (fuel for energy conversion) prices. Users are allowed to select and trial different U.S. counties and to see how energy prices affect project cashflow.
+                map of county-dependent feedstock (fuel for energy conversion) prices. Users are allowed to select and trial different U.S. counties and to see how energy prices affect project cash flow.
                 I collaborated closely with my mentor to build out this tool and communicate key milestones and findings through presentations.
               </p>
               <ul className="exp-bullets">
-                <li>Engineered a standalone optimization tool that ingests inputs across multiple bioresource systems and maximizes cashflow using configurable optimization algorithms, reducing manual analysis time for research teams.</li>
-                <li>Developed a QGIS plugin that parses U.S. county shapefile datasets and overlays them with energy price data to surface different feedstock sourcing.</li>
+                <li>Led and designed a standalone optimization tool in Python that ingests operational data across multiple bioresource systems and maximizes projected cash flow via configurable optimization algorithms.</li>
+                <li>Created and validated shapefile datasets, then engineered a companion QGIS plugin in Python that connects to the optimization tool via an internal API, letting users gauge how different feedstock locations affect profit yields.</li>
               </ul>
             </ExpCard>
 
@@ -89,7 +89,7 @@ function Experience() {
               location="Tempe, AZ"
               date="May 2025 – May 2026"
               logo="/svgs/asu.svg"
-              role="Undergraduate Research Assistant"
+              role="Junior Researcher"
               tags={['Python', 'Selenium', 'OCR', 'Web Scraping']}
             >
               <p className="exp-desc">
@@ -122,8 +122,8 @@ function Experience() {
                   </div>
                   <p className="exp-ta-prof">Prof. Xuerong Feng</p>
                   <ul className="exp-bullets">
-                    <li>Led review sessions covering red-black trees, dynamic programming, and minimum spanning tree algorithms (Kruskal's and Prim's), improving class comprehension ahead of the final exam.</li>
-                    <li>Held 5+ office hours weekly, guiding students through complex coding assignments and algorithm design challenges.</li>
+                    <li>Led exam review sessions on red-black trees, dynamic programming, and minimum spanning tree algorithms (Kruskal's and Prim's).</li>
+                    <li>Held 5+ office hours per week, guiding students through coding assignments and algorithm design challenges.</li>
                   </ul>
                 </div>
                 <div className="exp-ta-row">
