@@ -370,7 +370,7 @@ Each row is a CSS grid. The 200px left column holds `meta` (the project type, e.
 
 Rows start collapsed to a two-line preview and expand in place, with tags below. See *Expandable cards and tags*. `.project-links` stops click propagation, so opening a PDF or GitHub link doesn't also toggle the row.
 
-The link is **optional**. A project with no `link` or `pdfSrc` renders no link row. Red `.project-wip` badge on Independent Research and Material Boxes. It sits **inline at the end of the project title**, not on the type label, so on a wrapping title it follows the last word.
+Links are **optional and plural**: each project carries a `links` array, and each entry is either a `pdfSrc` (opens the PDF modal) or an `href` (outbound page). A project with no links renders no link row. Several links **stack vertically** in the order listed — the 200px column is too narrow for two uppercase labels side by side — and the stack stays centred on the 3/4 line. Material Boxes carries two: **View CurseForge above View GitHub**, since CurseForge is where the mod is actually downloaded. Two badge types sit **inline at the end of the project title**, not on the type label, so on a wrapping title they follow the last word: a green `.project-release` (the shipped version, e.g. "Version 1.0.0") and then a red `.project-wip`. Material Boxes carries both; Independent Research carries only WIP. They **share one rule** and differ only in fill — `#2e8b57` and `#e03e3e`, fixed colours rather than theme tokens, both at the same ~4.3:1 against white, so neither shouts over the other.
 
 **Month abbreviations never take a trailing period** (`Aug`, not `Aug.`) — site-wide.
 

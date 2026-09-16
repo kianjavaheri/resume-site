@@ -67,10 +67,11 @@
     gap: 8px;
 }
 
-/* Sits inline after the project title. inline-block + its own line-height so
-   the title's 1.3 doesn't stretch the badge; nudged up to sit on the title's
-   x-height rather than its baseline. */
-.project-wip {
+/* Badges sit inline after the project title, release first then WIP.
+   inline-block + their own line-height so the title's 1.3 doesn't stretch
+   them; nudged up to sit on the title's x-height rather than its baseline. */
+.project-wip,
+.project-release {
     display: inline-block;
     font-size: 0.58rem;
     font-weight: 600;
@@ -78,11 +79,27 @@
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: #ffffff;
-    background: #e03e3e;
     border-radius: 4px !important;
     padding: 1px 5px;
     margin-left: 8px;
     vertical-align: 0.15em;
+}
+
+/* Only the fill differs. Both are fixed colours, not theme tokens, and both
+   carry white text at the same ~4.3:1 — so neither badge shouts over the
+   other when a project has both. */
+.project-wip {
+    background: #e03e3e;
+}
+
+.project-release {
+    background: #2e8b57;
+}
+
+/* Keeps the badges together: they wrap onto the next line as a pair rather
+   than WIP breaking away from the release badge on a narrow card. */
+.project-badges {
+    white-space: nowrap;
 }
 
 .project-title {
@@ -101,10 +118,15 @@
 
 .project-links {
     grid-area: link;
-    /* Centred in the bottom half: the card's 3/4 line. */
+    /* Centred in the bottom half: the card's 3/4 line. With more than one
+       link the stack stays centred on that line. */
     align-self: center;
     display: flex;
-    gap: 24px;
+    /* Stacked, not side by side: the column is only 200px wide, and two
+       uppercase labels don't fit on one row. */
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
 }
 
 .project-link {

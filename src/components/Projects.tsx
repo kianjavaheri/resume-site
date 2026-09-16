@@ -11,24 +11,21 @@ const works = [
     title: 'Shipment Quoting Microservice',
     desc: 'Architected a high-throughput relational caching layer using PostgreSQL and Flask within a Dockerized microservice environment, intercepting and caching external carrier API responses to reduce redundant network calls. Achieved a 64.4% reduction in processing latency (334ms →︎ 119ms) — a 2.8x speedup over live API calls.',
     tags: ['Python', 'Flask', 'PostgreSQL', 'Docker'],
-    pdfSrc: '/pdfs/cs-capstone.pdf',
-    linkLabel: 'View Poster',
+    links: [{ label: 'View Poster', pdfSrc: '/pdfs/cs-capstone.pdf' }],
   },
   {
     tag: 'Barrett Honors Thesis',
     title: 'Public Perception vs. Actual Economic Effects of U.S.–China Trade Policy',
     desc: 'Investigated the divergence between the economic outcomes of the 2018–2020 U.S.–China trade war and the public\'s perception of those outcomes.The thesis utilizes a survey to gather public perception of international trade policy and employs Natural Language Processing (NLP) to identify the key drivers of public perception towards trade. The paper identifies key substructures in the results and finds formal education, price sensitivity, and media influence to be the largest factors affecting trade opinions.',
     tags: ['NLP', 'Survey Research', 'Qualtrics'],
-    link: 'https://keep.lib.asu.edu/items/203948',
-    linkLabel: 'Read Paper',
+    links: [{ label: 'Read Paper', href: 'https://keep.lib.asu.edu/items/203948' }],
   },
   {
     tag: 'Economics Capstone',
     title: 'Universal Basic Income vs. Targeted Welfare: A Macroeconomic Assessment',
     desc: 'Analyzed the macroeconomic feasibility and behavioral trade-offs of UBI versus targeted welfare systems. Drawing on empirical data and policy models from five recent global studies across developing nations (South Africa, Indonesia, Peru) and developed economies (U.S., Finland, New Zealand), the paper evaluates how funding mechanisms — consumption vs. income taxes — affect GDP growth, employment incentives, and long-term fiscal sustainability.',
     tags: ['Macroeconomics', 'Policy Analysis'],
-    pdfSrc: '/pdfs/basic-income.pdf',
-    linkLabel: 'Read Paper',
+    links: [{ label: 'Read Paper', pdfSrc: '/pdfs/basic-income.pdf' }],
   },
   {
     tag: 'Independent Research',
@@ -36,33 +33,42 @@ const works = [
     title: 'Estimating the Wage Effects of a Universal Basic Income',
     desc: 'Applied Double Machine Learning (LinearDML and CausalForestDML) to longitudinal CPS ASEC microdata to estimate the causal effect of unconditional cash transfers on future labor income, then used the model to simulate the predicted wage impact of a $6,000/year UBI program. Used XGBoost within the DoubleML framework to control for nonlinear confounding across demographic and socioeconomic variables.',
     tags: ['Python', 'EconML', 'XGBoost', 'Causal Inference'],
-    link: 'https://github.com/kianjavaheri/welfare-model',
-    linkLabel: 'View GitHub',
+    links: [{ label: 'View GitHub', href: 'https://github.com/kianjavaheri/welfare-model' }],
   },
   {
     tag: 'Personal Project',
     wip: true,
+    release: 'Version 1.0.0',
     title: 'Material Boxes',
     desc: 'Built a client-side Fabric mod for Minecraft 26.2 that tracks the materials needed for a build, and works on servers that don\'t have it installed. Players import a material list by pasting text, loading a Litematica export, or dropping in a screenshot that Claude reads. Chests, barrels and shulker boxes marked as Material Boxes then count what\'s already stored, color-code each slot by progress, and route shift-clicked items straight to the slots that still need them.',
     tags: ['Java', 'Fabric', 'Minecraft Modding', 'Claude API'],
-    link: 'https://github.com/kianjavaheri/material-boxes',
-    linkLabel: 'View GitHub',
+    links: [
+      { label: 'View CurseForge', href: 'https://www.curseforge.com/minecraft/mc-mods/material-boxes' },
+      { label: 'View GitHub', href: 'https://github.com/kianjavaheri/material-boxes' },
+    ],
   },
 ]
+
+// A link opens either the PDF modal (pdfSrc) or an outbound page (href).
+interface WorkLink {
+  label: string
+  pdfSrc?: string
+  href?: string
+}
 
 interface WorkProps {
   tag: string
   wip?: boolean
+  // Shipped version, e.g. 'Version 1.0.0'. Green badge, left of the WIP one.
+  release?: string
   title: string
   desc: string
   tags?: string[]
-  pdfSrc?: string
-  link?: string
-  linkLabel?: string
+  links?: WorkLink[]
   onOpenPdf?: (src: string) => void
 }
 
-function WorkCard({ tag, wip, title, desc, tags, pdfSrc, link, linkLabel, onOpenPdf }: WorkProps) {
+function WorkCard({ tag, wip, release, title, desc, tags, links, onOpenPdf }: WorkProps) {
   const { innerRef, expanded, canExpand, toggle, style, clampClass } = useClampedExpand()
 
   return (
@@ -77,7 +83,17 @@ function WorkCard({ tag, wip, title, desc, tags, pdfSrc, link, linkLabel, onOpen
         <div className="card-title-row">
           {/* Badge is inline in the title, so on a wrapping title it follows
               the last word rather than floating beside the first line. */}
-          <h2 className="project-title">{title}{wip && <span className="project-wip">WIP</span>}</h2>
+          <h2 className="project-title">
+            {title}
+            {(release || wip) && (
+              // Grouped so the badges wrap as a unit — on a phone WIP used to
+              // break onto a line of its own, away from the release badge.
+              <span className="project-badges">
+                {release && <span className="project-release">{release}</span>}
+                {wip && <span className="project-wip">WIP</span>}
+              </span>
+            )}
+          </h2>
           {canExpand && <span className="card-toggle-icon">{expanded ? '−' : '+'}</span>}
         </div>
         <div className={clampClass} style={style}>
@@ -87,25 +103,35 @@ function WorkCard({ tag, wip, title, desc, tags, pdfSrc, link, linkLabel, onOpen
         </div>
         <Tags tags={tags} />
       </div>
-      {/* Optional — a project with nothing to link to yet renders no link row. */}
-      {(pdfSrc || link) && (
+      {/* Optional — a project with nothing to link to yet renders no link row.
+          Several links stack in the order they're listed. */}
+      {links?.length ? (
         // Links act on their own — they must not also toggle the row.
         <div className="project-links" onClick={(e) => e.stopPropagation()}>
-          {pdfSrc ? (
-            <button
-              type="button"
-              className="project-link"
-              onClick={() => onOpenPdf?.(pdfSrc)}
-            >
-              {linkLabel}<ArrowOut />
-            </button>
-          ) : (
-            <a href={link} target="_blank" rel="noopener noreferrer" className="project-link">
-              {linkLabel}<ArrowOut />
-            </a>
-          )}
+          {links.map((l) => (
+            l.pdfSrc ? (
+              <button
+                key={l.label}
+                type="button"
+                className="project-link"
+                onClick={() => onOpenPdf?.(l.pdfSrc!)}
+              >
+                {l.label}<ArrowOut />
+              </button>
+            ) : (
+              <a
+                key={l.label}
+                href={l.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="project-link"
+              >
+                {l.label}<ArrowOut />
+              </a>
+            )
+          ))}
         </div>
-      )}
+      ) : null}
     </div>
   )
 }
