@@ -186,6 +186,19 @@
     margin-bottom: 20px;
 }
 
+/* The thesis's references print bare URLs, and a URL is one unbreakable token:
+   at 375px the longest ran 461px in a 331px column, which pushed the whole
+   document to a 480px scroll width. Nothing was visibly cut — the page just
+   scrolled sideways, and pinch-zooming out showed the empty band it opened on
+   the right. Breaking mid-token is confined to the text blocks that can carry
+   a URL; the tables keep their own `.paper-table-scroll` instead. */
+.paper-para,
+.paper-quote,
+.paper-list li,
+.paper-references li {
+    overflow-wrap: break-word;
+}
+
 .paper-quote {
     font-size: 0.95rem;
     line-height: 1.8;
@@ -575,6 +588,11 @@
     width: 100%;
     height: auto;
     overflow: visible;
+    /* Drops the ~300ms delay the double-tap-to-zoom heuristic adds before a tap
+       is dispatched as a click, so a tap on a point registers straight away.
+       `manipulation` and not `pan-y`, which would also take pinch-zoom away on
+       exactly the element a reader is most likely to zoom into. */
+    touch-action: manipulation;
 }
 
 .paper-chart-svg:focus-visible {
@@ -687,9 +705,13 @@ circle.paper-chart-s2 {
     color: var(--chart-s2);
 }
 
+/* Sits beside the crosshair, whose position arrives as --tip-x, and flips to
+   its other side past the midpoint so it never runs off the right edge. */
 .paper-chart-tooltip {
     position: absolute;
     top: 50%;
+    left: var(--tip-x);
+    transform: translate(14px, -50%);
     pointer-events: none;
     background: var(--bgcolor);
     border-radius: 10px !important;
@@ -697,6 +719,10 @@ circle.paper-chart-s2 {
     padding: 10px 12px;
     min-width: 128px;
     z-index: 2;
+}
+
+.paper-chart-tooltip-flip {
+    transform: translate(calc(-100% - 14px), -50%);
 }
 
 .paper-chart-tooltip-x {
@@ -868,12 +894,30 @@ circle.paper-chart-s2 {
     list-style: none;
 }
 
-.paper-references li {
+/* Two sources, one treatment. `.paper-references li` is the `references` field
+   on a Paper, which is what basic-income and cs-capstone use. The thesis's came
+   out of the PDF as an ordinary section instead — it groups its citations under
+   h3 subheadings ("Public Perception", …), which a flat `references: string[]`
+   can't express — so its entries are `p` blocks and were rendering as body copy:
+   1rem, full --textcolor, no hanging indent. Same rule for both now, keyed off
+   the section id in Paper.tsx.
+
+   Smaller and muted is right for both. A reference list is apparatus — you scan
+   it for a name, you don't read it — and at body weight it shouted louder than
+   the argument above it. */
+.paper-references li,
+.paper-section-references .paper-para {
     font-size: 0.85rem;
     line-height: 1.7;
     color: var(--muted);
     padding-left: 28px;
     text-indent: -28px;
+}
+
+/* The list gets its rhythm from `gap`; the section's paragraphs carry their own
+   margin, so it's matched here rather than inherited from .paper-para's 20px. */
+.paper-section-references .paper-para {
+    margin-bottom: 14px;
 }
 
 .paper-missing {
@@ -988,8 +1032,46 @@ circle.paper-chart-s2 {
         transform: translateY(-16px);
     }
 
+    /* No floor on the width: a series name like "Trade-to-GDP ratio" wrapped to
+       three lines inside 112px and the card grew tall enough to cover the whole
+       plot. One line per row makes it wider but much shorter. */
     .paper-chart-tooltip {
-        min-width: 112px;
+        min-width: 0;
         padding: 8px 10px;
+    }
+
+    /* And at that width it stops floating. ~190px beside a crosshair near the
+       middle of a 335px column hangs off whichever side it takes — which is not
+       just ugly, it puts an absolutely positioned box outside the article and
+       re-opens the sideways page scroll this file's overflow-wrap rule closed
+       (measured: 375px document, 390px scroll width, with one tooltip open).
+       Parked at the plot edge away from the reading, it always fits. */
+    .paper-chart-tooltip {
+        left: 0;
+        right: auto;
+        transform: translateY(-50%);
+    }
+
+    .paper-chart-tooltip-flip {
+        left: auto;
+        right: 0;
+        transform: translateY(-50%);
+    }
+
+    .paper-chart-tooltip-row {
+        font-size: 0.72rem;
+        line-height: 1.55;
+        white-space: nowrap;
+    }
+
+    /* Same 0.49x problem as the type: r=4 draws at about 2px, which is neither
+       visible nor plausibly something a finger aimed at. These are geometry
+       properties, so they override the attribute the component sets. */
+    circle.paper-chart-dot {
+        r: 7;
+    }
+
+    circle.paper-chart-dot-active {
+        r: 11;
     }
 }

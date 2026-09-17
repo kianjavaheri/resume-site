@@ -4,7 +4,6 @@ import PdfModal, { withViewerParams } from './PdfModal'
 import LinkIcon from './LinkIcon'
 import ArrowOut from './ArrowOut'
 import Tags from './Tags'
-import { useClampedExpand } from './useClampedExpand'
 import './../styling/components/Projects.css'
 
 // Annotated so each link's `icon` is checked against the union below rather
@@ -23,7 +22,7 @@ const works: Array<Omit<WorkProps, 'onOpenPdf'>> = [
   {
     tag: 'Barrett Honors Thesis',
     title: 'Public Perception vs. Actual Economic Effects of U.S.–China Trade Policy',
-    desc: 'Investigated the divergence between the economic outcomes of the 2018–2020 U.S.–China trade war and the public\'s perception of those outcomes.The thesis utilizes a survey to gather public perception of international trade policy and employs Natural Language Processing (NLP) to identify the key drivers of public perception towards trade. The paper identifies key substructures in the results and finds formal education, price sensitivity, and media influence to be the largest factors affecting trade opinions.',
+    desc: 'Investigated the divergence between the economic outcomes of the 2018–2020 U.S.–China trade war and the public\'s perception of those outcomes. The thesis utilizes a survey to gather public perception of international trade policy and employs Natural Language Processing (NLP) to identify the key drivers of public perception towards trade. The paper identifies key substructures in the results and finds formal education, price sensitivity, and media influence to be the largest factors affecting trade opinions.',
     tags: ['NLP', 'Survey Research', 'Qualtrics'],
     links: [
       { label: 'Read Paper', short: 'Read', icon: 'paper', to: '/papers/thesis' },
@@ -88,45 +87,41 @@ interface WorkProps {
   onOpenPdf?: (src: string) => void
 }
 
+// Always open. These rows used to clamp to a two-line preview like the
+// Experience cards, but the descriptions are short enough that most of them
+// cleared the clamp outright — so the section was a row of `+` icons where
+// only some did anything, and the one card that couldn't expand also lost the
+// hover tint, which read as a bug. Nothing is hidden now, so there is no
+// toggle, and `.hover-card` gives every row the tint without the pointer
+// cursor that `.expandable-card` carries (see App.css).
 function WorkCard({ tag, wip, release, title, desc, tags, links, onOpenPdf }: WorkProps) {
-  const { innerRef, expanded, canExpand, toggle, style, clampClass } = useClampedExpand()
-
   return (
-    <div
-      className={`sub-card project-card ${canExpand ? 'expandable-card' : ''}`}
-      onClick={canExpand ? toggle : undefined}
-    >
+    <div className="sub-card project-card hover-card">
       <div className="project-card-meta">
         <span className="project-tag">{tag}</span>
       </div>
       <div className="project-body">
-        <div className="card-title-row">
-          {/* Badge is inline in the title, so on a wrapping title it follows
-              the last word rather than floating beside the first line. */}
-          <h2 className="project-title">
-            {title}
-            {(release || wip) && (
-              // Grouped so the badges wrap as a unit — on a phone WIP used to
-              // break onto a line of its own, away from the release badge.
-              <span className="project-badges">
-                {release && <span className="project-release">{release}</span>}
-                {wip && <span className="project-wip">WIP</span>}
-              </span>
-            )}
-          </h2>
-          {canExpand && <span className="card-toggle-icon">{expanded ? '−' : '+'}</span>}
-        </div>
-        <div className={clampClass} style={style}>
-          <div ref={innerRef}>
-            <p className="project-desc">{desc}</p>
-          </div>
-        </div>
+        {/* Badge is inline in the title, so on a wrapping title it follows
+            the last word rather than floating beside the first line. */}
+        <h2 className="project-title">
+          {title}
+          {(release || wip) && (
+            // Grouped so the badges wrap as a unit — on a phone WIP used to
+            // break onto a line of its own, away from the release badge.
+            <span className="project-badges">
+              {release && <span className="project-release">{release}</span>}
+              {wip && <span className="project-wip">WIP</span>}
+            </span>
+          )}
+        </h2>
+        <p className="project-desc">{desc}</p>
         <Tags tags={tags} />
       </div>
       {/* Optional — a project with nothing to link to yet renders no links. */}
       {links?.length ? (
-        // Links act on their own — they must not also toggle the row.
-        <div className="project-links" onClick={(e) => e.stopPropagation()}>
+        // No stopPropagation any more: the card itself has no click handler to
+        // swallow, so the links are the only thing here that acts on a click.
+        <div className="project-links">
           {links.map((l) => (
             l.to ? (
               <Link key={l.label} to={l.to} className="project-icon-link" aria-label={l.label} title={l.label}>
@@ -191,7 +186,7 @@ function Projects() {
         </div>
         <div className="section-body-wrapper">
           <div className="section-body-inner">
-            <div className="sub-cards-stack">
+            <div className="sub-cards-stack work-stack">
               {works.map((w, i) => (
                 <WorkCard key={i} {...w} onOpenPdf={openPdf} />
               ))}

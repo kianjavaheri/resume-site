@@ -1,8 +1,31 @@
 /* Full-width rows, stacked. Each card is a two-column row — meta and link on
    the left, title and description on the right — so an entry is wide and
    short rather than a tall grid tile. The stack itself reuses .sub-cards-stack.
-   Collapse/expand and the hover tint are shared with Experience: see
-   useClampedExpand and .expandable-card in App.css. */
+   The rows are always open (no clamp, no toggle) and take .hover-card for the
+   tint without the pointer cursor — see App.css. */
+
+/* Equal heights: the stack becomes a grid so `1fr` auto rows all resolve to
+   the tallest card's content, instead of each row sizing to its own. Measured
+   before: 176 / 224 / 200 / 200 / 200, a 48px spread that read as
+   almost-but-not-quite aligned. All five are 224px now.
+
+   Written as `.sub-cards-stack.work-stack`, not `.work-stack` — both are
+   0-1-0 on their own, and App.css's `.sub-cards-stack { display: flex }` loads
+   after this file, so the single class silently lost and the stack stayed
+   flex. The media query adds no specificity. Qualifying it is enough; no
+   !important needed.
+
+   Desktop only. Below 769px the card restacks to one column and a description
+   runs eight to twelve lines, so equalising there would pad the short cards
+   with most of a screen of dead space to match the longest one.
+
+   `gap` and `padding` carry over from .sub-cards-stack to grid unchanged. */
+@media (min-width: 769px) {
+    .sub-cards-stack.work-stack {
+        display: grid;
+        grid-auto-rows: 1fr;
+    }
+}
 
 /* Cards also carry .sub-card, which supplies radius, fill, shadow and padding.
    The type and the link tiles centre in the card as a pair: two equal flexible
@@ -17,29 +40,46 @@
 .project-card {
     display: grid;
     grid-template-columns: 200px 1fr;
-    grid-template-rows: 1fr auto auto 1fr;
+    /* Three rows with the flexible one in the MIDDLE, so the left column
+       brackets the card exactly as the right one does: the type label pins to
+       the top of the content box beside the title, the tiles pin to the bottom
+       beside the tags, and the slack sits between them. The label and the tiles
+       used to travel together as a centred pair — they're independent now,
+       each tied to the body row it belongs with. */
+    grid-template-rows: auto 1fr auto;
     grid-template-areas:
-        ".    body"
         "meta body"
-        "link body"
-        ".    body";
+        ".    body"
+        "link body";
     column-gap: 40px;
-    /* Also the gap between the type and the tiles. */
-    row-gap: 14px;
+    /* Zero, and only on desktop. The middle row is `1fr`, so a row gap here is
+       invisible — it just comes out of the flexible track — while still costing
+       the card real height if it ever has to squeeze. The mobile block restates
+       14px, where the rows stack and the gap is the thing separating them. */
+    row-gap: 0;
 }
 
-/* The card's own top/bottom padding sits outside the grid, so the centred pair
-   would be measured against the content box rather than the card. Moving it
-   onto the body lets the rows span the full card height. Desktop only: mobile
-   keeps the stacked layout and the sub-card's normal padding. */
-@media (min-width: 769px) {
-    .sub-card.project-card {
-        padding-top: 0;
-        padding-bottom: 0;
-    }
+/* Two anchors, one line. The cards are all one height, so the body has slack
+   to put somewhere; putting it BETWEEN the description and the tags pins the
+   two things that should line up and leaves the two that shouldn't alone:
+   every title starts at the same offset from the card's top, and every tag row
+   ends at the same offset from its bottom — which is the line the link tiles
+   are anchored to as well.
 
-    .project-body {
-        padding: 20px 0;
+   This is why the card keeps its normal `.sub-card` padding now. It used to be
+   zeroed top/bottom, with `padding: 20px 0` moved onto the body, so that the
+   meta pair could be centred against the whole card rather than its content
+   box. Nothing is centred any more, so that indirection is gone: the grid's
+   content box is inset 20px, the last row ends there, and the tags end there.
+
+   Desktop only — below 769px the card restacks to one column, where the label
+   heads the title and the tiles simply follow the tags. */
+@media (min-width: 769px) {
+    /* Beats `.tag-list { margin-top: 2px }` in App.css on specificity (0-2-0
+       against 0-1-0). It's the tags that absorb the slack, not the body, so
+       `justify-content` stays at its default. */
+    .project-body .tag-list {
+        margin-top: auto;
     }
 }
 
@@ -53,6 +93,19 @@
     flex-direction: column;
     align-items: center;
     gap: 6px;
+}
+
+/* Top-aligning the two BOXES isn't the same as aligning the two texts: the
+   label's line box is 13px against the title's 19.76px, so at a shared top edge
+   the label's caps sat 1.8px high. 2px puts the cap heights level, which is
+   what "flush with the title" means to the eye — the label and the title start
+   on the same optical line. Cap tops, not baselines: those are 5.4px apart, and
+   matching them would drop the small label visibly below the title.
+   Desktop only; the areas restack below 769px. */
+@media (min-width: 769px) {
+    .project-card-meta {
+        padding-top: 2px;
+    }
 }
 
 .project-body {

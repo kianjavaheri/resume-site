@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
 import Tags from './Tags'
+import CalendarIcon from './CalendarIcon'
 import { useClampedExpand } from './useClampedExpand'
 import './../styling/Experience.css'
 
 interface ExpCardProps {
   company: string
-  location: string
   date: string
   logo: string
   role: string
@@ -16,7 +16,7 @@ interface ExpCardProps {
 
 // One role per card. Collapsed to a two-line preview; the tags stay visible
 // below the clamp. Shares its expand behaviour with the Selected Work rows.
-function ExpCard({ company, location, date, logo, role, tags, children }: ExpCardProps) {
+function ExpCard({ company, date, logo, role, tags, children }: ExpCardProps) {
   const { innerRef, expanded, canExpand, toggle, style, clampClass } = useClampedExpand()
 
   return (
@@ -25,15 +25,16 @@ function ExpCard({ company, location, date, logo, role, tags, children }: ExpCar
       onClick={canExpand ? toggle : undefined}
     >
       <div className="exp-meta">
-        {/* Decorative: the company name is right beside it. */}
-        <div className="exp-logo">
-          <img src={logo} className="exp-org-logo" alt="" />
-        </div>
-        <div className="exp-meta-text">
+        <div className="exp-meta-head">
+          {/* Decorative: the company name is right beside it. */}
+          <div className="exp-logo">
+            <img src={logo} className="exp-org-logo" alt="" />
+          </div>
           <p className="exp-company">{company}</p>
-          <p className="exp-location">{location}</p>
-          <p className="exp-date">{date}</p>
         </div>
+        {/* Its own row under the tile, so it gets the column's full width
+            rather than the ~132px the tile leaves beside it. */}
+        <span className="exp-date"><CalendarIcon />{date}</span>
       </div>
       <div className="exp-content">
         <div className="card-title-row">
@@ -65,17 +66,16 @@ function Experience() {
 
             <ExpCard
               company="Sandia National Laboratories"
-              location="Livermore, CA"
               date="May 2023 – Aug 2024"
               logo="/svgs/sandia.svg"
               role="R&D Bioresource and Environment Security Year-round Intern"
               tags={['Python', 'Pandas', 'QGIS', 'Optimization', 'Geospatial Data']}
             >
               <p className="exp-desc">
-                At Sandia National Laboratories, I developed a standalone tool that optimizes theoretical cash flow for bioresource systems using configurable
-                optimization algorithms tailored to user inputs. I also built a QGIS plugin that builds a geospatial
-                map of county-dependent feedstock (fuel for energy conversion) prices. Users are allowed to select and trial different U.S. counties and to see how energy prices affect project cash flow.
-                I collaborated closely with my mentor to build out this tool and communicate key milestones and findings through presentations.
+                I built a standalone tool that optimizes cash flow for bioresource systems, plus a QGIS plugin
+                mapping county-dependent feedstock — the fuel for energy conversion — so users can trial different
+                U.S. counties and see how energy prices affect project cash flow. I worked closely with my mentor
+                and presented milestones and findings throughout.
               </p>
               <ul className="exp-bullets">
                 <li>Led and designed a standalone optimization tool in Python that ingests operational data across multiple bioresource systems and maximizes projected cash flow via configurable optimization algorithms.</li>
@@ -85,17 +85,15 @@ function Experience() {
 
             <ExpCard
               company="Arizona State University"
-              location="Tempe, AZ"
               date="May 2025 – May 2026"
               logo="/svgs/asu.svg"
               role="Junior Researcher"
               tags={['Python', 'Selenium', 'OCR', 'Web Scraping']}
             >
               <p className="exp-desc">
-                Supervised by Professor Michael Hanemann, I built a web scraper using the Selenium Python library to collect
-                annual report documents from the Arizona Department of Water Resources (ADWR). I also built
-                OCR scripts to extract and parse data from the collected reports and structured the output
-                into clean CSV files for econometric analysis.
+                Supervised by Professor Michael Hanemann, I built a Selenium scraper that collects annual reports
+                from the Arizona Department of Water Resources (ADWR), then OCR scripts that parse them into clean
+                CSVs for econometric analysis.
               </p>
               <ul className="exp-bullets">
                 <li>Automated large-scale document retrieval from the ADWR using Selenium WebDriver, eliminating manual collection across hundreds of annual reports.</li>
@@ -105,7 +103,6 @@ function Experience() {
 
             <ExpCard
               company="Arizona State University"
-              location="Tempe, AZ"
               date="Aug 2023 – May 2024"
               logo="/svgs/asu.svg"
               role="Undergraduate Teaching Assistant"

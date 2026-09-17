@@ -7,25 +7,24 @@
     column-gap: 40px;
 }
 
-/* Icon on the left, the three text lines beside it — not stacked above them.
-   The tile is 48px and the gap 12px, so the text runs in the remaining ~140px
-   of the 200px column (~110px at the 1024px breakpoint). That's enough for
-   "Sandia National" on one line, which is the longest word pair here.
+/* Two rows: the tile and the company name side by side, then the date chip
+   underneath on the column's full width.
 
-   Putting the tile beside the text instead of above it also gives the meta
-   column back its 60px of height: the Sandia card used to run 14px taller
-   than its own content because the tile and a two-line company name together
-   outgrew the role text. All three cards are content-driven again. */
+   Putting the tile beside the name instead of above it gave the meta column
+   back its 60px of height: the Sandia card used to run 14px taller than its
+   own content because the tile and a two-line company name together outgrew
+   the role text. All three cards are content-driven. */
 .exp-meta {
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
     gap: 12px;
 }
 
-.exp-meta-text {
+.exp-meta-head {
     display: flex;
-    flex-direction: column;
-    gap: 4px;
+    align-items: center;
+    gap: 12px;
     /* Without this the flex item refuses to shrink below its longest word and
        the company name pushes the tile out of the column. */
     min-width: 0;
@@ -40,18 +39,47 @@
     line-height: 1.3;
 }
 
-.exp-location {
-    font-size: 0.75rem;
-    font-weight: 400;
-    color: var(--muted);
-    margin-top: 2px;
-}
+/* An OUTLINED PILL, and every attribute here is the inverse of `.tag` on
+   purpose. It first shipped as a copy of the tag treatment — same --well-bg
+   fill, same boxy 6px, same 0.7rem/500 — which made the date and the tech
+   chips look like two instances of one component that happened to sit at
+   opposite corners of the card. The calendar glyph alone wasn't enough to
+   separate them.
 
+   So: no fill against the tags' filled --well-bg, a hairline rim against their
+   none, and a full 999px pill against their boxy 6px. Three attributes differ
+   at once, which is what makes the two families read as deliberately distinct
+   rather than as an inconsistency. Don't half-revert one of them.
+
+   The rim is --card-border, the site's internal-divider token. That is a mild
+   extension of "no card borders" — the rule governs cards, which carry shadows
+   instead, and this is a chip. The text stays at full --textcolor: a quiet
+   container around confident type, not a muted caption.
+
+   Tabular figures line the three cards' dates up with each other down the
+   column. The calendar glyph is inline SVG on currentColor (CalendarIcon.tsx),
+   sized in em so it scales with the label rather than being pinned in px.
+
+   It sits on its own row for a reason. Beside the tile it had 132px on desktop
+   and 102px in the 769-1024px band, against the 117px "May 2023 – Aug 2024"
+   needs, so that string wrapped to two lines at every tablet width. On its own
+   row it has the whole 200px (170px at the breakpoint) and never wraps. */
 .exp-date {
-    font-size: 0.72rem;
-    font-weight: 400;
-    color: var(--muted);
-    margin-top: 2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    line-height: 1;
+    /* The `*` reset sets `border: 0` with no !important, so a class rule wins.
+       border-radius is the one that needs it. */
+    padding: 6px 12px;
+    border: 1px solid var(--card-border);
+    border-radius: 999px !important;
+    background: none;
+    color: var(--textcolor);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
 }
 
 /* A small rounded tile at the head of the meta column, left of the company
@@ -64,6 +92,12 @@
    bare mark floating in the column has no business being there, while a mark
    on a tile is an icon and reads as deliberate at 48px.
 
+   60px is the ceiling, and the constraint is the company name beside it, not
+   the tile. At the 1024px breakpoint the column is 170px, so the name gets
+   170 - 60 - 12 = 98px against "Laboratories" at 93.4px — 4.6px of headroom.
+   64px would leave 0.6px, which one font fallback erases. Measure that word
+   before growing it again.
+
    --well-bg rather than a fixed white or dark fill. Two reasons: it is the
    site's step-down convention (see "Nesting goes DOWN"), and its lightness in
    each theme is within a point or two of the sub-card the logos already sat
@@ -71,16 +105,20 @@
    carries black elements and the ASU seal carries white ones, so a fixed fill
    would make one of them lose parts in one of the themes. */
 .exp-logo {
-    width: 56px;
-    height: 56px;
+    width: 60px;
+    height: 60px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Padding and radius both scale with the tile: the mark stays inset by a
-       sixth, and 56/14 holds the same 0.25 ratio 48/12 did. */
-    padding: 9px;
-    border-radius: 14px !important;
+    /* 6px on 60px is a 10% inset — an app-icon proportion, and where the marks
+       actually read. The old 9px on 56px was a 16% inset that left a 38px mark
+       in a 56px tile, which looked stranded, worst on the circular ASU seal
+       (a contained circle wastes its corners and reads smaller still than a
+       square glyph at the same box). The mark is now 48px: 26% bigger.
+       Radius still scales with the tile at 0.25 — keep 60/15 in step. */
+    padding: 6px;
+    border-radius: 15px !important;
     background: var(--well-bg);
     box-shadow: var(--well-shadow);
 }
@@ -182,6 +220,7 @@
     font-weight: 400;
     color: var(--muted);
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
 }
 
 .exp-ta-prof {

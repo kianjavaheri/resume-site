@@ -130,15 +130,27 @@ a {
 /* ── Expandable cards (useClampedExpand) ──────── */
 /* Experience cards and Selected Work rows. Tint layered ABOVE the sub-card
    gradient — a bare background-image would replace it and flatten the card. */
-.expandable-card {
-    cursor: pointer;
+/* The hover tint. Split from the pointer cursor, because Selected Work's rows
+   want the tint without it: they're always open, so there is nothing on the
+   card to click, and a pointer on an inert card is a promise it can't keep.
+   Experience's cards still toggle, so they take .expandable-card and get both.
+
+   Per the hover convention, both re-declare --sub-card-grad beneath the tint —
+   a bare background-image would replace the gradient and flatten the card. */
+.expandable-card,
+.hover-card {
     transition: background-image 0.15s ease;
 }
 
-.expandable-card:hover {
+.expandable-card:hover,
+.hover-card:hover {
     background-image:
         linear-gradient(var(--hover-tint), var(--hover-tint)),
         var(--sub-card-grad);
+}
+
+.expandable-card {
+    cursor: pointer;
 }
 
 .card-title-row {
@@ -479,4 +491,12 @@ a {
     /* Nudged up: the glyph's visual mass sits high, so baseline-aligning the
        box would leave it looking dropped next to uppercase text. */
     margin-top: -0.08em;
+}
+
+/* Calendar glyph (CalendarIcon.tsx), sized the same way: 1em, so it tracks the
+   label beside it instead of carrying a px size per caller. */
+.cal-icon {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
 }

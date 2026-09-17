@@ -277,7 +277,15 @@ function Paper() {
                 : stacked
 
               return (
-                <section key={s.id} className="paper-section">
+                // The thesis's references came out of the PDF as an ordinary
+                // section — it groups them under h3 subheadings, which the flat
+                // `references: string[]` field can't express — so they'd render
+                // as body copy. The class hands them the reference treatment
+                // (see .paper-section-references in Paper.css).
+                <section
+                  key={s.id}
+                  className={`paper-section${s.id === 'references' ? ' paper-section-references' : ''}`}
+                >
                   <h2 id={s.id} className="paper-section-title">{s.title}</h2>
                   {visible.map(renderBlock)}
                   {cut !== -1 && explorer ? (
