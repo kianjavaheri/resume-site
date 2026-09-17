@@ -4,14 +4,122 @@ import Footer from '../components/Footer'
 import ScrollButton from '../components/Scroll'
 import ArrowOut from '../components/ArrowOut'
 import { useTheme } from '../components/useTheme'
-import { papers } from '../content/papers'
+import SurveyExplorer from '../components/SurveyExplorer'
+import FigureChart from '../components/FigureChart'
+import { papers, surveyExplorers } from '../content/papers'
+import type { Block, PaperTable } from '../content/papers'
+import { paperTables } from '../content/tables'
+import { paperCharts } from '../content/charts'
 import './../styling/pages/Paper.css'
+
+// Columns of figures read better flush right, where the decimal points line
+// up; text columns stay left. Detected rather than declared per table, so a
+// new table doesn't need an alignment array maintained alongside it.
+//
+// "Quantity" rather than "number", because these tables write amounts as
+// `$115.6 billion` and `~3.19%` — approximate, prefixed and suffixed. Matching
+// bare digits only would leave those columns ragged left while `1.95%` beside
+// them went right. What must NOT match is the Data Dictionary's prose, so the
+// pattern still requires a digit up front: `% of U.S. GDP` and `Index Level`
+// stay text.
+const QUANTITY = /^[~≈]?\$?[+\-\u2212]?\d[\d.,]*%?(\s+(billion|million|trillion))?$/i
+
+function isQuantityColumn(rows: string[][], col: number) {
+  const cells = rows.map((r) => r[col]).filter((c) => c && c.trim())
+  return cells.length > 0 && cells.every((c) => QUANTITY.test(c.trim()))
+}
+
+function PaperTableBlock({ table }: { table: PaperTable }) {
+  // Column 0 is always the row label, even when it's all years — aligning the
+  // header right while the <th> body cells stay left would just look broken.
+  const numeric = table.columns.map((_, c) => c > 0 && isQuantityColumn(table.rows, c))
+
+  return (
+    <div className="paper-table-block">
+      {/* The horizontal scroll lives on its own element so the table keeps its
+          natural column widths instead of being squeezed on a phone. */}
+      <div className="paper-table-scroll" tabIndex={0} role="group" aria-label={table.title}>
+        <table className="paper-table">
+          {table.title ? <caption className="paper-table-title">{table.title}</caption> : null}
+          <thead>
+            <tr>
+              {table.columns.map((c, j) => (
+                <th key={j} scope="col" className={numeric[j] ? 'paper-table-num' : undefined}>
+                  {c}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {table.rows.map((row, r) => (
+              <tr key={r}>
+                {row.map((cell, c) =>
+                  c === 0 ? (
+                    <th key={c} scope="row">{cell}</th>
+                  ) : (
+                    <td key={c} className={numeric[c] ? 'paper-table-num' : undefined}>{cell}</td>
+                  )
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {table.notes?.length ? (
+        <div className="paper-table-notes">{table.notes.map(renderBlock)}</div>
+      ) : null}
+    </div>
+  )
+}
+
+function renderBlock(b: Block, i: number) {
+  if (b.type === 'figure') {
+    // Tables and charts that have been rebuilt from their data render from it;
+    // the image each replaces stays on disk and stays referenced by the
+    // generated content, it just isn't what gets drawn.
+    const table = paperTables[b.src]
+    if (table) return <PaperTableBlock key={i} table={table} />
+
+    const chart = paperCharts[b.src]
+    if (chart) return <FigureChart key={i} chart={chart} caption={b.caption} />
+
+    return (
+      <figure key={i} className="paper-figure">
+        <img
+          src={b.src}
+          alt={b.caption || ''}
+          width={b.width}
+          height={b.height}
+          loading="lazy"
+        />
+        {b.caption ? <figcaption>{b.caption}</figcaption> : null}
+      </figure>
+    )
+  }
+  if (b.type === 'list') {
+    return (
+      <ul key={i} className={`paper-list${b.nested ? ' paper-list-nested' : ''}`}>
+        {b.items.map((item, j) => (
+          <li key={j}>{item}</li>
+        ))}
+      </ul>
+    )
+  }
+  if (b.type === 'h3') {
+    return <h3 key={i} className="paper-subheading">{b.text}</h3>
+  }
+  if (b.type === 'quote') {
+    return <blockquote key={i} className="paper-quote">{b.text}</blockquote>
+  }
+  return <p key={i} className="paper-para">{b.text}</p>
+}
 
 function Paper() {
   const { slug } = useParams()
   const paper = slug ? papers[slug] : undefined
   const { theme, switchTheme, isChecked } = useTheme()
   const [activeId, setActiveId] = useState('')
+  const explorer = slug ? surveyExplorers[slug] : undefined
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -142,43 +250,42 @@ function Paper() {
           </nav>
 
           <article className="paper-article">
-            {paper.sections.map((s) => (
-              <section key={s.id} className="paper-section">
-                <h2 id={s.id} className="paper-section-title">{s.title}</h2>
-                {s.blocks.map((b, i) => {
-                  if (b.type === 'figure') {
-                    return (
-                      <figure key={i} className="paper-figure">
-                        <img
-                          src={b.src}
-                          alt={b.caption || ''}
-                          width={b.width}
-                          height={b.height}
-                          loading="lazy"
-                        />
-                        {b.caption ? <figcaption>{b.caption}</figcaption> : null}
-                      </figure>
+            {paper.sections.map((s) => {
+              // A section can end in a run of survey charts that renders as the
+              // explorer rather than as a stack of pictures. The marker heading
+              // stays put and labels it; everything after it is superseded by
+              // the explorer's own data and drops out of the flow.
+              const cut =
+                explorer && s.id === explorer.sectionId
+                  ? s.blocks.findIndex(
+                      (b) => b.type === 'h3' && b.text === explorer.afterHeading
                     )
-                  }
-                  if (b.type === 'list') {
-                    return (
-                      <ul key={i} className={`paper-list${b.nested ? ' paper-list-nested' : ''}`}>
-                        {b.items.map((item, j) => (
-                          <li key={j}>{item}</li>
-                        ))}
-                      </ul>
-                    )
-                  }
-                  if (b.type === 'h3') {
-                    return <h3 key={i} className="paper-subheading">{b.text}</h3>
-                  }
-                  if (b.type === 'quote') {
-                    return <blockquote key={i} className="paper-quote">{b.text}</blockquote>
-                  }
-                  return <p key={i} className="paper-para">{b.text}</p>
-                })}
-              </section>
-            ))}
+                  : -1
+              const stacked = cut === -1 ? s.blocks : s.blocks.slice(0, cut + 1)
+
+              // Text the section's rebuilt tables now draw themselves. The
+              // crops cut several tables off early and the remainder was
+              // extracted as loose paragraphs, so without this the page prints
+              // those rows twice — once in the table, once as running text.
+              const absorbed = new Set(
+                stacked.flatMap((b) =>
+                  b.type === 'figure' ? paperTables[b.src]?.absorbs ?? [] : []
+                )
+              )
+              const visible = absorbed.size
+                ? stacked.filter((b) => !(b.type === 'p' && absorbed.has(b.text.trim())))
+                : stacked
+
+              return (
+                <section key={s.id} className="paper-section">
+                  <h2 id={s.id} className="paper-section-title">{s.title}</h2>
+                  {visible.map(renderBlock)}
+                  {cut !== -1 && explorer ? (
+                    <SurveyExplorer heading={explorer.afterHeading} />
+                  ) : null}
+                </section>
+              )
+            })}
 
             {paper.references?.length ? (
               <section className="paper-section">

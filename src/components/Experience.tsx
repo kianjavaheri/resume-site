@@ -21,19 +21,18 @@ function ExpCard({ company, location, date, logo, role, tags, children }: ExpCar
 
   return (
     <div
-      className={`sub-card experience-item ${canExpand ? 'expandable-card' : ''} ${expanded ? 'exp-expanded' : ''}`}
+      className={`sub-card experience-item ${canExpand ? 'expandable-card' : ''}`}
       onClick={canExpand ? toggle : undefined}
     >
       <div className="exp-meta">
-        <p className="exp-company">{company}</p>
-        <p className="exp-location">{location}</p>
-        <p className="exp-date">{date}</p>
-        {/* Only shown while expanded — collapsed, it would set the card's
-            height on its own. Decorative: the company name is right above. */}
-        <div className="exp-logo-wrap">
-          <div className="exp-logo-inner">
-            <img src={logo} className="exp-org-logo" alt="" />
-          </div>
+        {/* Decorative: the company name is right beside it. */}
+        <div className="exp-logo">
+          <img src={logo} className="exp-org-logo" alt="" />
+        </div>
+        <div className="exp-meta-text">
+          <p className="exp-company">{company}</p>
+          <p className="exp-location">{location}</p>
+          <p className="exp-date">{date}</p>
         </div>
       </div>
       <div className="exp-content">

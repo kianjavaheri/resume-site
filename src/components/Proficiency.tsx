@@ -34,6 +34,10 @@ const skillGroups: { label: string; skills: Skill[] }[] = [
       { title: 'Flask', src: '/svgs/flask.svg', invertDark: true },
       { title: 'JUnit', src: '/svgs/junit5.svg' },
       { title: 'Pandas', src: '/svgs/pandas.svg' },
+      { title: 'PyTorch', src: '/svgs/pytorch.svg' },
+      // simple-icons has no PySpark glyph; the Apache Spark mark is the same
+      // project and is what the label already says.
+      { title: 'PySpark', src: '/svgs/apachespark.svg' },
     ],
   },
   {
@@ -55,7 +59,11 @@ const skillGroups: { label: string; skills: Skill[] }[] = [
     label: 'Data & Research',
     skills: [
       { title: 'JupyterHub', src: '/svgs/jupyter.svg' },
-      { title: 'MATLAB', abbr: 'ML' },
+      // Promoted off the monogram fallback: simple-icons still has no MATLAB
+      // glyph, so this one is devicon's (MIT), the only multi-colour icon in
+      // the set. It carries its own gradients, which is fine through <img>
+      // where the ids stay scoped to the file.
+      { title: 'MATLAB', src: '/svgs/matlab.svg' },
       { title: 'QGIS', src: '/svgs/qgis.svg' },
       { title: 'Stata', src: '/svgs/stata.svg' },
       { title: 'Qualtrics', src: '/svgs/qualtrics.svg' },

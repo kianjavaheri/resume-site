@@ -7,15 +7,36 @@
     column-gap: 40px;
 }
 
+/* Icon on the left, the three text lines beside it — not stacked above them.
+   The tile is 48px and the gap 12px, so the text runs in the remaining ~140px
+   of the 200px column (~110px at the 1024px breakpoint). That's enough for
+   "Sandia National" on one line, which is the longest word pair here.
+
+   Putting the tile beside the text instead of above it also gives the meta
+   column back its 60px of height: the Sandia card used to run 14px taller
+   than its own content because the tile and a two-line company name together
+   outgrew the role text. All three cards are content-driven again. */
 .exp-meta {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.exp-meta-text {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    /* Without this the flex item refuses to shrink below its longest word and
+       the company name pushes the tile out of the column. */
+    min-width: 0;
 }
 
+/* 600, matching `.edu-institution` — the name at the head of Education's meta
+   column does the same job. Experience was the only one of the three sub-card
+   sections still setting its name and its title at body weight. */
 .exp-company {
     font-size: 0.95rem;
-    font-weight: 400;
+    font-weight: 600;
     line-height: 1.3;
 }
 
@@ -33,35 +54,42 @@
     margin-top: 2px;
 }
 
-/* The logo only appears once the card is expanded. At full size it set the
-   collapsed card's height by itself (~250px against ~150px of content), and
-   shrinking it just looked undecided. It grows in with the same 0fr → 1fr row
-   trick and 0.35s timing as the clamp, so the two land together. */
-.exp-logo-wrap {
-    display: grid;
-    grid-template-rows: 0fr;
-    opacity: 0;
-    transition: grid-template-rows 0.35s ease, opacity 0.35s ease;
-}
+/* A small rounded tile at the head of the meta column, left of the company
+   name. Always visible.
 
-.exp-expanded .exp-logo-wrap {
-    grid-template-rows: 1fr;
-    opacity: 1;
-}
+   This replaced a half-column logo that was revealed only on expand, because
+   at full size it set the collapsed card's height on its own (~250px against
+   ~150px of content). Shrinking that same bare logo to 56px was tried and read
+   as an awkward middle size — but the fix was the treatment, not the size: a
+   bare mark floating in the column has no business being there, while a mark
+   on a tile is an icon and reads as deliberate at 48px.
 
-/* overflow: hidden also makes this a BFC, so the logo's top margin stays
-   inside it and collapses away with the row. */
-.exp-logo-inner {
-    overflow: hidden;
-    min-height: 0;
+   --well-bg rather than a fixed white or dark fill. Two reasons: it is the
+   site's step-down convention (see "Nesting goes DOWN"), and its lightness in
+   each theme is within a point or two of the sub-card the logos already sat
+   on, so neither mark changes appearance. That matters here — the Sandia glyph
+   carries black elements and the ASU seal carries white ones, so a fixed fill
+   would make one of them lose parts in one of the themes. */
+.exp-logo {
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Padding and radius both scale with the tile: the mark stays inset by a
+       sixth, and 56/14 holds the same 0.25 ratio 48/12 did. */
+    padding: 9px;
+    border-radius: 14px !important;
+    background: var(--well-bg);
+    box-shadow: var(--well-shadow);
 }
 
 .exp-org-logo {
-    width: 50%;
-    height: auto;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
     display: block;
-    margin: 16px 0 0;
 }
 
 .exp-content {
@@ -70,9 +98,11 @@
     gap: 12px;
 }
 
+/* Same 0.95rem/600 as `.project-title`, deliberately: it's the primary line of
+   the card, and Experience and Selected Work are built to line up. */
 .exp-role {
     font-size: 0.95rem;
-    font-weight: 400;
+    font-weight: 600;
     line-height: 1.35;
 }
 
@@ -172,12 +202,6 @@
     .experience-item {
         grid-template-columns: 1fr;
         row-gap: 12px;
-    }
-
-    .exp-org-logo {
-        max-height: 120px;
-        max-width: 160px;
-        margin-top: 12px;
     }
 
     .exp-ta-meta {

@@ -1,4 +1,5 @@
-import React, { useEffect, useCallback } from 'react'
+import React from 'react'
+import { useModalChrome } from './useModalChrome'
 
 // PDF open parameters: `pagemode=none` asks for neither the outline nor the
 // thumbnail panel; `navpanes=0` is Adobe's equivalent. Viewers that don't
@@ -12,31 +13,9 @@ interface PdfModalProps {
 }
 
 function PdfModal({ src, onClose }: PdfModalProps) {
-  useEffect(() => {
-    document.body.style.overflow = 'hidden'
-
-    // Prevent page-level pinch-zoom while modal is open (iOS Safari).
-    // The iframe's PDF viewer still handles its own touch gestures.
-    const viewport = document.querySelector('meta[name=viewport]') as HTMLMetaElement | null
-    const prevContent = viewport ? viewport.content : null
-    if (viewport) {
-      viewport.content = 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no'
-    }
-
-    return () => {
-      document.body.style.overflow = ''
-      if (viewport && prevContent !== null) viewport.content = prevContent
-    }
-  }, [])
-
-  const handleKey = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape') onClose()
-  }, [onClose])
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [handleKey])
+  // Pins the viewport: the iframe's PDF viewer handles its own touch gestures,
+  // so page-level pinch-zoom on iOS Safari is never what was meant.
+  useModalChrome(onClose, true)
 
   return (
     <div className="pdf-overlay" onClick={onClose}>

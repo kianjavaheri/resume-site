@@ -15,6 +15,21 @@ npm run preview  # preview production build
 
 Deployed on **Vercel** via git push to `master`. The build command is `vite build` (no `tsc` — esbuild handles TypeScript transpilation).
 
+### Testing in a hidden preview pane
+
+Four things behave differently when the browser pane is hidden, and each one has already been mistaken for a bug in this repo. **Check the environment before concluding the code is broken.**
+
+| Symptom | Cause | Check |
+|---|---|---|
+| A CSS **transition** never moves — the inline `max-height` says `299px`, the computed value stays at the old one | The transition clock is frozen; `getAnimations()` shows the transition `running` at `currentTime: 0` | `el.getAnimations()`. To measure the real end state, set `transition: none` first |
+| An **animation** jumps to its fill state and `animationend` never fires | Same frozen clock | `document.visibilityState` |
+| **Focus** handlers never fire, though `document.activeElement` is set | A hidden pane isn't focused, so no `focus`/`focusin`/`blur`/`focusout` is dispatched — on any element, a plain `<button>` included | `document.hasFocus()` |
+| `scrollWidth` exceeds `clientWidth`, or a `position: fixed` element sits outside the viewport | The emulated viewport is *scaled*: `innerWidth` and `clientWidth` disagree, and fixed elements anchor to the visual viewport | Compare against an element you didn't touch; if it overflows too, it's the pane |
+
+A fifth, related: **programmatic `window.scrollTo` doesn't reliably fire a `scroll` event** there — dispatch `new Event('scroll')` after scrolling or the readings are stale.
+
+Screenshots also come back blank while the pane is hidden, so verify structurally (`read_page`, computed styles, geometry) instead.
+
 ## Tech stack
 
 - **React 18** with TypeScript
@@ -152,9 +167,12 @@ src/
     Education.tsx      # Collapsible, default OPEN. ASU sub-card + course data + nested <Coursework> blocks
     Experience.tsx     # Collapsible, default OPEN. Three expandable role cards (Sandia, ASU RA, ASU TA) w/ tags
     Projects.tsx       # Collapsible, default OPEN. Stacked expandable row sub-cards w/ tags; PDF modal; WIP badge
-    Proficiency.tsx    # Collapsible, default OPEN. 23 skills in 4 labelled groups of rounded icon tiles
+    Proficiency.tsx    # Collapsible, default OPEN. 25 skills in 4 labelled groups of rounded icon tiles
     useClampedExpand.ts # Shared clamp-and-expand hook for Experience cards + Selected Work rows
     useTheme.ts        # Shared theme hook (theme-pref) — used by Home AND Paper
+    useModalChrome.ts  # Escape / click-outside / scroll lock for PdfModal
+    FigureChart.tsx    # Inline SVG line charts for the thesis's Background figures
+    SurveyExplorer.tsx # The thesis's survey section: question + dimension pickers, drawn bars
     Tags.tsx           # Tech tag pills, shown below the clamp on Experience + Selected Work
     LinkIcon.tsx       # Inline SVGs for the Selected Work link chips (paper/pdf/library/github/curseforge)
     Contact.tsx        # NOT a section-card; label above, 3 contact-card links
@@ -172,15 +190,19 @@ src/
     basic-income.ts    # GENERATED from public/pdfs/basic-income/ — regenerate, don't hand-edit
     thesis.ts          # GENERATED from public/pdfs/thesis/ — regenerate, don't hand-edit
     cs-capstone.ts     # GENERATED from public/pdfs/cs-capstone/ by scripts/extract-cs-capstone.py
-  App.tsx              # <Routes> with the single "/" route → Home
+    tables.ts          # Thesis tables rebuilt as markup, keyed by the PNG they replace
+    charts.ts          # Background figures 1-4, derived from tables.ts (never re-typed)
+    survey.ts          # All 10 survey questions x 7 subgroups; Q16 derived from tables.ts
+  App.tsx              # <Routes>: "/" → Home, "/papers/:slug" → Paper
   index.tsx            # createRoot + <BrowserRouter>
   react-app-env.d.ts   # vite/client types + the *.svg module shim
   util/svgs/           # DEAD — 8 SVGs, referenced nowhere. See below.
   styling/
     App.css            # Reset, tokens, card system, expandable cards + tags, PDF modal, scrollbar
     Education.css      # .edu-main 3-col grid + nested coursework rows
-    Experience.css     # .experience-item 200px/1fr grid; TA sub-rows
+    Experience.css     # .experience-item 200px/1fr grid; .exp-meta logo-left row; TA sub-rows
     pages/Home.css
+    pages/Paper.css    # Reading page, survey explorer, charts, tables
     components/
       About.css        # Hero, gallery (4/3, border-radius 75px, two-way slide)
       Contact.css      # 3-col grid of .contact-card
@@ -195,7 +217,7 @@ scripts/
 public/
   images/              # img1–3.jpg used by the gallery (array in About.tsx);
                        #   img_dep*.jpg (4) are unreferenced
-  svgs/                # 24 files: asu, sandia + 22 skill icons (see Skills)
+  svgs/                # 27 files: asu, sandia + 25 skill icons (see Skills)
   pdfs/                # resume.pdf + a folder per paper: cs-capstone/, basic-income/, thesis/
 ```
 
@@ -288,9 +310,23 @@ Experience cards and Selected Work rows share one hook, **`useClampedExpand`** (
 ### Experience
 Three cards: Sandia, ASU Junior Researcher and ASU Undergraduate Teaching Assistant.
 
-**Wording:** the **bullets follow Kian's resume** (`~/Library/CloudStorage/Dropbox/resume.pdf`), lightly adapted into sentences. The **paragraphs above them are hand-written**, so keep edits to them minimal and never smooth them into generic resume-speak. No buzzwords, and no outcome claims the resume doesn't make. (To read the PDF here: `pdftotext` and Python PDF libraries aren't installed, but macOS PDFKit via `osascript -l JavaScript` works.) The two ASU roles used to share one card with a timeline. They were split so each role collapses on its own. Cards use the same `200px 1fr` grid as the Selected Work rows (170px at ≤1024px, stacked at ≤768px), so the two sections line up. The TA card has no summary paragraph, so its preview is the first course row. **CSE 310 is deliberately first**, ahead of the earlier FSE 150. It's the role that matters most to employers, so it's the one visible while the card is collapsed.
+**The company name and the role are both 0.95rem / 600.** Not a style preference — Experience was the last of the three sub-card sections still setting them at body weight. `.edu-institution` (the name at the head of Education's meta column) is 1rem/600 and `.project-title` is 0.95rem/600, so `.exp-company` matches the first in role and `.exp-role` matches the second exactly. A card's hierarchy is then weight and colour, not colour alone: role and company at 600 `--textcolor`, location and dates at 400 `--muted`.
 
-**Logos appear only when a card is expanded.** At full size (50% of the column) the logo alone set each collapsed card's height: about 250px on desktop and 450px on a phone, against about 150px of content. Shrinking it to 56px was tried and read as an awkward middle size. So the logo sits in `.exp-logo-wrap`, which uses the same `0fr → 1fr` row trick and 0.35s timing as the clamp, gated on `.exp-expanded`. It's decorative (`alt=""`), because the company name sits right above it. A card that could never expand would never show its logo; none currently can't.
+**Wording:** the **bullets follow Kian's resume** (`~/Library/CloudStorage/Dropbox/resume.pdf`), lightly adapted into sentences. The **paragraphs above them are hand-written**, so keep edits to them minimal and never smooth them into generic resume-speak. No buzzwords, and no outcome claims the resume doesn't make. (To read the PDF here: `pdftotext` is installed — `pdftotext -layout` is the quickest way in. Python PDF libraries are not; macOS PDFKit via `osascript -l JavaScript` also works.) The two ASU roles used to share one card with a timeline. They were split so each role collapses on its own. Cards use the same `200px 1fr` grid as the Selected Work rows (170px at ≤1024px, stacked at ≤768px), so the two sections line up. The TA card has no summary paragraph, so its preview is the first course row. **CSE 310 is deliberately first**, ahead of the earlier FSE 150. It's the role that matters most to employers, so it's the one visible while the card is collapsed.
+
+**The meta column reads icon on the LEFT, name, location and dates beside it.** `.exp-meta` is a flex *row*: a 56px `.exp-logo` tile (`border-radius: 14px !important`, logo inset 9px, `object-fit: contain`) and then an `.exp-meta-text` column. **Padding and radius scale with the tile** — the mark stays inset by about a sixth, and 56/14 holds the same 0.25 ratio the old 48/12 did. Retune all three together. It's decorative (`alt=""`) — the company name is right next to it. `.exp-meta-text` needs `min-width: 0` or the flex item refuses to shrink below its longest word and pushes the tile out of the column.
+
+The tile used to sit *above* the name. Moving it beside the text is what finally removed the height overhang this section used to log as a known trade: measured at 1280px, all three cards have `.exp-meta` exactly as tall as `.exp-content` (117/117, 117/117, 115/115), so every card is content-driven. Growing the tile from 48px to 56px cost nothing there — same heights, same line counts.
+
+**The whole constraint is the text column's width**, which is whatever the tile and the 12px gap leave: 132px of the 200px column, and 102px at the 1024px breakpoint. Measured against the bold 0.95rem/600 name, the longest unbreakable word is "Laboratories" at 93.4px, so there is 8.6px of headroom at the tightest size. **That number is the budget — check it before growing the tile again.** One known wrap, unchanged by any of this: in the 769-1024px band `.exp-date` needs 117px on one line against a 102px box, so "May 2023 – Aug 2024" takes two lines there. It's muted secondary text, it doesn't overflow, and it isn't what sets the card's height. Don't widen the meta column past 170px to fix it — it's paired with the Selected Work rows' left column, and the two sections line up.
+
+**This reverses an earlier decision, deliberately.** The logo used to be half the column's width and revealed only on expand, inside a `.exp-logo-wrap` that used the same `0fr → 1fr` trick as the clamp, because at full size it set each collapsed card's height on its own — about 250px on desktop and 450px on a phone against ~150px of content. Shrinking that *bare* mark to around 56px was tried then and read as an awkward middle size — neither a logo nor an icon.
+
+What changed is the **treatment, not the size**, and that distinction is the whole lesson: the tile is 56px today, the same size that failed as a bare mark. A mark floating loose in a text column has no role and looks stranded at any size; the same mark on a filled, rounded tile is an icon, and reads as deliberate. `.exp-expanded`, `.exp-logo-wrap` and `.exp-logo-inner` are gone with it — the first existed only to gate the second.
+
+**The tile is `--well-bg`, not a fixed fill**, for two reasons. It's the site's step-down convention (*Nesting goes DOWN*), shared with the tags and the Selected Work link tiles. And its lightness in each theme is within a point or two of the sub-card the logos already sat on, so neither mark changes appearance — which matters here, because **the Sandia glyph carries black elements and the ASU seal carries white ones**. Any fixed fill makes one of them lose parts in one of the themes.
+
+**The old height problem is now gone outright.** While the tile sat *above* the name it still drove the Sandia card 14px past its own content (185px collapsed against 171px of content), which was logged here as a knowing trade. Moving the tile beside the text ended it: measured at 1280px, all three cards have `.exp-meta` exactly as tall as `.exp-content`, and growing the tile to 56px didn't bring it back. If a card ever runs taller than its content again, the meta column is what to measure first.
 
 ## Education section
 
@@ -330,11 +366,11 @@ Each `.course-card` is a flex row: a `.course-card-text` column (code above name
 
 ## Skills section
 
-23 skills in `Proficiency.tsx`, in **four labelled groups**: Languages (7), Frameworks & Libraries (5), Developer Tools (6), Data & Research (5). Each group is its own `.skill-group` — a `.skill-group-label` above a `.skills-grid` flex-wrap of `.skill-item`; each icon sits in a 72px `.skill-icon-wrap` (`border-radius: 16px !important`, sub-card gradient + shadow).
+25 skills in `Proficiency.tsx`, in **four labelled groups**: Languages (7), Frameworks & Libraries (7), Developer Tools (6), Data & Research (5). Each group is its own `.skill-group` — a `.skill-group-label` above a `.skills-grid` flex-wrap of `.skill-item`; each icon sits in a 72px `.skill-icon-wrap` (`border-radius: 16px !important`, sub-card gradient + shadow).
 
 **The groups have to be render structure, not just array order.** This was previously one flat array ordered languages → frameworks → tools with blank lines between the runs. `.skills-grid` is `flex-wrap`, so rows reflowed straight across those boundaries and the ordering was invisible — all the maintenance cost, none of the benefit.
 
-**Data & Research is deliberately not folded into Developer Tools.** Stata, QGIS, Qualtrics, MATLAB and JupyterHub are the tooling behind the econometrics and the thesis, and they are the clearest evidence in the site that the Economics degree is a second credential rather than a line item. Filing them under "Developer Tools" both mislabels them (Qualtrics is a survey platform) and buries the point. It also keeps the buckets even — 7/5/6/5 instead of 7/5/11.
+**Data & Research is deliberately not folded into Developer Tools.** Stata, QGIS, Qualtrics, MATLAB and JupyterHub are the tooling behind the econometrics and the thesis, and they are the clearest evidence in the site that the Economics degree is a second credential rather than a line item. Filing them under "Developer Tools" both mislabels them (Qualtrics is a survey platform) and buries the point. It also keeps the buckets even — 7/7/6/5 instead of 7/7/11.
 
 `skillGroups` is **explicitly annotated** `{ label: string; skills: Skill[] }[]`. Without the annotation each group's array gets its own narrow element type and `s.invertDark` errors in the groups that have no inverted icon.
 
@@ -351,7 +387,9 @@ Spacing has to keep a group break louder than a row wrap: `.skills-wrapper` row 
 
 - Icons are `<img src="/svgs/name.svg">` from `public/svgs/` — **not** Vite imports.
 - Most are **simple-icons** glyphs with the brand hex added as a `fill` attribute on the `<svg>` tag (matching how `react.svg` was already built).
-- **Skills without an SVG fall back to an `abbr` monogram.** Currently only **MATLAB** (`ML`) — simple-icons has no MATLAB glyph. To promote one: drop the file in `public/svgs/` and swap `abbr` for `src`.
+- **Skills without an SVG fall back to an `abbr` monogram.** Nothing uses it right now; the mechanism stays for the next skill that has no glyph. To promote one: drop the file in `public/svgs/` and swap `abbr` for `src`.
+- **MATLAB is the one non-simple-icons icon.** simple-icons still has no MATLAB glyph (it 404s), so `matlab.svg` is **devicon's** (MIT) — the real membrane mark, and the only multi-colour, gradient-carrying icon in the set. The gradients use `id`s, which is safe only because these are loaded through `<img src>`, where ids stay scoped to the file. Inline it and they'd collide.
+- **PySpark wears the Apache Spark mark** (`apachespark.svg`), since simple-icons has no PySpark glyph and it's the same project. PyTorch and PySpark are both filed under Frameworks & Libraries, not Data & Research — that group is specifically the econometrics/thesis tooling (see above), and these are Python libraries.
 - `invertDark: true` applies `filter: invert(1) brightness(0.85)` in dark mode. Used by **Flask** and **GitHub** (GitHub's brand hex `#181717` is invisible on black).
 - C++ uses the lighter logo blue `#659AD2` rather than `#00599C` for dark-mode legibility.
 
@@ -426,15 +464,48 @@ Full-text reading pages for the written work, at **`/papers/:slug`** (`src/pages
 - **Contents highlighting is scroll-position based**, not an `IntersectionObserver`: the active section is the last heading past the probe line. An observer watching a band near the top of the viewport left *nothing* highlighted whenever a jump landed between two headings.
 - **The probe line slides down as the page runs out of scroll** — 120px normally, easing to the full viewport height at the bottom (from `remaining = scrollHeight - (scrollY + innerHeight)`). At a flat 120px, a section whose heading can never reach that line never lit up at all: on a page ending in short sections the scroll limit arrives first, so the highlight stranded three or four entries early. The capstone poster showed it worst — Value for RP, Lessons Learned and Future Work sit 273/427/581px down at max scroll and were unreachable.
 - Testing this in the hidden preview pane is misleading: **programmatic `window.scrollTo` doesn't reliably fire a `scroll` event there**, so the highlight looks stuck. Dispatch `new Event('scroll')` after scrolling, or the readings are stale.
+- The same pane swallows focus events entirely, and freezes transitions — see *Testing in a hidden preview pane* near the top.
 - Headings carry `scroll-margin-top`, so a jump doesn't tuck them under the top edge. The contents list is **hidden below 900px**.
-- **Every figure carries `width` and `height`** (the PNG's real pixel size, stored in the content). Without them, lazy-loaded images reserve no space: jumping to a late section scrolled to where it was *then*, images below the fold loaded on the way past, the document grew, and the target ended up further down — so it took several clicks to reach References or the Appendix. With intrinsic sizes the height is stable from first paint (the thesis page measured 30,838px before and after scrolling through), and one click lands. Keep the dimensions in step with the images when regenerating.
+- **Every figure carries `width` and `height`** (the PNG's real pixel size, stored in the content). Without them, lazy-loaded images reserve no space: jumping to a late section scrolled to where it was *then*, images below the fold loaded on the way past, the document grew, and the target ended up further down — so it took several clicks to reach References or the Appendix. With intrinsic sizes the height is stable from first paint, and one click lands. Keep the dimensions in step with the images when regenerating. (The thesis page no longer has any images at all — see *The survey section is an explorer* — but `basic-income` and `cs-capstone` still do.)
+
+### The survey section is an explorer, not twenty-three pictures
+
+The thesis's Discussion ends in a run of **twenty-three survey charts** printed one after another under a "Bar Graph Breakdowns" heading. Stacked as images they ran about 10,000px — half the page — and buried the analysis on either side of them.
+
+They were first replaced with a carousel of the same PNGs, which fixed the height but not the reading: those twenty-three charts are a *subset* of ten questions across seven subgroups, picked to make the thesis's argument, so "how did the Econ No group answer question 14" usually wasn't in there at all, and when it was you clicked until you found it.
+
+**Now the images are gone and the numbers are drawn.** `SurveyExplorer.tsx` renders one chart you steer with two pickers — a question (Q7-Q16) and a dimension to break it down by — over the full grid in `content/survey.ts`. The page measures **20,478px** (30,838px stacked, 20,614px as the carousel), and **the thesis page now contains zero images**: every figure is an SVG chart, every table is markup, and the survey is this.
+
+`FigureCarousel.tsx` and `ImageLightbox.tsx` are **deleted** along with their CSS (`.paper-carousel-*`, `.lightbox-*`) and `buildSlides`. `useModalChrome` stays — `PdfModal` still uses it — but nothing passes `pinViewport: false` any more.
+
+#### Why two pickers and not seventy slides
+- **The dimension is the unit of choice, not the subgroup.** `surveyDimensions` offers Overall / Economics coursework / Gender / Age, and picking one puts *both* halves on the same rows. The thesis's point is always a contrast ("Econ Yes against Econ No"), so flipping between two single-subgroup views is the wrong interaction. It also caps the chart at **two series**, which is exactly how many validated categorical slots the site has — the explorer reuses the Background charts' `--chart-s1`/`--chart-s2` hexes.
+- **Both pickers sit above the chart.** Changing a question or a dimension changes how tall the chart is (four options against six, one series against two), so putting the controls above everything that moves means **nothing needs a reserved height**. This is the deliberate opposite of the carousel, whose arrows sat *below* the chart and so had to pin `min-height: 132px` to the longest question. Measured here: the prompt runs 53px at the shortest and 131px at question 11 in a 678px column, and the only thing that moves is the chart the reader is already looking toward. Don't reintroduce the reserve — it's 78px of white under six of the ten questions plus a constant to keep in step with the copy.
+- **Horizontal bars on a fixed 0-100% track.** The option labels are full sentences ("Balanced Trade (Imports and exports are even)"), which vertical bars can only take at an angle. The groove is the whole subgroup, never scaled to the row's own maximum, so a 2.4% answer reads as the sliver it is and the ten questions stay comparable with each other.
+- **A 0.0% answer draws nothing.** A 2px stub was tried so the row wouldn't look unrendered; several questions have real zero answers and a mark where the value is zero is a lie. The number beside the empty groove carries it.
+- The chips are **boxy, not pills** — 8px on a ~30px chip, the same proportion `.tag` carries at 6px on 23px. They sit *on* the `--well-bg` controls panel so they take the raised `--sub-card-grad` (the inverse of the tags, which are recessed *into* a sub-card), and hover re-declares that gradient beneath the tint. **The selected chip inverts** to a `--textcolor` fill like `.scroll-top`, because it has to be unmistakable across ten neighbours and a tint alone doesn't separate from a hover.
+- The series name is repeated in a **visually-hidden span** on every value, since a screen reader reading one row at a time gets nothing from the colour.
+
+#### The data is transcribed once and verified twice
+`src/content/survey.ts` holds all ten questions x seven subgroups. It lives there and not in `thesis.ts` for the usual reason: that module is generated from the PDF.
+
+**Nothing here was typed and trusted.** Two independent checks, both passing:
+1. Every stated percentage recomputes from its own counts — **294 cells** (9 closed questions x 7 subgroups x their options).
+2. **63 further cells** cross-check against **Tables 3 and 4 in `tables.ts`**, which came from a separate pass over the PDF: 42 headline shares (Q7/Q8/Q9's correct-answer rates, Q10's awareness rate, Q11's and Q15's) and 21 weighted means (Q12/Q13/Q14 across all seven subgroups, `mean = Σ count_i × (5 − i) / n`, the 5-point scale from Table 4's notes). Every mean matches exactly; 39 of the 42 shares match, with the 3 documented below.
+
+The three expected divergences are all Table 3's **"Q10: Price Increase Awareness"** — Full Sample, Male and Female — where the thesis adds its own two rounded percentages (42.9 + 54.8 = 97.7) instead of recomputing from counts (82/84 = 97.6). That's the thesis's arithmetic and it's kept — don't "fix" either side. The re-runnable check is in the scratchpad note at the top of `survey.ts`.
+
+- **Question 16 is read from `paperTables`, not transcribed again.** It's already in the repo as Table 5, so `openEnded()` derives its six theme percentages from `table4.png`'s rows — the same rule the Background charts follow with Tables 1 and 2, and it means the chart and the table printed further down the page cannot drift apart. It is also the only question with **no counts** and percentages that don't sum to 100%: free-text answers coded into themes, one answer able to carry several. That's what `note` says on screen.
+- **`sliceLabels` keeps the thesis's own inconsistency.** Q13, Q14 and Q16 label the second age slice "Age Other" where the rest say "Age 25+". It's the same partition (both halves sum to that question's full sample), but it's printed differently, so it's rendered differently — same rule as `Satisfication` and the two "Figure 4"s.
+- Gender is the one dimension that doesn't sum to the full sample on any question: two respondents didn't state one.
+- The generated figure blocks after the cut heading are **dropped from the flow**, not rendered. `surveyExplorers` in `content/papers.ts` names the paper, section and heading to cut at; the heading itself stays visible above the explorer.
 
 ### Content is converted from the PDF, not retyped
 `src/content/papers.ts` holds the types and the registry; each paper is its own generated module (`basic-income.ts`, `thesis.ts`, `cs-capstone.ts`). Only the capstone's conversion script survives in the repo, as `scripts/extract-cs-capstone.py`; the other two were one-off scripts.
 
 - **Paragraph breaks come from the PDF's own first-line indents.** Body text at x≈72 is a continuation, x≈108 starts a paragraph. Line length is *not* a usable signal — a paragraph's last line can be longer than a mid-paragraph line.
 - The **references section inverts it**: entries start at x≈102 with continuations hanging at x≈132.
-- Extraction uses **macOS PDFKit via `osascript -l JavaScript`** (`pdftotext` and Python PDF libs aren't installed here). Watch one trap: `characterBoundsAtIndex` indexes **skip newlines**, so subtract the number of preceding line breaks or every x is shifted.
+- Extraction uses **macOS PDFKit via `osascript -l JavaScript`**. (`pdftotext` is also installed now and `pdftotext -layout` is far quicker when you only want text; Python PDF libs still aren't. PDFKit remains the path for figure geometry, which is what the original scripts needed.) Watch one trap: `characterBoundsAtIndex` indexes **skip newlines**, so subtract the number of preceding line breaks or every x is shifted.
 - **Figures are cropped out of the PDF**, not screenshotted: each placed image is an object-replacement character whose bounds give the rectangle, so setting that as the page's crop box and rendering it yields the figure alone. They live beside their PDF in `public/pdfs/<slug>/` (see *Assets live beside the paper*). On `basic-income` the figures are collected into their own trailing section, which also keeps their "Figure N" labels out of the conclusion's last paragraph.
 - Regenerating is a script, not hand-editing: don't patch the generated file by hand, or the next regeneration drops the change.
 
@@ -447,7 +518,7 @@ Full-text reading pages for the written work, at **`/papers/:slug`** (`src/pages
 | Headings | a known list of titles | **type size** (h≥11 section, h=10 subheading), at the left margin |
 | Figures | 3, placed images | 27 placed images + **6 tables cropped as images** |
 
-- The thesis has **two heading levels**, so blocks include `h3`. Its tables extract as scattered positioned fragments (headers split across lines), so they're **cropped as images** rather than rebuilt as HTML — faithful now, convertible later. They are therefore not selectable text.
+- The thesis has **two heading levels**, so blocks include `h3`. Its tables were originally **cropped as images** because they extract as scattered positioned fragments. Four of the six have since been rebuilt as real markup — see *Tables are markup, not screenshots* below.
 - Thesis text runs **split mid-line on font changes**, so runs on the same baseline (y within 3pt) are merged before anything else.
 - Paragraphs are **not broken at page boundaries** — a paragraph usually continues across the page. The cost is that a paragraph ending exactly at a page bottom merges with the next one.
 
@@ -461,6 +532,72 @@ Full-text reading pages for the written work, at **`/papers/:slug`** (`src/pages
 - PyMuPDF rects are **top-left origin**, so unlike the PDFKit path below they're used as the clip directly, with no y flip.
 - The poster has **no caption lines**, so its figures render uncaptioned.
 - Its typos are the poster's own ("Satisfication", "loads into in") and are kept **verbatim**.
+
+### Figures 1-4 are drawn, not screenshotted
+
+The four Background figures render as inline SVG line charts (`FigureChart.tsx`, data in `src/content/charts.ts`), keyed by image src in `paperCharts` exactly as the tables are in `paperTables`. **Nothing on the thesis page is a picture any more** — the survey section became an explorer drawn from its own counts, so the page carries zero `<img>` elements.
+
+**Chart data is derived from the tables, not transcribed a second time.** Figures 1 and 2 plot Table 1; Figures 3 and 4 plot Table 2. `column()` parses the table cells (`$115.6 billion` -> 115.6, `~3.19%` -> 3.19), so the chart and the table printed below it on the same page cannot drift apart, and the verification already done against the PDF covers both. Verify a change by inverting the rendered point geometry back to values rather than by eye.
+
+**The one place the site knowingly departs from the thesis.** Table 1 prints the 2016 trade balance as `1.95%`, positive, while Figure 2 plots it at -1.95%. Every other year is negative in both, and a positive value would mean a trade *surplus* with China, so the published table is missing a minus sign. **Kian confirmed the table is wrong, and `tables.ts` now carries `-1.95%`.**
+
+This is the only cell on the site that does not reproduce its source verbatim, which makes it the one exception to the rule that the thesis's own errors are kept as printed (`Satisfication`, the two "Figure 4"s, the en dash in `Age 18–24`). It is marked as such in `tables.ts` — don't "restore" it to match the PDF, and note that a token-by-token diff against the PDF will legitimately flag it.
+
+#### Departures from the originals
+The source images are Google Sheets defaults, and three of their habits are anti-patterns:
+- **A value on every point.** All nine, on every series. Direct labels only work when sparing, so only the **last point** of each series is labelled; the axis and the tooltip carry the rest.
+- **An in-chart title.** The figcaption underneath already names the chart, so repeating it inside is the title twice. For the same reason a single-series chart gets **no legend** — one colour, and the caption names it.
+- **A white slab.** The PNGs carry their own white background, which is why `.paper-figure img` has to paint one. Inline SVG takes the page's ink and inverts with the theme instead.
+
+#### Colour is validated, not chosen
+Two categorical slots, stepped per mode: `#2a78d6`/`#eb6834` light, `#3987e5`/`#d95926` dark. Both pairs were run through the palette validator **against this site's actual surfaces — pure `#ffffff` and pure `#000000`**, not a near-white and near-black, and pass the lightness band, chroma floor, CVD separation (worst ΔE 24.7 light / 26.8 dark against a ≥8 target), the normal-vision floor and 3:1 contrast. Re-run it if either hex changes.
+
+Text never wears the series colour — ticks, labels and the legend stay on `--muted`, and identity comes from the line key beside them.
+
+#### Two things that bit
+- **The marker's surface ring needs `circle.paper-chart-dot`, not `.paper-chart-dot`.** The `.paper-chart-s1`/`s2` rules set `stroke` to the series colour for the lines; at equal specificity and later in the file they win, so the ring painted in the series colour — invisible, precisely on the overlapping markers it exists to separate. The element-qualified selector outranks them.
+- **The SVG scales with its container, so the type scales too.** At 335px the 680-unit viewBox draws at 0.49x and 15px axis chrome lands at an unreadable 7.4px. The mobile block sets 23 viewBox units (~11px rendered) and re-anchors the end label to its right edge, since at that size `$438.7B` is wider than the 66-unit right margin.
+
+The hover layer is a crosshair plus one tooltip listing every series at that x, with arrow keys doing the same from the keyboard. It enhances and never gates: **every value it shows is also in Tables 1 and 2, in the same section** — that's the table view, already on the page.
+
+### Tables are markup, not screenshots
+
+**All six of the thesis's tables** render as real `<table>` markup: Tables 1 and 2 (Background), Tables 3, 4 and 5 (Results) and the appendix Data Dictionary. No table on the site is a picture any more. The Economics capstone and the capstone poster have no tables.
+
+**The PNG filenames do not match the thesis's own table numbers**, which is the first thing to check before touching these:
+
+| File | Thesis label | Section |
+|---|---|---|
+| `table1.png` | **Actual Effects – Table 1** | Background |
+| `table2.png` | **Actual Effects – Table 2** | Background |
+| `table3.png` | **Table 3** | Results |
+| `table6.png` | **Table 4** | Results |
+| `table4.png` | **Table 5 – Question 16** | Results |
+| `table5.png` | **Data Dictionary** | Appendix |
+
+**The data lives in `src/content/tables.ts`, keyed by the `src` of the image it replaces**, not in `thesis.ts` — same reason as `charts.ts` and `survey.ts`: that module is generated. `renderBlock` looks each figure's src up in `paperTables` and draws the table instead when it finds one. The PNGs stay on disk and stay referenced by the generated content; only the rendering changes.
+
+#### Half of each cropped table was already on the page as loose text
+This is the thing to understand before editing any of it. Several crops cut their table off early, and **the remainder didn't vanish — it was extracted as ordinary paragraphs** and printed as running text beside the picture:
+
+- `table2.png` stops at **2021**; the 2022, 2023 and 2024 rows ran underneath it as three lines of prose.
+- `table4.png` (Table 5) stops one row short; `Age 25+ 52.4% 0.0% ...` trailed the image.
+- `table6.png` (Table 4) excluded both its **title line and its entire Notes block** — the 5-point scale the four "(Mean)" columns are meaningless without — so "Table 4" printed twice and the scale key appeared as body copy.
+
+So rebuilding a table is two jobs, and doing only the first is what produced a visible duplicate "Table 4": put the content in the grid, **and** remove the orphans. That's what **`absorbs`** is for — a list of exact paragraph texts that the table now draws itself. `Paper.tsx` collects the `absorbs` of every table in a section and filters matching `p` blocks out of the flow. Match is on the exact trimmed string, so if the generated text ever changes, the orphan silently comes back; check the section renders clean after any regeneration.
+
+**Transcribe from `pdftotext -layout`, never from the images** — the images are exactly what's missing the rows. Verify afterwards rather than trusting the typing: every quantity token in the PDF's table region should match the rendered cells in order (195 of them across the five data tables — **with one expected exception**, Table 1's 2016 trade balance, see above), and the Data Dictionary should match word for word. Two things that look like errors but aren't: in `-layout` output a row's cells are interleaved column-wise, so a cell's words are *not* contiguous in the text — compare word multisets, not substrings, and check headers against the PNG instead. And `Gender Female` wraps across two lines, so that exact string never appears.
+
+The thesis's own inconsistencies are kept verbatim, as everywhere else: Table 5 writes `Age 18–24` with an en dash where Tables 3 and 4 use a hyphen.
+
+#### Styling is the site's idiom, not the document's
+The source tables are a blue-banded Word grid; these have no vertical rules, no outer box, one 1.5px rule under the header and hairline `--card-border` row separators, with weight on the row labels instead of banding.
+
+**Alignment is detected, not declared**, so a new table needs no alignment array maintained beside it:
+- The test is for a **quantity**, not a bare number, because these tables write amounts as `$115.6 billion` and `~3.19%`. Matching digits only would leave those columns ragged left while `1.95%` beside them went right. The pattern still requires a leading digit after any `~`/`$`/sign, which is what keeps the Data Dictionary's `% of U.S. GDP` and `Index Level` as text.
+- **Column 0 is never treated as a quantity**, even when it's all years. It renders as `<th scope="row">` and stays left; without the exception, Tables 1 and 2 aligned the "Year" header right over left-aligned body cells.
+
+Each table sits in a focusable `.paper-table-scroll` with `overflow-x: auto`, so on a phone the table keeps its natural column widths and scrolls instead of being crushed. Measured at 375px: Table 5 is 541px in a 335px column, and every table clips at the 20px gutter.
 
 ### Assets live beside the paper
 `public/pdfs/<slug>/` holds the PDF and its images (`figure1.png`, `table1.png`, …) — Kian's layout, adopted for all three papers.
@@ -513,11 +650,12 @@ iOS Safari renders codepoints that carry an *emoji presentation* as color emoji 
 |---|---|---|
 | **≤1100px** | Skills only | Skill groups go from 2×2 back to stacked |
 | **≤1024px** | Experience, Education, About, Courses, Projects | Reduced padding; `.edu-main` → `auto 170px 1fr`; courses → 3 columns; experience and project rows' left column → 170px |
-| **≤768px** | everywhere | Single-column layouts, hamburger nav, gallery below bio, education logo on top, contact cards stack, courses → 2 columns, project rows restack, nav collapse shortens to 0.42s, PDFs open in a new tab |
+| **≤900px** | Paper pages only | The contents list is hidden — no room beside the text |
+| **≤768px** | everywhere | Single-column layouts, hamburger nav, gallery below bio, education logo on top, contact cards stack, courses → 2 columns, project rows restack, survey explorer rows stack label-over-bar, nav collapse shortens to 0.42s, PDFs open in a new tab |
 | **≤520px** | Courses only | `.course-card-num` watermark drops out |
 | **≤480px** | About only | Further font/padding reductions |
 
-There are also two **`prefers-reduced-motion: reduce`** blocks — `Nav.css` (drops the collapse's spring overshoot) and `About.css` (swaps the gallery's full-width slide for a fade). Both are at the end of their files so they win on source order.
+There are four **`prefers-reduced-motion: reduce`** blocks: `Nav.css` (drops the collapse's spring overshoot), `About.css` (swaps the gallery's full-width slide for a fade), and two in `Paper.css` (the chart marker's `r` transition and the survey bar's `width` transition). The first two are at the end of their files so they win on source order; the `Paper.css` pair each sit directly beneath the rule they suppress, which is unambiguous because nothing later re-declares those transitions.
 
 ## Key technical decisions
 

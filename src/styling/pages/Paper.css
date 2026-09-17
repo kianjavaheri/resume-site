@@ -251,6 +251,615 @@
     margin-top: 10px;
 }
 
+/* ---- Survey explorer --------------------------------------------------- */
+/* The thesis's survey section, drawn from its response counts instead of shown
+   as its twenty-three chart images. See components/SurveyExplorer.tsx for why
+   the controls are a question picker plus a dimension picker, and why they sit
+   above the chart rather than under it.
+
+   The series colours are the same two validated categorical slots the
+   Background charts use, and they are declared here as well as on .paper-chart
+   because the two blocks are independent — neither is nested in the other. */
+.paper-survey {
+    margin: 0 0 28px;
+    --chart-s1: #2a78d6;
+    --chart-s2: #eb6834;
+}
+
+[data-theme='dark'] .paper-survey {
+    --chart-s1: #3987e5;
+    --chart-s2: #d95926;
+}
+
+/* A recessed panel holding both pickers, so the controls read as one apparatus
+   rather than as two loose rows of buttons in the middle of an article.
+   --well-bg is the site's step-down (see "Nesting goes DOWN" in CLAUDE.md),
+   which is also what the chips inside it sit on. */
+.paper-survey-controls {
+    background: var(--well-bg);
+    box-shadow: var(--well-shadow);
+    border-radius: 14px !important;
+    padding: 18px 20px 20px;
+}
+
+/* The site's micro-label: 0.65rem uppercase letterspaced, same step as the
+   skill group labels. No new size in the type scale. */
+.paper-survey-control-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+
+.paper-survey-chips + .paper-survey-control-label {
+    margin-top: 18px;
+}
+
+.paper-survey-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+/* Boxy, not pill-shaped: 8px on a ~30px chip is the same proportion the tech
+   tags carry at 6px on 23px, so the two read as one shape at two sizes.
+   The chips sit ON the well, so they take the raised sub-card fill — the
+   inverse of the tags, which are recessed INTO a sub-card. */
+.paper-survey-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 7px 12px;
+    border: none;
+    border-radius: 8px !important;
+    background-color: var(--sub-card-fill);
+    background-image: var(--sub-card-grad);
+    box-shadow: var(--sub-card-shadow);
+    color: var(--textcolor);
+    font-family: inherit;
+    font-size: 0.78rem;
+    line-height: 1.3;
+    cursor: pointer;
+    text-align: left;
+}
+
+/* Hover re-declares the gradient beneath the tint, or the bare background-image
+   would replace it and flatten the chip. */
+.paper-survey-chip:hover {
+    background-image:
+        linear-gradient(var(--hover-tint), var(--hover-tint)),
+        var(--sub-card-grad);
+}
+
+.paper-survey-chip-num {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+}
+
+/* The selected chip inverts, the way the scroll-to-top button does: it is the
+   one state that has to be unmistakable at a glance across ten neighbours, and
+   a tint alone is not enough separation from a hover. */
+.paper-survey-chip-on {
+    background-color: var(--textcolor);
+    background-image: none;
+    color: var(--bgcolor);
+}
+
+.paper-survey-chip-on:hover {
+    background-image: linear-gradient(var(--hover-tint-inverse), var(--hover-tint-inverse));
+}
+
+.paper-survey-chip-on .paper-survey-chip-num {
+    color: inherit;
+    opacity: 0.6;
+}
+
+.paper-survey-chip:focus-visible {
+    outline: 2px solid var(--textcolor);
+    outline-offset: 2px;
+}
+
+/* Deliberately NOT height-reserved, unlike the carousel this replaced.
+   That one pinned its text block to the longest question because its controls
+   sat BELOW the chart, so an unreserved prompt moved the arrows you were
+   clicking. Here both pickers are above everything that changes, so the only
+   thing a taller question moves is the chart — which is where the reader is
+   looking next anyway. Reserving for question 11 instead means 78px of empty
+   space under six of the ten questions, and a measured constant to keep in
+   step with the copy. Measured: 53px at the shortest, 131px at question 11,
+   in a 678px column. */
+.paper-survey-prompt-block {
+    margin: 22px 0 18px;
+}
+
+.paper-survey-heading {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.paper-survey-prompt {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--muted);
+}
+
+.paper-survey-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 14px;
+}
+
+.paper-survey-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+/* A small filled block, mirroring the bar it stands for — the Background
+   charts use a line key for the same reason, because they draw lines. */
+.paper-survey-key {
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    border-radius: 3px !important;
+    background: currentColor;
+}
+
+.paper-survey-n {
+    font-variant-numeric: tabular-nums;
+    opacity: 0.75;
+}
+
+.paper-survey-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.paper-survey-row {
+    display: grid;
+    grid-template-columns: 190px 1fr;
+    column-gap: 18px;
+    align-items: center;
+}
+
+.paper-survey-option {
+    font-size: 0.8rem;
+    line-height: 1.45;
+}
+
+.paper-survey-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.paper-survey-bar {
+    display: grid;
+    grid-template-columns: 1fr 88px;
+    align-items: center;
+    column-gap: 12px;
+}
+
+/* The groove is the whole subgroup, always 0-100%, never scaled to the row's
+   own maximum: a 2.4% answer has to read as the sliver it is, and the ten
+   questions have to stay comparable with each other. */
+.paper-survey-track {
+    display: block;
+    height: 14px;
+    border-radius: 4px !important;
+    background: var(--well-bg);
+    box-shadow: var(--well-shadow);
+    overflow: hidden;
+}
+
+.paper-survey-fill {
+    display: block;
+    height: 100%;
+    border-radius: 4px !important;
+    /* No min-width: an answer nobody chose draws nothing. A 2px stub was tried
+       so the row wouldn't look unrendered, but it puts a mark where the value
+       is zero, and several of these questions have real 0.0% answers. The
+       number beside the empty groove says it without lying about it. */
+    transition: width 0.3s ease;
+}
+
+.paper-survey-s1 {
+    background: var(--chart-s1);
+    color: var(--chart-s1);
+}
+
+.paper-survey-s2 {
+    background: var(--chart-s2);
+    color: var(--chart-s2);
+}
+
+.paper-survey-value {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    font-size: 0.78rem;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.paper-survey-pct {
+    font-weight: 600;
+}
+
+.paper-survey-count {
+    color: var(--muted);
+}
+
+/* Visually hidden, not display:none — the series name has to reach a screen
+   reader reading one row at a time, where the colour says nothing. */
+.paper-survey-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.paper-survey-note {
+    font-size: 0.75rem;
+    line-height: 1.6;
+    color: var(--muted);
+    margin-top: 18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .paper-survey-fill {
+        transition: none;
+    }
+}
+
+/* ---- Charts ------------------------------------------------------------ */
+/* The four Background figures, drawn from Table 1 and Table 2's data rather
+   than screenshotted out of a spreadsheet. Inline SVG, so they take the page's
+   own ink and invert with the theme instead of being a white slab on black.
+
+   The two series colours are categorical slots 1 and 2 of the validated
+   palette, stepped separately for each mode. Both pairs were checked against
+   THIS site's surfaces — pure #ffffff and pure #000000, not a near-white and
+   near-black — and pass the lightness band, chroma floor, CVD separation
+   (worst ΔE 24.7 light / 26.8 dark against a ≥8 target), the normal-vision
+   floor and 3:1 contrast. Re-run the validator if either hex changes.
+
+   Text never wears the series colour: identity comes from the line key beside
+   it. The values a tooltip shows are all in Tables 1 and 2 further down the
+   same section, which is the table view — the hover layer enhances, it never
+   gates. */
+.paper-chart {
+    margin: 0 0 28px;
+    --chart-s1: #2a78d6;
+    --chart-s2: #eb6834;
+    --chart-grid: rgba(0, 0, 0, 0.1);
+    --chart-zero: rgba(0, 0, 0, 0.28);
+    /* The ring that keeps a marker legible where the two lines cross. */
+    --chart-surface: var(--bgcolor);
+}
+
+[data-theme='dark'] .paper-chart {
+    --chart-s1: #3987e5;
+    --chart-s2: #d95926;
+    --chart-grid: rgba(255, 255, 255, 0.14);
+    --chart-zero: rgba(255, 255, 255, 0.32);
+}
+
+.paper-chart-frame {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.paper-chart-plot {
+    position: relative;
+}
+
+.paper-chart-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.paper-chart-svg:focus-visible {
+    outline: 2px solid var(--textcolor);
+    outline-offset: 4px;
+    border-radius: 8px !important;
+}
+
+/* Recessive chrome: solid hairlines one step off the surface. Never dashed —
+   dashing reads as "projection" or "threshold" when it is just a grid. */
+.paper-chart-grid {
+    stroke: var(--chart-grid);
+    stroke-width: 1;
+}
+
+/* Zero is a real boundary on the trade-balance chart, where the series crosses
+   it, so it reads a step stronger than the other gridlines. */
+.paper-chart-zero {
+    stroke: var(--chart-zero);
+}
+
+.paper-chart-crosshair {
+    stroke: var(--chart-zero);
+    stroke-width: 1;
+}
+
+.paper-chart-tick {
+    fill: var(--muted);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+}
+
+.paper-chart-axis-title {
+    fill: var(--muted);
+    font-size: 15px;
+}
+
+.paper-chart-line {
+    fill: none;
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+
+/* `circle.` deliberately: the .paper-chart-s1/s2 rules below set `stroke` to
+   the series colour for the lines, at equal specificity and later in the file,
+   so a bare `.paper-chart-dot` loses and the ring silently paints in the series
+   colour instead of the surface — which is exactly where it stops doing its
+   job, on the markers that overlap. */
+circle.paper-chart-dot {
+    stroke: var(--chart-surface);
+    stroke-width: 2;
+    transition: r 0.12s ease;
+}
+
+.paper-chart-s1 {
+    stroke: var(--chart-s1);
+}
+
+.paper-chart-s2 {
+    stroke: var(--chart-s2);
+}
+
+circle.paper-chart-s1 {
+    fill: var(--chart-s1);
+}
+
+circle.paper-chart-s2 {
+    fill: var(--chart-s2);
+}
+
+/* The end label is the only direct label: a value on every point is chaos and
+   goes unread, so the axis and the tooltip carry the rest. */
+.paper-chart-end-label {
+    fill: var(--muted);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+}
+
+.paper-chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+.paper-chart-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+/* A line key, mirroring the mark it stands for. */
+.paper-chart-key {
+    width: 14px;
+    height: 2px;
+    flex-shrink: 0;
+    border-radius: 2px !important;
+    background: currentColor;
+}
+
+.paper-chart-legend-item .paper-chart-s1,
+.paper-chart-tooltip .paper-chart-s1 {
+    color: var(--chart-s1);
+}
+
+.paper-chart-legend-item .paper-chart-s2,
+.paper-chart-tooltip .paper-chart-s2 {
+    color: var(--chart-s2);
+}
+
+.paper-chart-tooltip {
+    position: absolute;
+    top: 50%;
+    pointer-events: none;
+    background: var(--bgcolor);
+    border-radius: 10px !important;
+    box-shadow: var(--card-shadow);
+    padding: 10px 12px;
+    min-width: 128px;
+    z-index: 2;
+}
+
+.paper-chart-tooltip-x {
+    font-size: 0.7rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+.paper-chart-tooltip-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.78rem;
+    line-height: 1.7;
+}
+
+/* Value leads, label follows: the reader already knows the series and wants
+   the number — the legend's hierarchy inverted. */
+.paper-chart-tooltip-value {
+    font-weight: 600;
+    color: var(--textcolor);
+    font-variant-numeric: tabular-nums;
+}
+
+.paper-chart-tooltip-label {
+    color: var(--muted);
+}
+
+.paper-chart figcaption {
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin-top: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    circle.paper-chart-dot {
+        transition: none;
+    }
+}
+
+/* ---- Tables ----------------------------------------------------------- */
+/* Rebuilt as markup from the PDF rather than shown as a cropped screenshot,
+   so the text is selectable, searchable and readable in both themes. The
+   source tables are a blue-banded Word grid; this is the site's own idiom —
+   no vertical rules, no outer box, hairline row separators, and the theme
+   tokens rather than the document's colours. */
+.paper-table-block {
+    margin: 0 0 28px;
+}
+
+/* The table sets its own column widths and this scrolls if they don't fit,
+   rather than the table squeezing itself to the column width. Focusable so
+   a keyboard can reach the scroll, which is why it needs the role/label. */
+.paper-table-scroll {
+    overflow-x: auto;
+    /* Full-bleed to the article's edges on small screens would be nicer still,
+       but the article column is the measure here. */
+    max-width: 100%;
+}
+
+.paper-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    /* Long descriptions in the Data Dictionary need to wrap rather than force
+       a scroll, but the short numeric columns shouldn't be squeezed to do it. */
+    table-layout: auto;
+}
+
+.paper-table-title {
+    caption-side: top;
+    text-align: left;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--textcolor);
+    padding-bottom: 12px;
+}
+
+.paper-table th,
+.paper-table td {
+    padding: 10px 16px 10px 0;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.paper-table thead th {
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--muted);
+    /* The one heavier rule in the table: it separates the labels from the
+       data, which is the only division that has to be unmissable. */
+    border-bottom: 1.5px solid var(--textcolor);
+    white-space: normal;
+}
+
+/* Row labels — the subgroup or variable name — carry the weight instead of a
+   fill, so the table needs no banding. */
+.paper-table tbody th {
+    font-weight: 600;
+    color: var(--textcolor);
+    padding-right: 24px;
+}
+
+.paper-table tbody td {
+    color: var(--textcolor);
+}
+
+.paper-table tbody tr:last-child th,
+.paper-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.paper-table tbody tr:hover th,
+.paper-table tbody tr:hover td {
+    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
+}
+
+/* Figures flush right so the decimal points line up down the column. The
+   tabular figures stop 4.62 and 100.0% from setting different digit widths. */
+.paper-table-num {
+    text-align: right !important;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.paper-table th:last-child,
+.paper-table td:last-child {
+    padding-right: 0;
+}
+
+/* The scale key under Table 4. Smaller and muted so it reads as apparatus
+   rather than body copy. */
+.paper-table-notes {
+    margin-top: 14px;
+}
+
+.paper-table-notes .paper-para {
+    font-size: 0.8rem;
+    line-height: 1.65;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+
+.paper-table-notes .paper-list {
+    margin-bottom: 10px;
+    gap: 4px;
+}
+
+.paper-table-notes .paper-list li {
+    font-size: 0.8rem;
+    line-height: 1.65;
+    color: var(--muted);
+}
+
+.paper-table-notes > *:last-child {
+    margin-bottom: 0;
+}
+
 /* Hanging indent, as in the paper itself. */
 .paper-references {
     display: flex;
@@ -310,5 +919,77 @@
     .paper-list li {
         font-size: 0.95rem;
         line-height: 1.8;
+    }
+}
+
+@media (max-width: 768px) {
+    /* The option labels are full sentences and the column is ~335px, so the
+       190px label column would leave the bars about 80px wide. Stacked, the
+       label gets the full width and the bar under it does too. */
+    .paper-survey-row {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 8px;
+        align-items: stretch;
+    }
+
+    .paper-survey-controls {
+        padding: 16px;
+    }
+
+    /* Comfortable thumb targets. The ten question chips wrap to about four
+       rows here, which is still the whole set visible at once — a dropdown
+       would hide it to save two rows. */
+    .paper-survey-chip {
+        padding: 9px 12px;
+    }
+
+    .paper-survey-heading,
+    .paper-survey-prompt {
+        font-size: 0.9rem;
+    }
+
+    .paper-survey-bar {
+        grid-template-columns: 1fr 84px;
+        column-gap: 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .paper-table {
+        font-size: 0.8rem;
+    }
+
+    .paper-table th,
+    .paper-table td {
+        padding: 9px 12px 9px 0;
+    }
+
+    .paper-table tbody th {
+        padding-right: 16px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* The SVG scales to its container, so the type scales with it: at 335px
+       the viewBox is drawn at 0.49x and 15px chrome lands at an unreadable
+       7.4px. These are viewBox units, so 23 renders at about 11px — the size
+       axis chrome actually wants on a phone. */
+    .paper-chart-tick,
+    .paper-chart-axis-title,
+    .paper-chart-end-label {
+        font-size: 23px;
+    }
+
+    /* At that size "$438.7B" is wider than the 66-unit right margin and would
+       hang outside the plot. Anchoring it at its right edge instead runs it
+       back over the plot, and the lift keeps it clear of its own marker. */
+    .paper-chart-end-label {
+        text-anchor: end;
+        transform: translateY(-16px);
+    }
+
+    .paper-chart-tooltip {
+        min-width: 112px;
+        padding: 8px 10px;
     }
 }
