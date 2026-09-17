@@ -140,7 +140,9 @@ src/
     Projects.tsx       # Collapsible, default OPEN. Stacked expandable row sub-cards w/ tags; PDF modal; WIP badge
     Proficiency.tsx    # Collapsible, default OPEN. 23 skills in 4 labelled groups of rounded icon tiles
     useClampedExpand.ts # Shared clamp-and-expand hook for Experience cards + Selected Work rows
+    useTheme.ts        # Shared theme hook (theme-pref) — used by Home AND Paper
     Tags.tsx           # Tech tag pills, shown below the clamp on Experience + Selected Work
+    LinkIcon.tsx       # Inline SVGs for the Selected Work link chips (paper/pdf/library/github/curseforge)
     Contact.tsx        # NOT a section-card; label above, 3 contact-card links
     PdfModal.tsx       # Shared PDF modal (iframe); exports withViewerParams()
     Navbar.tsx         # Floating glass pill; fades past 50% scroll; hamburger ≤768px
@@ -155,6 +157,7 @@ src/
     papers.ts          # Paper/Block types + slug registry
     basic-income.ts    # GENERATED from public/pdfs/basic-income/ — regenerate, don't hand-edit
     thesis.ts          # GENERATED from public/pdfs/thesis/ — regenerate, don't hand-edit
+    cs-capstone.ts     # GENERATED from public/pdfs/cs-capstone/ by scripts/extract-cs-capstone.py
   App.tsx              # <Routes> with the single "/" route → Home
   index.tsx            # createRoot + <BrowserRouter>
   react-app-env.d.ts   # vite/client types + the *.svg module shim
@@ -173,11 +176,13 @@ src/
       Proficiency.css  # .skill-group + label; .skills-grid flex-wrap; 72px .skill-icon-wrap; .skill-monogram
       Projects.css     # Row cards (grid areas meta/body/link); hover re-declares --sub-card-grad
       Scroll.css       # Inverted fill, rounded square, fade in/out
+scripts/
+  extract-cs-capstone.py  # Poster → src/content/cs-capstone.ts. Needs `pip install pymupdf`
 public/
   images/              # img1–3.jpg used by the gallery (array in About.tsx);
                        #   img_dep*.jpg (4) are unreferenced
   svgs/                # 24 files: asu, sandia + 22 skill icons (see Skills)
-  pdfs/                # resume.pdf, cs-capstone.pdf, basic-income.pdf
+  pdfs/                # resume.pdf + a folder per paper: cs-capstone/, basic-income/, thesis/
 ```
 
 ### Dead code and assets
@@ -397,26 +402,28 @@ Three details keep the stack from fitting badly, all learned the hard way:
 
 ## Paper pages
 
-Full-text reading pages for the written work, at **`/papers/:slug`** (`src/pages/Paper.tsx`, `src/styling/pages/Paper.css`). Modelled on OpenAI's incident-report page: title block, sticky contents list on the left, ~700px article column on the right. Two papers: `basic-income` and `thesis`.
+Full-text reading pages for the written work, at **`/papers/:slug`** (`src/pages/Paper.tsx`, `src/styling/pages/Paper.css`). Modelled on OpenAI's incident-report page: title block, sticky contents list on the left, ~700px article column on the right. Three: `basic-income`, `thesis` and `cs-capstone`.
 
 - **Routing.** `App.tsx` has `/` and `/papers/:slug`. A slug with no entry renders a short "doesn't exist" block with a link home, rather than crashing. **`vercel.json` carries an SPA rewrite** (`/(.*)` → `/index.html`); without it a direct hit on `/papers/basic-income` 404s on Vercel, since only `index.html` exists on disk. Vercel checks the filesystem before rewrites, so assets still serve normally.
 - **Theme.** `useTheme` (`src/components/useTheme.ts`) is shared by `Home` and `Paper`, so both follow `theme-pref` identically. Home was refactored onto it; don't duplicate that logic in a new page.
 - **No navbar.** The nav's links scroll to sections that only exist on the home page. A paper page has a "Kian Javaheri" link back home and its own theme toggle instead.
-- **Contents highlighting is scroll-position based**, not an `IntersectionObserver`: the active section is the last heading scrolled past (`top <= 120`). An observer watching a band near the top of the viewport left *nothing* highlighted whenever a jump landed between two headings.
+- **Contents highlighting is scroll-position based**, not an `IntersectionObserver`: the active section is the last heading past the probe line. An observer watching a band near the top of the viewport left *nothing* highlighted whenever a jump landed between two headings.
+- **The probe line slides down as the page runs out of scroll** — 120px normally, easing to the full viewport height at the bottom (from `remaining = scrollHeight - (scrollY + innerHeight)`). At a flat 120px, a section whose heading can never reach that line never lit up at all: on a page ending in short sections the scroll limit arrives first, so the highlight stranded three or four entries early. The capstone poster showed it worst — Value for RP, Lessons Learned and Future Work sit 273/427/581px down at max scroll and were unreachable.
+- Testing this in the hidden preview pane is misleading: **programmatic `window.scrollTo` doesn't reliably fire a `scroll` event there**, so the highlight looks stuck. Dispatch `new Event('scroll')` after scrolling, or the readings are stale.
 - Headings carry `scroll-margin-top`, so a jump doesn't tuck them under the top edge. The contents list is **hidden below 900px**.
 - **Every figure carries `width` and `height`** (the PNG's real pixel size, stored in the content). Without them, lazy-loaded images reserve no space: jumping to a late section scrolled to where it was *then*, images below the fold loaded on the way past, the document grew, and the target ended up further down — so it took several clicks to reach References or the Appendix. With intrinsic sizes the height is stable from first paint (the thesis page measured 30,838px before and after scrolling through), and one click lands. Keep the dimensions in step with the images when regenerating.
 
 ### Content is converted from the PDF, not retyped
-`src/content/papers.ts` holds the types and the registry; each paper is its own generated module (`src/content/basic-income.ts`).
+`src/content/papers.ts` holds the types and the registry; each paper is its own generated module (`basic-income.ts`, `thesis.ts`, `cs-capstone.ts`). Only the capstone's conversion script survives in the repo, as `scripts/extract-cs-capstone.py`; the other two were one-off scripts.
 
 - **Paragraph breaks come from the PDF's own first-line indents.** Body text at x≈72 is a continuation, x≈108 starts a paragraph. Line length is *not* a usable signal — a paragraph's last line can be longer than a mid-paragraph line.
 - The **references section inverts it**: entries start at x≈102 with continuations hanging at x≈132.
 - Extraction uses **macOS PDFKit via `osascript -l JavaScript`** (`pdftotext` and Python PDF libs aren't installed here). Watch one trap: `characterBoundsAtIndex` indexes **skip newlines**, so subtract the number of preceding line breaks or every x is shifted.
-- **Figures are cropped out of the PDF**, not screenshotted: each placed image is an object-replacement character whose bounds give the rectangle, so setting that as the page's crop box and rendering it yields the figure alone. They live in `public/images/papers/`. Figures are collected into their own trailing section, which also keeps their "Figure N" labels out of the conclusion's last paragraph.
+- **Figures are cropped out of the PDF**, not screenshotted: each placed image is an object-replacement character whose bounds give the rectangle, so setting that as the page's crop box and rendering it yields the figure alone. They live beside their PDF in `public/pdfs/<slug>/` (see *Assets live beside the paper*). On `basic-income` the figures are collected into their own trailing section, which also keeps their "Figure N" labels out of the conclusion's last paragraph.
 - Regenerating is a script, not hand-editing: don't patch the generated file by hand, or the next regeneration drops the change.
 
-### Two papers, two different PDFs
-`basic-income` (Economics capstone) and `thesis` (Barrett honors thesis). They needed different conversion rules, which is the point worth remembering: **inspect the PDF's geometry before converting, don't assume.**
+### Every PDF converts differently
+`basic-income` (Economics capstone), `thesis` (Barrett honors thesis) and `cs-capstone` (the poster — see its own section below). Each needed its own conversion rules, which is the point worth remembering: **inspect the PDF's geometry before converting, don't assume.**
 
 | | basic-income | thesis |
 |---|---|---|
@@ -428,8 +435,19 @@ Full-text reading pages for the written work, at **`/papers/:slug`** (`src/pages
 - Thesis text runs **split mid-line on font changes**, so runs on the same baseline (y within 3pt) are merged before anything else.
 - Paragraphs are **not broken at page boundaries** — a paragraph usually continues across the page. The cost is that a paragraph ending exactly at a page bottom merges with the next one.
 
+### The capstone is a poster, not a paper
+`cs-capstone` converts a single 24x36in conference poster. Its conversion script **is kept in the repo** — `scripts/extract-cs-capstone.py`, which needs `pip install pymupdf`.
+
+- **Most of its 27 placed images are not figures.** The pink heading banners and the bullet text were re-exported as pictures by the slide tool, with the real text layer sitting underneath them. Only **4 are real figures** (architecture, sequence, caching flow, UI screenshot), cropped by image xref.
+- **Text is selected by rectangle, not reading order.** The two-column split doesn't hold for the whole page: the last Results bullet sits at x>=800, beside the "Value for RP" heading, so each block names its own box. Lines on the same visual row are **bucketed by y before sorting by x** — otherwise "Customer Satisfication", which sits 1pt higher, jumps ahead of "Financial".
+- **Poster bullets need the `list` block** (`items`, plus `nested` for the poster's second-level arrow markers). `.paper-list` sets `list-style` explicitly, because the global `*` reset in `App.css` clears it.
+- **A figure can spill past its own image rect**: figure 3's "Front-End Application" box is a separate white drawing hanging below the image, so that crop is the **union** of the two rects. This is the same lesson as the y-flip trap below — it was only visible by opening the PNG.
+- PyMuPDF rects are **top-left origin**, so unlike the PDFKit path below they're used as the clip directly, with no y flip.
+- The poster has **no caption lines**, so its figures render uncaptioned.
+- Its typos are the poster's own ("Satisfication", "loads into in") and are kept **verbatim**.
+
 ### Assets live beside the paper
-`public/pdfs/<slug>/` holds the PDF and its images (`figure1.png`, `table1.png`, …) — Kian's layout, adopted for both papers.
+`public/pdfs/<slug>/` holds the PDF and its images (`figure1.png`, `table1.png`, …) — Kian's layout, adopted for all three papers.
 
 **Captions are text, never pixels.** In both PDFs the "Figure N" label is a separate text line, so cropping at the image's own rectangle yields the graph alone and the label is rendered as a `figcaption`. Kian's hand-made Economics exports had the label inside the image; those were replaced by 3× renders from the PDF, which are sharper and keep the caption selectable.
 - **Economics**: captions are `Figure 1`–`3`.

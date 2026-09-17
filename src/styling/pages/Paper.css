@@ -195,6 +195,33 @@
     margin: 0 0 20px;
 }
 
+/* Poster bullets. The global `*` reset sets list-style: none on every element,
+   and it lands on the <li> itself — so the marker has to be re-set there, not
+   on the <ul>, where it would only be inherited and lose. */
+.paper-list {
+    padding-left: 22px;
+    margin: 0 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.paper-list li {
+    list-style: disc;
+    font-size: 1rem;
+    line-height: 1.85;
+}
+
+/* The poster's second-level (➢) bullets, tucked under the item they belong to:
+   the negative top margin closes the gap left by the parent list. */
+.paper-list-nested {
+    margin: -12px 0 20px 22px;
+}
+
+.paper-list-nested li {
+    list-style: circle;
+}
+
 .paper-subheading {
     font-size: 0.95rem;
     font-weight: 600;
@@ -279,7 +306,8 @@
         max-width: none;
     }
 
-    .paper-para {
+    .paper-para,
+    .paper-list li {
         font-size: 0.95rem;
         line-height: 1.8;
     }

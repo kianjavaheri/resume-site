@@ -7,6 +7,9 @@ export type Block =
   | { type: 'quote'; text: string }
   // Subheading inside a section (the thesis has two heading levels).
   | { type: 'h3'; text: string }
+  // Bulleted list. The capstone poster is written as bullets, not prose;
+  // `nested` marks the poster's second-level (➢) items.
+  | { type: 'list'; items: string[]; nested?: boolean }
   // Cropped from the source PDF at the rectangle the image occupies there.
   // width/height are the PNG's real pixel size. They must be rendered on the
   // <img>, or lazy-loaded images have no reserved space: the page grows as you
@@ -38,9 +41,11 @@ export interface Paper {
 }
 
 import { basicIncome } from './basic-income'
+import { csCapstone } from './cs-capstone'
 import { thesis } from './thesis'
 
 export const papers: Record<string, Paper> = {
   [basicIncome.slug]: basicIncome,
+  [csCapstone.slug]: csCapstone,
   [thesis.slug]: thesis,
 }

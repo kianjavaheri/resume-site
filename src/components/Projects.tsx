@@ -15,7 +15,10 @@ const works: Array<Omit<WorkProps, 'onOpenPdf'>> = [
     title: 'Shipment Quoting Microservice',
     desc: 'Architected a high-throughput relational caching layer using PostgreSQL and Flask within a Dockerized microservice environment, intercepting and caching external carrier API responses to reduce redundant network calls. Achieved a 64.4% reduction in processing latency (334ms →︎ 119ms) — a 2.8x speedup over live API calls.',
     tags: ['Python', 'Flask', 'PostgreSQL', 'Docker'],
-    links: [{ label: 'View Poster', short: 'Poster', icon: 'pdf', pdfSrc: '/pdfs/cs-capstone.pdf' }],
+    links: [
+      { label: 'Read Poster', short: 'Read', icon: 'paper', to: '/papers/cs-capstone' },
+      { label: 'View PDF', short: 'PDF', icon: 'pdf', pdfSrc: '/pdfs/cs-capstone/cs-capstone.pdf' },
+    ],
   },
   {
     tag: 'Barrett Honors Thesis',

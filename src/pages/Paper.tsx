@@ -27,14 +27,28 @@ function Paper() {
   // active one is the last heading scrolled past. An IntersectionObserver
   // watching a band near the top of the viewport left nothing highlighted
   // whenever a jump landed between two headings.
+  //
+  // The probe line slides down as the page runs out of scroll. At 120px flat,
+  // any section whose heading can never reach that line — the last few on a
+  // page that ends in short sections, like the capstone poster — never lit up
+  // at all: the page hit its scroll limit first, stranding the highlight three
+  // or four sections early. `remaining` is how much scrolling is left, so at
+  // the bottom the probe is the whole viewport (the last visible heading wins)
+  // and it eases back to 120px as soon as there's room to scroll again.
   useEffect(() => {
     if (!paper) return
     const ids = [...paper.sections.map((s) => s.id), ...(paper.references?.length ? ['references'] : [])]
     const update = () => {
+      const doc = document.documentElement
+      const remaining = doc.scrollHeight - (window.scrollY + window.innerHeight)
+      const probe = Math.min(
+        window.innerHeight,
+        120 + Math.max(0, window.innerHeight - 120 - Math.max(0, remaining))
+      )
       let current = ids[0] ?? ''
       for (const id of ids) {
         const el = document.getElementById(id)
-        if (el && el.getBoundingClientRect().top <= 120) current = id
+        if (el && el.getBoundingClientRect().top <= probe) current = id
       }
       setActiveId(current)
     }
@@ -144,6 +158,15 @@ function Paper() {
                         />
                         {b.caption ? <figcaption>{b.caption}</figcaption> : null}
                       </figure>
+                    )
+                  }
+                  if (b.type === 'list') {
+                    return (
+                      <ul key={i} className={`paper-list${b.nested ? ' paper-list-nested' : ''}`}>
+                        {b.items.map((item, j) => (
+                          <li key={j}>{item}</li>
+                        ))}
+                      </ul>
                     )
                   }
                   if (b.type === 'h3') {
