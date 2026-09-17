@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from './pages/Home'
+import Paper from './pages/Paper'
 import './styling/App.css'
 
 
@@ -11,6 +12,7 @@ function App() {
     <div>
       <Routes>
         <Route path="/" element={ <Home/> }/>
+        <Route path="/papers/:slug" element={ <Paper/> }/>
       </Routes>
     </div>
   );

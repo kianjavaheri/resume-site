@@ -118,35 +118,86 @@
 
 .project-links {
     grid-area: link;
-    /* Centred in the bottom half: the card's 3/4 line. With more than one
-       link the stack stays centred on that line. */
+    /* Centred in the bottom half: the card's 3/4 line. */
     align-self: center;
-    display: flex;
-    /* Stacked, not side by side: the column is only 200px wide, and two
-       uppercase labels don't fit on one row. */
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    /* One column, floor 150px: every chip on every card is the same width, not
+       just the ones sharing a card (they ranged 98–148px). 150 clears the
+       widest label, "CurseForge" + arrow at 148. minmax, not a fixed width, so
+       a longer label added later widens the track instead of overflowing it —
+       but then that card's chips are wider than the rest, so raise the floor
+       to match. It has to stay under the 170px column at ≤1024px.
+       justify-content keeps the track against the left. */
+    display: grid;
+    grid-template-columns: minmax(150px, max-content);
+    justify-content: start;
+    gap: 5px;
+    /* Lifts the stack off the 3/4 line: centring accounts for margins, so the
+       bottom margin pulls the group up within its half. Sitting exactly on the
+       quarter read as too low against the type label.
+       15px is the ceiling — the two-chip stack is 61px in a 76px half, so
+       61 + 15 fills it exactly. Any more and the half grows, which made
+       two-link cards 162px against 152px for the rest. */
+    margin-bottom: 15px;
 }
 
-.project-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5em;
-    font-size: 0.7rem;
-    font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    background: none;
+/* Shaped like .scroll-top — 12px on a 40px button is the same corner ratio as
+   its 14px on 46px — but NOT its inverted fill. A black square on a near-white
+   card (and a white one in dark) fought the card it sat on. These are recessed
+   chips instead: --well-bg, a step DOWN from the sub-card, the same fill the
+   tech tags use. The label survives as the button's aria-label and tooltip. */
+/* 28px tall with a 5px gap, so two of them (61px) sit inside the card's 76px
+   bottom half with ~7px of air above and below. At 34/8 the stack measured
+   exactly 76 and the lower chip ran flush into the card's bottom edge; 30/6
+   left only 5px. Keep the stack clear of the half if either value changes. */
+.project-icon-link {
+    height: 28px;
+    padding: 0 10px;
+    flex-shrink: 0;
+    border-radius: 9px !important;
+    background-color: var(--well-bg);
     color: var(--textcolor);
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 2px;
-    transition: opacity 0.15s;
+    box-shadow: var(--well-shadow);
+    display: flex;
+    align-items: center;
+    gap: 7px;
     cursor: pointer;
+    transition: background-image 0.15s ease;
 }
 
-.project-link:hover {
-    opacity: 0.45;
+/* Pushed to the chip's right edge. The chips share a width (the max-content
+   grid track), so the arrows line up in a column down the stack. */
+.project-icon-link .arrow-out {
+    margin-left: auto;
+    opacity: 0.55;
+}
+
+/* The same uppercase micro-label as the project type above it. */
+.project-icon-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+/* Stated for :visited too. A visited <a> is styled by `a:visited` at 0-1-1,
+   which outranks this class on its own (0-1-0) — that's what turned visited
+   links' icons black-on-black back when the fill was inverted. Browsers hide
+   :visited from JS, so it only ever shows up on screen. */
+a.project-icon-link,
+a.project-icon-link:visited {
+    color: var(--textcolor);
+}
+
+/* --well-hover-tint, not --hover-tint: the latter is calibrated against the
+   page and is effectively invisible on --well-bg. */
+.project-icon-link:hover {
+    background-image:
+        linear-gradient(var(--well-hover-tint), var(--well-hover-tint));
+}
+
+.project-icon-link svg {
+    display: block;
 }
 
 @media (max-width: 1024px) {

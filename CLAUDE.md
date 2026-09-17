@@ -149,7 +149,12 @@ src/
     ArrowOut.tsx       # Inline SVG ↗ for outbound links — replaces the emoji-prone U+2197
     Resume.tsx         # DEAD — not imported anywhere
   pages/
-    Home.tsx           # Root; .cards-wrapper; owns theme state (system-following)
+    Home.tsx           # Root; .cards-wrapper; theme via useTheme
+    Paper.tsx          # /papers/:slug — full-text reading page (contents list + article)
+  content/
+    papers.ts          # Paper/Block types + slug registry
+    basic-income.ts    # GENERATED from public/pdfs/basic-income/ — regenerate, don't hand-edit
+    thesis.ts          # GENERATED from public/pdfs/thesis/ — regenerate, don't hand-edit
   App.tsx              # <Routes> with the single "/" route → Home
   index.tsx            # createRoot + <BrowserRouter>
   react-app-env.d.ts   # vite/client types + the *.svg module shim
@@ -370,9 +375,74 @@ Each row is a CSS grid. The 200px left column holds `meta` (the project type, e.
 
 Rows start collapsed to a two-line preview and expand in place, with tags below. See *Expandable cards and tags*. `.project-links` stops click propagation, so opening a PDF or GitHub link doesn't also toggle the row.
 
-Links are **optional and plural**: each project carries a `links` array, and each entry is either a `pdfSrc` (opens the PDF modal) or an `href` (outbound page). A project with no links renders no link row. Several links **stack vertically** in the order listed — the 200px column is too narrow for two uppercase labels side by side — and the stack stays centred on the 3/4 line. Material Boxes carries two: **View CurseForge above View GitHub**, since CurseForge is where the mod is actually downloaded. Two badge types sit **inline at the end of the project title**, not on the type label, so on a wrapping title they follow the last word: a green `.project-release` (the shipped version, e.g. "Version 1.0.0") and then a red `.project-wip`. Material Boxes carries both; Independent Research carries only WIP. They **share one rule** and differ only in fill — `#2e8b57` and `#e03e3e`, fixed colours rather than theme tokens, both at the same ~4.3:1 against white, so neither shouts over the other.
+Links are **optional and plural**: each project carries a `links` array, and each entry is a `pdfSrc` (opens the PDF modal), an `href` (outbound page), or a `to` (a page on this site, rendered as a react-router `Link` — e.g. Economics Capstone's "Read Paper" → `/papers/basic-income`). A project with no links renders no link row.
+
+**They render as `.project-icon-link` chips**: 28px rounded rectangles, icon left and short uppercase label right, **stacked vertically** and centred as a group on the 3/4 line. Icon-only squares were tried in between and lost too much meaning; plain uppercase text links before that read as a cramped list.
+
+Each chip is icon → label → **`ArrowOut`**, the arrow pushed to the right edge with `margin-left: auto` at `opacity: .55`. Because the chips share a width, the arrows line up in a column down the stack.
+
+Three details keep the stack from fitting badly, all learned the hard way:
+- **One `minmax(150px, max-content)` grid column.** Every chip on every card is 150px, so the whole section lines up, not just the chips within a card (those ranged 98–148px). 150 clears the widest label, "CurseForge" plus its arrow at 148. `minmax`, not a fixed width, so a longer label widens the track rather than overflowing — but that card's chips would then be wider than the rest, so raise the floor to match. It must stay under the **170px** column at ≤1024px.
+- **The stack must stay clear of its half.** The card's bottom half is 76px; at 34px chips with an 8px gap two of them measured exactly 76 and the lower chip ran flush into the card's bottom edge. 28px with a 5px gap is 61px.
+- **`margin-bottom: 15px` lifts the group off the 3/4 line** to ~70% of the card, which reads better against the type label. Centring accounts for margins, so the bottom margin pulls the group up. **15px is the ceiling**: 61 + 15 fills the 76px half exactly, and anything more grows the half — at 20px the two-link cards went to 162px while the one-link cards stayed 152px. Re-check the arithmetic if the chip height, the gap or the row height changes.
+
+**They are recessed chips, NOT inverted like `.scroll-top`.** `--well-bg` fill, `--textcolor` icon, `--well-shadow`, `--well-hover-tint` on hover — the same treatment as the tech tags, a step *down* from the sub-card per *Nesting goes DOWN*. The inverted version was tried first (black squares on a near-white card, white on the dark one) and read as far too much contrast against the card carrying them. The scroll button keeps its inversion because it floats over arbitrary page content; these sit inside a card.
+- Each entry needs an **`icon`**: `paper` (a reading page here), `pdf`, `library`, `github`, `curseforge`. The `works` array is annotated `Array<Omit<WorkProps, 'onOpenPdf'>>` so those names are checked rather than widening to `string`.
+- The icons live in **`LinkIcon.tsx` as inline SVG**, not `public/svgs/` like the skill tiles: they sit on a `--textcolor` fill and must take their colour from it, which an `<img>` can't. GitHub and CurseForge are simple-icons paths (CC0).
+- **Never reintroduce `a:visited { color: inherit }`** (it used to sit in `App.css`). `a:visited` is 0-1-1 and outranks a component's own class rule at 0-1-0, so a *visited* link silently reverted to the inherited text colour — which on these buttons meant a black icon on a black fill, for the links you'd actually opened. Author styles already beat the browser's purple-visited default, so the plain `a { color: var(--textcolor) }` is enough. `.project-icon-link` also restates its colour for `:visited` as insurance.
+  **It cannot be caught from JavaScript**: browsers hide `:visited` styling from `getComputedStyle`, so computed styles and canvas pixel tests both read as correct. Check it on screen, in a browser whose history actually contains the link.
+- Each entry carries both a **`label`** (accessible name + tooltip: "View in ASU Library") and a **`short`** (visible text: "ASU Library"). Keep `short` a subset of `label` — a visible label that isn't part of the accessible name breaks *Label in Name* for anyone using voice control. Current set: `Read`, `PDF`, `Poster`, `ASU Library`, `GitHub`, `CurseForge`. Material Boxes carries two: **View CurseForge above View GitHub**, since CurseForge is where the mod is actually downloaded. Two badge types sit **inline at the end of the project title**, not on the type label, so on a wrapping title they follow the last word: a green `.project-release` (the shipped version, e.g. "Version 1.0.0") and then a red `.project-wip`. Material Boxes carries both; Independent Research carries only WIP. They **share one rule** and differ only in fill — `#2e8b57` and `#e03e3e`, fixed colours rather than theme tokens, both at the same ~4.3:1 against white, so neither shouts over the other.
 
 **Month abbreviations never take a trailing period** (`Aug`, not `Aug.`) — site-wide.
+
+## Paper pages
+
+Full-text reading pages for the written work, at **`/papers/:slug`** (`src/pages/Paper.tsx`, `src/styling/pages/Paper.css`). Modelled on OpenAI's incident-report page: title block, sticky contents list on the left, ~700px article column on the right. Two papers: `basic-income` and `thesis`.
+
+- **Routing.** `App.tsx` has `/` and `/papers/:slug`. A slug with no entry renders a short "doesn't exist" block with a link home, rather than crashing. **`vercel.json` carries an SPA rewrite** (`/(.*)` → `/index.html`); without it a direct hit on `/papers/basic-income` 404s on Vercel, since only `index.html` exists on disk. Vercel checks the filesystem before rewrites, so assets still serve normally.
+- **Theme.** `useTheme` (`src/components/useTheme.ts`) is shared by `Home` and `Paper`, so both follow `theme-pref` identically. Home was refactored onto it; don't duplicate that logic in a new page.
+- **No navbar.** The nav's links scroll to sections that only exist on the home page. A paper page has a "Kian Javaheri" link back home and its own theme toggle instead.
+- **Contents highlighting is scroll-position based**, not an `IntersectionObserver`: the active section is the last heading scrolled past (`top <= 120`). An observer watching a band near the top of the viewport left *nothing* highlighted whenever a jump landed between two headings.
+- Headings carry `scroll-margin-top`, so a jump doesn't tuck them under the top edge. The contents list is **hidden below 900px**.
+- **Every figure carries `width` and `height`** (the PNG's real pixel size, stored in the content). Without them, lazy-loaded images reserve no space: jumping to a late section scrolled to where it was *then*, images below the fold loaded on the way past, the document grew, and the target ended up further down — so it took several clicks to reach References or the Appendix. With intrinsic sizes the height is stable from first paint (the thesis page measured 30,838px before and after scrolling through), and one click lands. Keep the dimensions in step with the images when regenerating.
+
+### Content is converted from the PDF, not retyped
+`src/content/papers.ts` holds the types and the registry; each paper is its own generated module (`src/content/basic-income.ts`).
+
+- **Paragraph breaks come from the PDF's own first-line indents.** Body text at x≈72 is a continuation, x≈108 starts a paragraph. Line length is *not* a usable signal — a paragraph's last line can be longer than a mid-paragraph line.
+- The **references section inverts it**: entries start at x≈102 with continuations hanging at x≈132.
+- Extraction uses **macOS PDFKit via `osascript -l JavaScript`** (`pdftotext` and Python PDF libs aren't installed here). Watch one trap: `characterBoundsAtIndex` indexes **skip newlines**, so subtract the number of preceding line breaks or every x is shifted.
+- **Figures are cropped out of the PDF**, not screenshotted: each placed image is an object-replacement character whose bounds give the rectangle, so setting that as the page's crop box and rendering it yields the figure alone. They live in `public/images/papers/`. Figures are collected into their own trailing section, which also keeps their "Figure N" labels out of the conclusion's last paragraph.
+- Regenerating is a script, not hand-editing: don't patch the generated file by hand, or the next regeneration drops the change.
+
+### Two papers, two different PDFs
+`basic-income` (Economics capstone) and `thesis` (Barrett honors thesis). They needed different conversion rules, which is the point worth remembering: **inspect the PDF's geometry before converting, don't assume.**
+
+| | basic-income | thesis |
+|---|---|---|
+| Paragraph breaks | first-line indent (x≈108 vs 72) | **vertical gaps** (≥19pt; within a paragraph it's 13–17) |
+| Headings | a known list of titles | **type size** (h≥11 section, h=10 subheading), at the left margin |
+| Figures | 3, placed images | 27 placed images + **6 tables cropped as images** |
+
+- The thesis has **two heading levels**, so blocks include `h3`. Its tables extract as scattered positioned fragments (headers split across lines), so they're **cropped as images** rather than rebuilt as HTML — faithful now, convertible later. They are therefore not selectable text.
+- Thesis text runs **split mid-line on font changes**, so runs on the same baseline (y within 3pt) are merged before anything else.
+- Paragraphs are **not broken at page boundaries** — a paragraph usually continues across the page. The cost is that a paragraph ending exactly at a page bottom merges with the next one.
+
+### Assets live beside the paper
+`public/pdfs/<slug>/` holds the PDF and its images (`figure1.png`, `table1.png`, …) — Kian's layout, adopted for both papers.
+
+**Captions are text, never pixels.** In both PDFs the "Figure N" label is a separate text line, so cropping at the image's own rectangle yields the graph alone and the label is rendered as a `figcaption`. Kian's hand-made Economics exports had the label inside the image; those were replaced by 3× renders from the PDF, which are sharper and keep the caption selectable.
+- **Economics**: captions are `Figure 1`–`3`.
+- **Thesis**: captions are the thesis's **own caption lines** ("Figure 2. U.S. Trade-to-GDP ratio…"), matched to the image above them and removed from the body so they don't appear twice. Don't generate numbers here — the thesis's numbering restarts in the survey section (there are two "Figure 4"s), so invented numbers contradict the prose. The last 8 charts (pages 23–26) carry no caption in the thesis either.
+- **Tables**: the crop starts above the title row, so the title is in the image and the block has no caption.
+- `.paper-figure` renders a `figcaption` only when a caption is present.
+
+### Cropping figures out of a PDF — the trap
+Each placed image is an object-replacement character whose `characterBoundsAtIndex` gives its rectangle. Set that as the page's crop box and render.
+
+- **Bounds are PDF space: origin bottom-left.** Do NOT flip the y. Flipping it silently produced crops of the wrong band (a sliver of chart plus white space) — the files existed at plausible sizes, so it only showed up by *looking at a PNG*. After any extraction change, open one image.
+- For reading order, sort images by **descending y** (higher y = higher on the page). Ascending numbers them bottom-first on two-figure pages.
+- Tables are cropped by band instead: from the title line down to the next heading or table title, full text width.
 
 ## Back-to-top button (`Scroll.tsx`)
 

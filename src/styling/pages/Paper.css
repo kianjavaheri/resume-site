@@ -1,0 +1,286 @@
+/* Reading page for a full paper: title block, sticky contents list on the
+   left, article column on the right. Uses the same theme tokens as the rest
+   of the site, so it follows light/dark with no rules of its own. */
+.paper {
+    background: var(--page-base);
+    color: var(--textcolor);
+    min-height: 100vh;
+}
+
+.paper-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 36px;
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.paper-back {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--textcolor);
+    transition: opacity 0.15s;
+}
+
+.paper-back:hover {
+    opacity: 0.55;
+}
+
+.paper-theme-toggle {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+    transition: opacity 0.15s;
+}
+
+.paper-theme-toggle:hover {
+    opacity: 0.55;
+}
+
+.paper-inner {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 36px 96px;
+}
+
+.paper-head {
+    padding: 26px 0 30px;
+    border-bottom: 1px solid var(--card-border) !important;
+}
+
+/* Same uppercase micro-label as the project type it came from. */
+.paper-eyebrow {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+}
+
+.paper-title {
+    font-size: clamp(1.7rem, 3.2vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    max-width: 20ch;
+}
+
+.paper-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    margin-top: 22px;
+}
+
+.paper-meta-item {
+    font-size: 0.78rem;
+    color: var(--textcolor);
+}
+
+.paper-meta-label {
+    display: block;
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 3px;
+}
+
+.paper-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 26px;
+}
+
+.paper-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--textcolor);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 2px;
+    transition: opacity 0.15s;
+}
+
+.paper-link:hover {
+    opacity: 0.45;
+}
+
+.paper-layout {
+    display: grid;
+    grid-template-columns: 210px minmax(0, 1fr);
+    gap: 60px;
+    align-items: start;
+    margin-top: 44px;
+}
+
+.paper-toc {
+    position: sticky;
+    top: 32px;
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.paper-toc-label {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+
+/* The left rule marks the section you're in; transparent otherwise, so the
+   text doesn't shift when it becomes active. */
+.paper-toc-link {
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--muted);
+    padding: 6px 0 6px 12px;
+    border-left: 2px solid transparent !important;
+    transition: color 0.15s, border-color 0.15s;
+}
+
+.paper-toc-link:hover {
+    color: var(--textcolor);
+}
+
+.paper-toc-active {
+    color: var(--textcolor);
+    border-left-color: var(--textcolor) !important;
+}
+
+.paper-article {
+    max-width: 700px;
+}
+
+.paper-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 44px 0 18px;
+    /* Clears the jump target from the top of the viewport. */
+    scroll-margin-top: 28px;
+}
+
+.paper-section:first-child .paper-section-title {
+    margin-top: 0;
+}
+
+.paper-para {
+    font-size: 1rem;
+    line-height: 1.85;
+    margin-bottom: 20px;
+}
+
+.paper-quote {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--muted);
+    border-left: 2px solid var(--card-border) !important;
+    padding-left: 20px;
+    margin: 0 0 20px;
+}
+
+.paper-subheading {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 30px 0 12px;
+}
+
+/* Figures sit on a light card in both themes: they're screenshots of charts
+   with white backgrounds, so a dark page would otherwise show a bright slab
+   with a hard edge. */
+.paper-figure {
+    margin: 0 0 28px;
+}
+
+.paper-figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 10px !important;
+    background: #ffffff;
+    padding: 12px;
+}
+
+.paper-figure figcaption {
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin-top: 10px;
+}
+
+/* Hanging indent, as in the paper itself. */
+.paper-references {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    list-style: none;
+}
+
+.paper-references li {
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: var(--muted);
+    padding-left: 28px;
+    text-indent: -28px;
+}
+
+.paper-missing {
+    padding-top: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.paper-missing-text {
+    font-size: 1rem;
+}
+
+@media (max-width: 900px) {
+    /* No room for the contents list beside the text; the headings still carry
+       the structure. */
+    .paper-toc {
+        display: none;
+    }
+
+    .paper-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
+        margin-top: 32px;
+    }
+}
+
+@media (max-width: 768px) {
+    .paper-topbar {
+        padding: 18px 20px;
+    }
+
+    .paper-inner {
+        padding: 0 20px 72px;
+    }
+
+    .paper-title {
+        max-width: none;
+    }
+
+    .paper-para {
+        font-size: 0.95rem;
+        line-height: 1.8;
+    }
+}

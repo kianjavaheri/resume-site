@@ -119,9 +119,13 @@ a {
     color: var(--textcolor);
 }
 
-a:visited {
-    color: inherit;
-}
+/* No `a:visited { color: inherit }` here. It was removed deliberately:
+   `a:visited` (0-1-1) outranks a component's own class rule (0-1-0), so once a
+   link had been visited its colour reverted to the inherited page text colour.
+   That turned the Selected Work icon buttons black-on-black — and because
+   browsers hide :visited styling from JavaScript, computed styles and pixel
+   tests all looked correct. Author styles already beat the UA's purple-visited
+   default, so the rule above is enough on its own. */
 
 /* ── Expandable cards (useClampedExpand) ──────── */
 /* Experience cards and Selected Work rows. Tint layered ABOVE the sub-card

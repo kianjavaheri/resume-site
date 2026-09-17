@@ -1,31 +1,41 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 import PdfModal, { withViewerParams } from './PdfModal'
+import LinkIcon from './LinkIcon'
 import ArrowOut from './ArrowOut'
 import Tags from './Tags'
 import { useClampedExpand } from './useClampedExpand'
 import './../styling/components/Projects.css'
 
-const works = [
+// Annotated so each link's `icon` is checked against the union below rather
+// than widening to string.
+const works: Array<Omit<WorkProps, 'onOpenPdf'>> = [
   {
     tag: 'CS Capstone',
     title: 'Shipment Quoting Microservice',
     desc: 'Architected a high-throughput relational caching layer using PostgreSQL and Flask within a Dockerized microservice environment, intercepting and caching external carrier API responses to reduce redundant network calls. Achieved a 64.4% reduction in processing latency (334ms →︎ 119ms) — a 2.8x speedup over live API calls.',
     tags: ['Python', 'Flask', 'PostgreSQL', 'Docker'],
-    links: [{ label: 'View Poster', pdfSrc: '/pdfs/cs-capstone.pdf' }],
+    links: [{ label: 'View Poster', short: 'Poster', icon: 'pdf', pdfSrc: '/pdfs/cs-capstone.pdf' }],
   },
   {
     tag: 'Barrett Honors Thesis',
     title: 'Public Perception vs. Actual Economic Effects of U.S.–China Trade Policy',
     desc: 'Investigated the divergence between the economic outcomes of the 2018–2020 U.S.–China trade war and the public\'s perception of those outcomes.The thesis utilizes a survey to gather public perception of international trade policy and employs Natural Language Processing (NLP) to identify the key drivers of public perception towards trade. The paper identifies key substructures in the results and finds formal education, price sensitivity, and media influence to be the largest factors affecting trade opinions.',
     tags: ['NLP', 'Survey Research', 'Qualtrics'],
-    links: [{ label: 'Read Paper', href: 'https://keep.lib.asu.edu/items/203948' }],
+    links: [
+      { label: 'Read Paper', short: 'Read', icon: 'paper', to: '/papers/thesis' },
+      { label: 'View in ASU Library', short: 'ASU Library', icon: 'library', href: 'https://keep.lib.asu.edu/items/203948' },
+    ],
   },
   {
     tag: 'Economics Capstone',
     title: 'Universal Basic Income vs. Targeted Welfare: A Macroeconomic Assessment',
     desc: 'Analyzed the macroeconomic feasibility and behavioral trade-offs of UBI versus targeted welfare systems. Drawing on empirical data and policy models from five recent global studies across developing nations (South Africa, Indonesia, Peru) and developed economies (U.S., Finland, New Zealand), the paper evaluates how funding mechanisms — consumption vs. income taxes — affect GDP growth, employment incentives, and long-term fiscal sustainability.',
     tags: ['Macroeconomics', 'Policy Analysis'],
-    links: [{ label: 'Read Paper', pdfSrc: '/pdfs/basic-income.pdf' }],
+    links: [
+      { label: 'Read Paper', short: 'Read', icon: 'paper', to: '/papers/basic-income' },
+      { label: 'View PDF', short: 'PDF', icon: 'pdf', pdfSrc: '/pdfs/basic-income/basic-income.pdf' },
+    ],
   },
   {
     tag: 'Independent Research',
@@ -33,7 +43,7 @@ const works = [
     title: 'Estimating the Wage Effects of a Universal Basic Income',
     desc: 'Applied Double Machine Learning (LinearDML and CausalForestDML) to longitudinal CPS ASEC microdata to estimate the causal effect of unconditional cash transfers on future labor income, then used the model to simulate the predicted wage impact of a $6,000/year UBI program. Used XGBoost within the DoubleML framework to control for nonlinear confounding across demographic and socioeconomic variables.',
     tags: ['Python', 'EconML', 'XGBoost', 'Causal Inference'],
-    links: [{ label: 'View GitHub', href: 'https://github.com/kianjavaheri/welfare-model' }],
+    links: [{ label: 'View GitHub', short: 'GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/welfare-model' }],
   },
   {
     tag: 'Personal Project',
@@ -43,17 +53,24 @@ const works = [
     desc: 'Built a client-side Fabric mod for Minecraft 26.2 that tracks the materials needed for a build, and works on servers that don\'t have it installed. Players import a material list by pasting text, loading a Litematica export, or dropping in a screenshot that Claude reads. Chests, barrels and shulker boxes marked as Material Boxes then count what\'s already stored, color-code each slot by progress, and route shift-clicked items straight to the slots that still need them.',
     tags: ['Java', 'Fabric', 'Minecraft Modding', 'Claude API'],
     links: [
-      { label: 'View CurseForge', href: 'https://www.curseforge.com/minecraft/mc-mods/material-boxes' },
-      { label: 'View GitHub', href: 'https://github.com/kianjavaheri/material-boxes' },
+      { label: 'View CurseForge', short: 'CurseForge', icon: 'curseforge', href: 'https://www.curseforge.com/minecraft/mc-mods/material-boxes' },
+      { label: 'View GitHub', short: 'GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/material-boxes' },
     ],
   },
 ]
 
-// A link opens either the PDF modal (pdfSrc) or an outbound page (href).
+// A link opens the PDF modal (pdfSrc), an outbound page (href), or a page on
+// this site (to — e.g. a paper's reading page).
 interface WorkLink {
+  // The button's accessible name and tooltip. Keep the visible `short` text a
+  // subset of it ("Read" ⊂ "Read Paper"), so the name matches what's on screen.
   label: string
+  // Visible text beside the icon — short, because the column is 200px wide.
+  short: string
+  icon: 'paper' | 'pdf' | 'library' | 'github' | 'curseforge'
   pdfSrc?: string
   href?: string
+  to?: string
 }
 
 interface WorkProps {
@@ -109,14 +126,24 @@ function WorkCard({ tag, wip, release, title, desc, tags, links, onOpenPdf }: Wo
         // Links act on their own — they must not also toggle the row.
         <div className="project-links" onClick={(e) => e.stopPropagation()}>
           {links.map((l) => (
-            l.pdfSrc ? (
+            l.to ? (
+              <Link key={l.label} to={l.to} className="project-icon-link" aria-label={l.label} title={l.label}>
+                <LinkIcon kind={l.icon} />
+                <span className="project-icon-label">{l.short}</span>
+                <ArrowOut />
+              </Link>
+            ) : l.pdfSrc ? (
               <button
                 key={l.label}
                 type="button"
-                className="project-link"
+                className="project-icon-link"
+                aria-label={l.label}
+                title={l.label}
                 onClick={() => onOpenPdf?.(l.pdfSrc!)}
               >
-                {l.label}<ArrowOut />
+                <LinkIcon kind={l.icon} />
+                <span className="project-icon-label">{l.short}</span>
+                <ArrowOut />
               </button>
             ) : (
               <a
@@ -124,9 +151,13 @@ function WorkCard({ tag, wip, release, title, desc, tags, links, onOpenPdf }: Wo
                 href={l.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="project-link"
+                className="project-icon-link"
+                aria-label={l.label}
+                title={l.label}
               >
-                {l.label}<ArrowOut />
+                <LinkIcon kind={l.icon} />
+                <span className="project-icon-label">{l.short}</span>
+                <ArrowOut />
               </a>
             )
           ))}
