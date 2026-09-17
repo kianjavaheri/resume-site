@@ -369,11 +369,14 @@ Note when testing: an animation's clock does not advance while `document.visibil
 
 A vertical stack (`.sub-cards-stack`) of **wide, short rows**. It replaced a 3-column grid of tall tiles. Each card carries **both** `sub-card` and `project-card` — `.sub-card` supplies radius, fill, gradient, shadow and padding.
 
-Each row is a CSS grid. The 200px left column holds `meta` (the project type, e.g. "CS Capstone") on the card's **1/4 line** and the `link` on its **3/4 line**; `body` (title, description, tags) fills the right. At ≤768px the areas restack to `meta → body → link`.
+Each row is a CSS grid. The 200px left column holds `meta` (the project type, e.g. "CS Capstone") above the `link` tiles, **centred in the card as a pair**; `body` (title, description, tags) fills the right. At ≤768px the areas restack to `meta → body → link`.
 
-- **Why the quarters:** type at the top with the link pinned to the bottom left an empty column. The link alone at the vertical centre, with the type at the top, read as stranded. Splitting the card into halves spaces the two evenly.
-- **How:** rows are `1fr 1fr` with **`row-gap: 0`** (any gap makes the halves unequal). `meta` and `link` are each `align-self: center` in their half.
-- **The card's vertical padding moves onto `.project-body`** on desktop (`@media (min-width: 769px)`: `.sub-card.project-card` gets `padding-top/bottom: 0`, and `.project-body` gets `padding: 20px 0`). The card's own padding sits outside the grid, so without this both items land 10px toward the middle, on the content box's quarters rather than the card's. Phones keep the sub-card's normal padding.
+- **How:** four rows, `1fr auto auto 1fr`, with `body` spanning all four. The two equal flexible rows pin the pair to the middle; `row-gap: 14px` is also the gap between the type and the tiles. Measured: pair centred at 50%, type at 22%, tiles at 59%, rows a uniform 152px.
+- **Horizontally the pair is centred too**, on desktop: the type and the tiles are each centred in the 200px column, so the label sits over the tiles it belongs to instead of hanging off their left edge, and a one-tile project (Independent Research) stays aligned with the two-tile ones. Measured: every card's label and tile row share a centre at x=169. **At ≤768px both revert to `flex-start`** — the areas restack full-width there, and a centred label would float away from the left-aligned title and description below it.
+- **Two things that don't work**, both tried:
+  - **Centring the tiles alone** while the type keeps a quarter line. A 72px tile centred in a 152px card runs 40px–112px and overlaps the type's baseline.
+  - **Wrapping the pair in one element** and centring that. The body sits *between* them in the markup, so the wrapper swallows it and cards stretch to ~350px with the type stranded at 2%.
+- **The card's vertical padding moves onto `.project-body`** on desktop (`@media (min-width: 769px)`: `.sub-card.project-card` gets `padding-top/bottom: 0`, and `.project-body` gets `padding: 20px 0`). The card's own padding sits outside the grid, so without this the pair centres on the content box rather than the card. Phones keep the sub-card's normal padding.
 - **Tried and rejected:** moving the tags into the left column to fill it, with a three-line preview to balance the height. It balanced, but Kian didn't like it. The tags stay under the description, as on Experience.
 
 **Projects carry no dates.** They were removed deliberately. Don't reintroduce a `date` field without checking with Kian.
@@ -382,14 +385,14 @@ Rows start collapsed to a two-line preview and expand in place, with tags below.
 
 Links are **optional and plural**: each project carries a `links` array, and each entry is a `pdfSrc` (opens the PDF modal), an `href` (outbound page), or a `to` (a page on this site, rendered as a react-router `Link` — e.g. Economics Capstone's "Read Paper" → `/papers/basic-income`). A project with no links renders no link row.
 
-**They render as `.project-icon-link` chips**: 28px rounded rectangles, icon left and short uppercase label right, **stacked vertically** and centred as a group on the 3/4 line. Icon-only squares were tried in between and lost too much meaning; plain uppercase text links before that read as a cramped list.
+**They render as `.project-icon-link` tiles**: 72px squares, icon above a short uppercase label, **side by side** in a row, centred with the type as a pair (see above). Earlier passes went through plain uppercase text links (read as a cramped list), icon-only squares (lost too much meaning) and wide icon+label chips (only one fitted per row, so they stacked down the card).
 
-Each chip is icon → label → **`ArrowOut`**, the arrow pushed to the right edge with `margin-left: auto` at `opacity: .55`. Because the chips share a width, the arrows line up in a column down the stack.
+The arrow sits in the tile's **top-right corner**, absolutely positioned out of the icon/label column, at `opacity: .45`.
 
-Three details keep the stack from fitting badly, all learned the hard way:
-- **One `minmax(150px, max-content)` grid column.** Every chip on every card is 150px, so the whole section lines up, not just the chips within a card (those ranged 98–148px). 150 clears the widest label, "CurseForge" plus its arrow at 148. `minmax`, not a fixed width, so a longer label widens the track rather than overflowing — but that card's chips would then be wider than the rest, so raise the floor to match. It must stay under the **170px** column at ≤1024px.
-- **The stack must stay clear of its half.** The card's bottom half is 76px; at 34px chips with an 8px gap two of them measured exactly 76 and the lower chip ran flush into the card's bottom edge. 28px with a 5px gap is 61px.
-- **`margin-bottom: 15px` lifts the group off the 3/4 line** to ~70% of the card, which reads better against the type label. Centring accounts for margins, so the bottom margin pulls the group up. **15px is the ceiling**: 61 + 15 fills the 76px half exactly, and anything more grows the half — at 20px the two-link cards went to 162px while the one-link cards stayed 152px. Re-check the arithmetic if the chip height, the gap or the row height changes.
+Three measurements hold this together:
+- **Two tiles plus the 8px gap is 152px**, inside the **170px** column at ≤1024px. Widen the tile and check that sum first.
+- **Labels wrap** (`white-space: normal`, centred) inside the 60px the tile leaves after its 6px padding: "ASU Library" and "CurseForge" both take two lines, the rest one. **"CurseForge" is one unbreakable word**, so its `short` carries a **zero-width space (U+200B)** between "Curse" and "Forge" — invisible, gives the line somewhere to break, and doesn't touch the accessible name (that comes from `aria-label`). Without it the label ran 66px wide in a 60px box.
+- Nothing pads `.project-links` vertically any more — the centred pair keeps the tiles clear of the card's edges on its own, and rows stay **152px**.
 
 **They are recessed chips, NOT inverted like `.scroll-top`.** `--well-bg` fill, `--textcolor` icon, `--well-shadow`, `--well-hover-tint` on hover — the same treatment as the tech tags, a step *down* from the sub-card per *Nesting goes DOWN*. The inverted version was tried first (black squares on a near-white card, white on the dark one) and read as far too much contrast against the card carrying them. The scroll button keeps its inversion because it floats over arbitrary page content; these sit inside a card.
 - Each entry needs an **`icon`**: `paper` (a reading page here), `pdf`, `library`, `github`, `curseforge`. The `works` array is annotated `Array<Omit<WorkProps, 'onOpenPdf'>>` so those names are checked rather than widening to `string`.

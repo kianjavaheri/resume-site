@@ -13,7 +13,7 @@ const stroke = {
 }
 
 function LinkIcon({ kind }: { kind?: string }) {
-  const common = { viewBox: '0 0 24 24', width: 16, height: 16, 'aria-hidden': true as const }
+  const common = { viewBox: '0 0 24 24', width: 20, height: 20, 'aria-hidden': true as const }
 
   switch (kind) {
     // Reading page on this site.

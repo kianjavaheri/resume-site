@@ -5,29 +5,33 @@
    useClampedExpand and .expandable-card in App.css. */
 
 /* Cards also carry .sub-card, which supplies radius, fill, shadow and padding.
-   The aside splits the card into two equal halves, the type centred in the
-   top half and the link in the bottom — so they sit on the card's 1/4 and 3/4
-   lines. (Type at the top with the link pinned to the bottom left an empty
-   column; the link alone at the centre read as stranded.) For those to be the
-   CARD's quarters rather than its content box's, the vertical padding moves
-   onto .project-body on desktop — see the min-width query below. Below 768px
-   the areas restack into meta → body → link. */
+   The type and the link tiles centre in the card as a pair: two equal flexible
+   rows above and below pin them to the middle, and the body spans all four.
+   They used to sit on the card's 1/4 and 3/4 lines, each centred in its own
+   half, which left the tiles low.
+   Centring the TILES alone isn't possible while the type keeps a quarter line:
+   a 72px tile centred in a 152px card runs 40px–112px and overlaps the type's
+   baseline. Wrapping the pair in one element doesn't work either — the body
+   sits between them in the markup, so the wrapper swallows it and the card
+   stretches to ~350px. Below 768px the areas restack to meta → body → link. */
 .project-card {
     display: grid;
     grid-template-columns: 200px 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr auto auto 1fr;
     grid-template-areas:
+        ".    body"
         "meta body"
-        "link body";
+        "link body"
+        ".    body";
     column-gap: 40px;
-    /* Zero, or the two halves stop being equal. */
-    row-gap: 0;
+    /* Also the gap between the type and the tiles. */
+    row-gap: 14px;
 }
 
-/* The card's own top/bottom padding sits outside the grid, which would pull
-   both items 10px toward the middle. Moving it onto the body lets the aside
-   span the full card height. Desktop only: mobile keeps the stacked layout
-   and the sub-card's normal padding. */
+/* The card's own top/bottom padding sits outside the grid, so the centred pair
+   would be measured against the content box rather than the card. Moving it
+   onto the body lets the rows span the full card height. Desktop only: mobile
+   keeps the stacked layout and the sub-card's normal padding. */
 @media (min-width: 769px) {
     .sub-card.project-card {
         padding-top: 0;
@@ -39,13 +43,15 @@
     }
 }
 
+/* Centred in the left column, as .project-links is, so the type label sits
+   centred over the tiles it belongs to rather than hanging off their left
+   edge. Both are centred on the same axis, so the pair stays aligned whether
+   a project carries one tile or two. */
 .project-card-meta {
     grid-area: meta;
-    /* Centred in the top half: the card's 1/4 line. */
-    align-self: center;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
     gap: 6px;
 }
 
@@ -64,6 +70,8 @@
     color: var(--muted);
     display: flex;
     align-items: center;
+    justify-content: center;
+    text-align: center;
     gap: 8px;
 }
 
@@ -118,66 +126,58 @@
 
 .project-links {
     grid-area: link;
-    /* Centred in the bottom half: the card's 3/4 line. */
-    align-self: center;
-    /* One column, floor 150px: every chip on every card is the same width, not
-       just the ones sharing a card (they ranged 98–148px). 150 clears the
-       widest label, "CurseForge" + arrow at 148. minmax, not a fixed width, so
-       a longer label added later widens the track instead of overflowing it —
-       but then that card's chips are wider than the rest, so raise the floor
-       to match. It has to stay under the 170px column at ≤1024px.
-       justify-content keeps the track against the left. */
-    display: grid;
-    grid-template-columns: minmax(150px, max-content);
-    justify-content: start;
-    gap: 5px;
-    /* Lifts the stack off the 3/4 line: centring accounts for margins, so the
-       bottom margin pulls the group up within its half. Sitting exactly on the
-       quarter read as too low against the type label.
-       15px is the ceiling — the two-chip stack is 61px in a 76px half, so
-       61 + 15 fills it exactly. Any more and the half grows, which made
-       two-link cards 162px against 152px for the rest. */
-    margin-bottom: 15px;
+    /* Side by side: two 72px tiles + the gap is 152px, inside the 170px
+       column at ≤1024px. */
+    display: flex;
+    justify-content: center;
+    gap: 8px;
 }
 
-/* Shaped like .scroll-top — 12px on a 40px button is the same corner ratio as
-   its 14px on 46px — but NOT its inverted fill. A black square on a near-white
-   card (and a white one in dark) fought the card it sat on. These are recessed
-   chips instead: --well-bg, a step DOWN from the sub-card, the same fill the
-   tech tags use. The label survives as the button's aria-label and tooltip. */
-/* 28px tall with a 5px gap, so two of them (61px) sit inside the card's 76px
-   bottom half with ~7px of air above and below. At 34/8 the stack measured
-   exactly 76 and the lower chip ran flush into the card's bottom edge; 30/6
-   left only 5px. Keep the stack clear of the half if either value changes. */
+/* Square tiles: icon over label. Wide chips with the label beside the icon
+   only fitted one per row; stacked, they ran down the card. --well-bg fill and
+   --textcolor icon, NOT .scroll-top's inversion — a black square on a
+   near-white card (and white on the dark one) fought the card carrying it. */
 .project-icon-link {
-    height: 28px;
-    padding: 0 10px;
+    position: relative;
+    width: 72px;
+    height: 72px;
     flex-shrink: 0;
-    border-radius: 9px !important;
+    border-radius: 12px !important;
     background-color: var(--well-bg);
     color: var(--textcolor);
     box-shadow: var(--well-shadow);
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 7px;
+    justify-content: center;
+    gap: 5px;
+    padding: 6px;
     cursor: pointer;
     transition: background-image 0.15s ease;
 }
 
-/* Pushed to the chip's right edge. The chips share a width (the max-content
-   grid track), so the arrows line up in a column down the stack. */
+/* Top-right corner, out of the icon + label column. */
 .project-icon-link .arrow-out {
-    margin-left: auto;
-    opacity: 0.55;
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 0.62rem;
+    opacity: 0.45;
 }
 
-/* The same uppercase micro-label as the project type above it. */
+/* Sits under the icon and wraps: "ASU Library" and "CurseForge" both take two
+   lines inside the 60px the tile leaves after padding. CurseForge is one
+   unbreakable word, so its `short` carries a zero-width space (U+200B) between
+   "Curse" and "Forge" — invisible, but it gives the line a place to break.
+   The accessible name comes from aria-label, so it's unaffected. */
 .project-icon-label {
-    font-size: 0.65rem;
+    font-size: 0.55rem;
     font-weight: 500;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.06em;
+    line-height: 1.25;
     text-transform: uppercase;
-    white-space: nowrap;
+    text-align: center;
+    white-space: normal;
 }
 
 /* Stated for :visited too. A visited <a> is styled by `a:visited` at 0-1-1,
@@ -218,7 +218,19 @@ a.project-icon-link:visited {
         row-gap: 14px;
     }
 
+    /* Full-width rows here, so centring would strand the label and tiles in
+       the middle of the card against a left-aligned title and description. */
+    .project-card-meta {
+        align-items: flex-start;
+    }
+
+    .project-tag {
+        justify-content: flex-start;
+        text-align: left;
+    }
+
     .project-links {
+        justify-content: flex-start;
         margin-top: 4px;
     }
 }

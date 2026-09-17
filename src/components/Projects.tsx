@@ -56,7 +56,7 @@ const works: Array<Omit<WorkProps, 'onOpenPdf'>> = [
     desc: 'Built a client-side Fabric mod for Minecraft 26.2 that tracks the materials needed for a build, and works on servers that don\'t have it installed. Players import a material list by pasting text, loading a Litematica export, or dropping in a screenshot that Claude reads. Chests, barrels and shulker boxes marked as Material Boxes then count what\'s already stored, color-code each slot by progress, and route shift-clicked items straight to the slots that still need them.',
     tags: ['Java', 'Fabric', 'Minecraft Modding', 'Claude API'],
     links: [
-      { label: 'View CurseForge', short: 'CurseForge', icon: 'curseforge', href: 'https://www.curseforge.com/minecraft/mc-mods/material-boxes' },
+      { label: 'View CurseForge', short: 'Curse\u200BForge', icon: 'curseforge', href: 'https://www.curseforge.com/minecraft/mc-mods/material-boxes' },
       { label: 'View GitHub', short: 'GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/material-boxes' },
     ],
   },
@@ -123,8 +123,7 @@ function WorkCard({ tag, wip, release, title, desc, tags, links, onOpenPdf }: Wo
         </div>
         <Tags tags={tags} />
       </div>
-      {/* Optional — a project with nothing to link to yet renders no link row.
-          Several links stack in the order they're listed. */}
+      {/* Optional — a project with nothing to link to yet renders no links. */}
       {links?.length ? (
         // Links act on their own — they must not also toggle the row.
         <div className="project-links" onClick={(e) => e.stopPropagation()}>
