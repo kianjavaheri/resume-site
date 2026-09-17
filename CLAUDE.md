@@ -19,14 +19,28 @@ Deployed on **Vercel** via git push to `master`. The build command is `vite buil
 
 - **React 18** with TypeScript
 - **Vite 8** (rolldown bundler) with `@vitejs/plugin-react@6`
-- **react-router-dom v6** (BrowserRouter in index.tsx)
+- **react-router-dom v7** (BrowserRouter in index.tsx)
 - **use-local-storage** for theme persistence
 - No UI or icon libraries are used in `src/`
 
-### Unused dependencies (declared but never imported)
-`package.json` still lists `@mui/material`, `@emotion/react`, `@emotion/styled`, `react-pdf`, and four `@fortawesome/*` packages. **None are imported anywhere in `src/`** — verify with a grep before assuming otherwise. They are safe to uninstall; they only bloat `node_modules`. Do not start using them without a deliberate decision: the design has no UI-library dependency, and all icons are inline SVG or files in `public/svgs/`.
+### The dependency list is deliberately short
+`package.json` carries only what `src/` actually imports: `react`, `react-dom`, `react-router-dom` and `use-local-storage`.
+
+It used to also list `@mui/material`, `@emotion/react`, `@emotion/styled`, `react-pdf` and four `@fortawesome/*` packages, none of which were imported anywhere. **They were uninstalled** — they were pulling a `@babel/core` toolchain in behind them and were the source of most of the repo's Dependabot alerts (browserslist, baseline-browser-mapping, `@babel/runtime`), all for code that never reached the bundle. Removing them cleared those alerts outright rather than patching transitive deps of packages nothing used.
+
+Don't reintroduce them: the design has no UI-library dependency, and all icons are inline SVG or files in `public/svgs/`. See *Dependency security* below.
 
 `src/components/Resume.tsx` and `src/util/svgs/` are likewise dead — see *Dead code and assets* under File structure.
+
+### Dependency security
+
+`npm audit` is expected to report **0 vulnerabilities**. If it doesn't, the order of preference is: delete the package if nothing imports it, then bump it, and only then reach for a major upgrade.
+
+**react-router-dom is on v7, not v6, for a security reason.** GHSA-wrjc-x8rr-h8h6 (open redirect via backslash in `<Link>`/`useNavigate`) and GHSA-337j-9hxr-rhxg (constructor injection in SSR `deserializeErrors()`) cover `6.0.0 - 7.17.0`, so **there is no patched 6.x** — `6.30.6` is the last 6 release and is still in range. The fix only exists in 7.17.1+. Don't "downgrade back to v6 for stability": that reopens both advisories.
+
+The migration was a non-event because the router surface here is five imports — `BrowserRouter`, `Routes`, `Route`, `Link`, `useParams` — all unchanged in v7. Neither advisory was actually exploitable on this site (every `to=` is a hardcoded string from the `papers.ts` registry, and there's no SSR), so the upgrade was hygiene, not an incident.
+
+`postcss` and `nanoid` come in under `vite` and are build-time only; they patch with a plain `npm audit fix`.
 
 ## Theme
 
@@ -191,7 +205,6 @@ Verified unreferenced — safe to delete, and worth knowing about before you go 
 - **`src/components/Resume.tsx`** — not imported anywhere; points at an old Google Doc.
 - **`src/util/svgs/`** — 8 SVGs (`asulogo`, `cpp`, `gcp`, `go`, `java`, `js`, `python`, `react`) from before the move to `public/svgs/`. Nothing imports them. This is the trap the *SVGs live in `public/svgs/`* rule exists to avoid: there are two svg directories and only one is live.
 - **`public/images/img_dep*.jpg`** — 4 files, not in the gallery array.
-- The unused npm packages listed above.
 - **`.card-toggle-btn`** in `App.css` (plus `--toggle-btn-bg` / `--toggle-btn-bg-hover`, which feed nothing else) — styles for a button that is never rendered; headers toggle on the whole `.card-header` row.
 
 ## Sections and defaults
@@ -480,7 +493,7 @@ Shared by `About.tsx` and `Projects.tsx`; CSS lives in `App.css`. Uses an `<ifra
 - Blurred backdrop, click-outside and Escape to close, body scroll locked, viewport meta pinned while open (iOS pinch-zoom fix).
 - Close button: desktop `position: fixed` top-right 44px; mobile static in `.pdf-modal-bar`, 36px.
 
-**Do NOT add `react-pdf` / `pdfjs-dist` rendering.** `react-pdf` is in `package.json` but unused; the iframe is the intended approach.
+**Do NOT add `react-pdf` / `pdfjs-dist` rendering.** `react-pdf` was once declared but never used, and has been uninstalled; the iframe is the intended approach.
 
 ## No emoji glyphs in copy
 
