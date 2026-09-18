@@ -1,14 +1,55 @@
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 import type { PaperChart } from '../content/charts'
 
-// Plot geometry in viewBox units. The box is sized to include the x-axis band
-// and the axis titles, so nothing is clipped and the container never needs its
-// own scrollbar.
-const W = 680
-const H = 340
-const PAD = { top: 18, right: 66, bottom: 46, left: 56 }
-const PLOT_W = W - PAD.left - PAD.right
-const PLOT_H = H - PAD.top - PAD.bottom
+// Plot geometry in viewBox units, in two sizes. Each box is sized to include
+// the x-axis band and the axis titles, so nothing is clipped and the container
+// never needs its own scrollbar.
+//
+// There are two because **the chart scales with its container but its type does
+// not scale with it**: the mobile block in Paper.css bumps the axis chrome from
+// 15 viewBox units to 23, so that at 0.49x it still renders at a readable
+// ~11px. At 23 units the desktop gutters no longer hold it. Measured on
+// Figure 4 at 375px, three pairs of labels overlapped — the bottom-left y-tick
+// against the first x-tick, the y-ticks against the rotated axis title, and the
+// x-ticks against "Year". Shrinking the type back is not the fix; ~11px is
+// already the floor. The gutters are what have to grow.
+const GEO = {
+  wide: { W: 680, H: 340, top: 18, right: 66, bottom: 46, left: 56, xTickDy: 22, yTitleX: 14 },
+  compact: {
+    W: 680,
+    H: 400,
+    top: 18,
+    // The end label is anchored to its right edge on mobile (see Paper.css) and
+    // runs back over the plot, so it needs clearance, not a gutter.
+    right: 28,
+    // 90: the rotated y-title reaches x 27 at 23 units, the widest tick ("325")
+    // is 41 units, and the tick sits 10 off the axis. 27 + 41 + 10 plus air.
+    left: 90,
+    // The title's own x. At 14 its ascenders paint ~5px left of the svg's box,
+    // out into the page gutter — harmless (the svg is overflow: visible and it
+    // adds no page scroll) but it isn't inside the chart it labels. 24 seats it.
+    yTitleX: 24,
+    // 76 with a 36-unit tick offset: the y-tick centred on the plot's bottom
+    // edge hangs 11.5 units below it, so the x-tick's cap top has to clear
+    // that before "Year" clears the x-tick's descender.
+    bottom: 76,
+    xTickDy: 36,
+  },
+}
+
+// Which box to draw. Matches Paper.css's own 768px breakpoint, so the geometry
+// and the font-size override always switch together.
+function useCompactGeometry() {
+  const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 768px)').matches)
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)')
+    const sync = () => setCompact(mq.matches)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
+  return compact ? GEO.compact : GEO.wide
+}
 
 /**
  * The thesis's four Background charts, drawn from the same data as Tables 1
@@ -28,6 +69,10 @@ function FigureChart({ chart, caption }: { chart: PaperChart; caption?: string }
   const clipId = `clip-${uid.replace(/[:]/g, '')}`
   const svgRef = useRef<SVGSVGElement>(null)
   const [active, setActive] = useState<number | null>(null)
+  const geo = useCompactGeometry()
+  const { W, H } = geo
+  const PLOT_W = W - geo.left - geo.right
+  const PLOT_H = H - geo.top - geo.bottom
   // Which input opened the current reading, so a touch selection can persist
   // (there is no hover to end it) while a mouse one still follows the pointer.
   const heldByTouch = useRef(false)
@@ -38,8 +83,8 @@ function FigureChart({ chart, caption }: { chart: PaperChart; caption?: string }
   )
 
   const n = chart.x.length
-  const xAt = (i: number) => PAD.left + (n === 1 ? PLOT_W / 2 : (i * PLOT_W) / (n - 1))
-  const yAt = (v: number) => PAD.top + PLOT_H - ((v - yMin) / (yMax - yMin)) * PLOT_H
+  const xAt = (i: number) => geo.left + (n === 1 ? PLOT_W / 2 : (i * PLOT_W) / (n - 1))
+  const yAt = (v: number) => geo.top + PLOT_H - ((v - yMin) / (yMax - yMin)) * PLOT_H
 
   // Every other year, matching the source charts — nine labels on a narrow
   // column collide.
@@ -153,7 +198,7 @@ function FigureChart({ chart, caption }: { chart: PaperChart; caption?: string }
           >
             <defs>
               <clipPath id={clipId}>
-                <rect x={PAD.left} y={PAD.top} width={PLOT_W} height={PLOT_H} />
+                <rect x={geo.left} y={geo.top} width={PLOT_W} height={PLOT_H} />
               </clipPath>
             </defs>
 
@@ -162,14 +207,14 @@ function FigureChart({ chart, caption }: { chart: PaperChart; caption?: string }
               <g key={t}>
                 <line
                   className={`paper-chart-grid${zeroCrossing && t === 0 ? ' paper-chart-zero' : ''}`}
-                  x1={PAD.left}
-                  x2={PAD.left + PLOT_W}
+                  x1={geo.left}
+                  x2={geo.left + PLOT_W}
                   y1={yAt(t)}
                   y2={yAt(t)}
                 />
                 {/* Plain numbers: the axis title already carries the unit,
                     so "$200B" beside a "$ billions" label says it twice. */}
-                <text className="paper-chart-tick" x={PAD.left - 10} y={yAt(t)} textAnchor="end" dominantBaseline="middle">
+                <text className="paper-chart-tick" x={geo.left - 10} y={yAt(t)} textAnchor="end" dominantBaseline="middle">
                   {t}
                 </text>
               </g>
@@ -177,25 +222,25 @@ function FigureChart({ chart, caption }: { chart: PaperChart; caption?: string }
 
             {chart.x.map((label, i) =>
               xTickShown(i) ? (
-                <text key={label} className="paper-chart-tick" x={xAt(i)} y={PAD.top + PLOT_H + 22} textAnchor="middle">
+                <text key={label} className="paper-chart-tick" x={xAt(i)} y={geo.top + PLOT_H + geo.xTickDy} textAnchor="middle">
                   {label}
                 </text>
               ) : null
             )}
 
-            <text className="paper-chart-axis-title" x={PAD.left + PLOT_W / 2} y={H - 6} textAnchor="middle">
+            <text className="paper-chart-axis-title" x={geo.left + PLOT_W / 2} y={H - 6} textAnchor="middle">
               {chart.xLabel}
             </text>
             <text
               className="paper-chart-axis-title"
-              transform={`translate(14 ${PAD.top + PLOT_H / 2}) rotate(-90)`}
+              transform={`translate(${geo.yTitleX} ${geo.top + PLOT_H / 2}) rotate(-90)`}
               textAnchor="middle"
             >
               {chart.yLabel}
             </text>
 
             {active !== null && (
-              <line className="paper-chart-crosshair" x1={xAt(active)} x2={xAt(active)} y1={PAD.top} y2={PAD.top + PLOT_H} />
+              <line className="paper-chart-crosshair" x1={xAt(active)} x2={xAt(active)} y1={geo.top} y2={geo.top + PLOT_H} />
             )}
 
             <g clipPath={`url(#${clipId})`}>

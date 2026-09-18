@@ -95,16 +95,25 @@
     gap: 6px;
 }
 
-/* Top-aligning the two BOXES isn't the same as aligning the two texts: the
-   label's line box is 13px against the title's 19.76px, so at a shared top edge
-   the label's caps sat 1.8px high. 2px puts the cap heights level, which is
-   what "flush with the title" means to the eye — the label and the title start
-   on the same optical line. Cap tops, not baselines: those are 5.4px apart, and
-   matching them would drop the small label visibly below the title.
+/* The label centres on the GAP between the title and the description, not on
+   the title itself. Level with the title it competed with it for the same
+   line; a step down puts it in the card's own whitespace, where it reads as a
+   caption on the entry rather than as a second heading.
+
+   Measured, not guessed: the title's box ends 39.8px below the card's top and
+   the description starts at 49.8px, so the gap's centre is 44.8px. The label's
+   13.5px box was centred at 28.8px, hence 18px of padding (2 + 16).
+
+   This assumes a one-line title, which holds at every desktop width — checked
+   at 1280 and 1000px, where the longest ("Universal Basic Income vs. Targeted
+   Welfare: A Macroeconomic Assessment") still fits the body column on one line.
+   A title that wrapped would push its gap down 19.76px and leave the label
+   high; re-measure if the copy or the column widths change.
+
    Desktop only; the areas restack below 769px. */
 @media (min-width: 769px) {
     .project-card-meta {
-        padding-top: 2px;
+        padding-top: 18px;
     }
 }
 
