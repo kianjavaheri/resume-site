@@ -47,7 +47,10 @@ export interface PaperAction {
 
 export interface Paper {
   slug: string
-  // Shown above the title, matching the project's type label in Selected Work.
+  // Shown above the title. It used to match Selected Work's type label exactly;
+  // that one has since been promoted to 600/--textcolor and this stayed
+  // 500/--muted, because it sits directly above a much larger title rather than
+  // beside one across a gutter.
   eyebrow: string
   title: string
   // Small key/value lines under the title: course, date, length.

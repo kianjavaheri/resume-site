@@ -124,12 +124,23 @@
     gap: 10px;
 }
 
+/* The promoted micro-label: 600 on --textcolor, where the quiet version is 500
+   on --muted. This is not a new decision — `.skill-group-label` is already this
+   exact declaration (0.65rem, 0.15em, uppercase, 600, --textcolor) against
+   `.skill-name`'s 500/--muted, and the rule it follows is stated in CLAUDE.md:
+   **the hierarchy is carried by weight and colour alone.**
+
+   So the size stays at 0.65rem. Enlarging it is what would make the label
+   compete with `.project-title` (0.95rem/600) rather than sit beside it — at a
+   third smaller, uppercase and letterspaced to 0.15em, it reads as a different
+   register no matter how dark it gets, and the two are 40px apart in separate
+   columns. Raising the size would collapse that distance. */
 .project-tag {
     font-size: 0.65rem;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--textcolor);
     display: flex;
     align-items: center;
     justify-content: center;
