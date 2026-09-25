@@ -68,7 +68,10 @@
     position: relative;
     aspect-ratio: 4 / 3;
     overflow: hidden;
-    border-radius: 75px !important;
+    /* 14px, the same radius as `.sub-card` and every other panel nested inside
+       a section card. It was 75px, which made the gallery the one element on
+       the site with a radius of its own. */
+    border-radius: 14px !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.09);
 }
 

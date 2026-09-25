@@ -15,7 +15,7 @@ interface ExpCardProps {
 }
 
 // One role per card. Collapsed to a two-line preview; the tags stay visible
-// below the clamp. Shares its expand behaviour with the Selected Work rows.
+// below the clamp. The only caller of useClampedExpand.
 function ExpCard({ company, date, logo, role, tags, children }: ExpCardProps) {
   const { innerRef, expanded, canExpand, toggle, style, clampClass } = useClampedExpand()
 

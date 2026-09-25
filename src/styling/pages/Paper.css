@@ -16,6 +16,52 @@
     margin: 0 auto;
 }
 
+/* Groups the back control with the name so the pair sits at the top-left and
+   the theme toggle keeps the right end of the bar. */
+.paper-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+/* Icon only, no label. Quiet by default and matched to `.paper-back`'s hover,
+   so the two read as one control cluster rather than a button bolted beside a
+   link. The global `*` reset clears padding and border, so the hit area comes
+   from an explicit size: 32px square is comfortably past the 24px minimum and
+   the 14px glyph sits centred in it. */
+.paper-back-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    margin-left: -6px;
+    border-radius: 8px !important;
+    background: none;
+    color: var(--textcolor);
+    cursor: pointer;
+    transition: background-image 0.15s, opacity 0.15s;
+}
+
+/* A layered tint over the page, per the site's hover convention — not a fill
+   swap, which on a page-coloured surface would composite away to nothing. */
+.paper-back-btn:hover {
+    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
+}
+
+.paper-back-btn:focus-visible {
+    outline: 2px solid var(--textcolor);
+    outline-offset: 2px;
+}
+
+/* Sized here rather than in the component, the same way `.arrow-out` and
+   `.cal-icon` are, so the glyph tracks its context instead of carrying a px
+   size per caller. */
+.arrow-back {
+    width: 17px;
+    height: 17px;
+}
+
 .paper-back {
     font-size: 0.9rem;
     font-weight: 600;

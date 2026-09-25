@@ -1,6 +1,6 @@
 import React from 'react'
 
-// Icons for the Selected Work link buttons. Inline rather than <img> from
+// Icons for the Projects link buttons. Inline rather than <img> from
 // public/svgs/ (how the skill tiles do it) because these sit on a
 // --textcolor-filled button and have to take their colour from it.
 // GitHub and CurseForge marks are simple-icons paths (CC0).

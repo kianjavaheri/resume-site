@@ -1,6 +1,9 @@
-/* One role per card, same 200px / 1fr row as Selected Work so the two
-   sections line up. Collapse/expand is shared: see useClampedExpand and
-   .expandable-card in App.css. */
+/* One role per card: a 200px meta column beside the content. This USED to be
+   paired with the Projects rows, which carried the same 200px/1fr grid so the
+   two sections lined up down the page — Projects is a grid of thumbnail cards
+   now and no longer has a left column, so the pairing is gone and this width
+   is free to change on Experience's own terms. Collapse/expand: see
+   useClampedExpand and .expandable-card in App.css. */
 .experience-item {
     display: grid;
     grid-template-columns: 200px 1fr;
@@ -137,7 +140,9 @@
 }
 
 /* Same 0.95rem/600 as `.project-title`, deliberately: it's the primary line of
-   the card, and Experience and Selected Work are built to line up. */
+   the card in both sections. That's a type-scale decision and still stands —
+   unlike the old column pairing, it doesn't depend on the two sections sharing
+   a layout. */
 .exp-role {
     font-size: 0.95rem;
     font-weight: 600;

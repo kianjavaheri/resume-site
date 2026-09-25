@@ -47,7 +47,7 @@ export interface PaperAction {
 
 export interface Paper {
   slug: string
-  // Shown above the title. It used to match Selected Work's type label exactly;
+  // Shown above the title. It used to match the Projects type label exactly;
   // that one has since been promoted to 600/--textcolor and this stayed
   // 500/--muted, because it sits directly above a much larger title rather than
   // beside one across a gutter.
@@ -63,11 +63,39 @@ export interface Paper {
 import { basicIncome } from './basic-income'
 import { csCapstone } from './cs-capstone'
 import { thesis } from './thesis'
+// Hand-written, not converted from a document — see project-pages.ts.
+import { materialBoxes, rentalPrices, wageEffects } from './project-pages'
 
+// PDFs that are no longer offered for download. Kian withdrew the full-text
+// files for the thesis and the two capstones; the site links to the reading
+// pages instead, and to the ASU Library record for the thesis.
+//
+// This is applied HERE rather than by editing the papers' own modules, because
+// those three are generated from the source PDFs and carry a `View PDF` action
+// in the generated output — a hand edit there is dropped by the next
+// regeneration, and this isn't. The files themselves are gone from `public/`,
+// so the action would 404 anyway.
+const withheldPdfs = new Set([
+  '/pdfs/thesis/thesis.pdf',
+  '/pdfs/cs-capstone/cs-capstone.pdf',
+  '/pdfs/basic-income/basic-income.pdf',
+])
+
+function withoutWithheldPdfs(paper: Paper): Paper {
+  const actions = paper.actions.filter((a) => !(a.pdfSrc && withheldPdfs.has(a.pdfSrc)))
+  return actions.length === paper.actions.length ? paper : { ...paper, actions }
+}
+
+// Every project in the Projects grid has an entry here, because the cards link
+// to `/papers/:slug` and nothing else. A project added to `works` without a
+// page to point at is a dead card.
 export const papers: Record<string, Paper> = {
-  [basicIncome.slug]: basicIncome,
-  [csCapstone.slug]: csCapstone,
-  [thesis.slug]: thesis,
+  [basicIncome.slug]: withoutWithheldPdfs(basicIncome),
+  [csCapstone.slug]: withoutWithheldPdfs(csCapstone),
+  [thesis.slug]: withoutWithheldPdfs(thesis),
+  [wageEffects.slug]: wageEffects,
+  [rentalPrices.slug]: rentalPrices,
+  [materialBoxes.slug]: materialBoxes,
 }
 
 // Sections that end in a long run of survey charts. Everything from the

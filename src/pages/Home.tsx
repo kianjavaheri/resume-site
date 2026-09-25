@@ -1,5 +1,6 @@
 import React from 'react'
 import { useTheme } from '../components/useTheme';
+import { useScrollRestore } from '../components/useScrollRestore';
 import './../styling/pages/Home.css'
 
 import About from '../components/About';
@@ -14,6 +15,8 @@ import Footer from '../components/Footer';
 
 function Home() {
   const { theme, switchTheme, isChecked } = useTheme();
+  // Returning from a project page lands back at the card you left from.
+  useScrollRestore();
 
   return (
     <div className="home" data-theme={theme}>

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import Footer from '../components/Footer'
 import ScrollButton from '../components/Scroll'
 import ArrowOut from '../components/ArrowOut'
+import ArrowBack from '../components/ArrowBack'
+import { hasAppHistory, useScrollRestore } from '../components/useScrollRestore'
 import { useTheme } from '../components/useTheme'
 import SurveyExplorer from '../components/SurveyExplorer'
 import FigureChart from '../components/FigureChart'
@@ -10,7 +12,7 @@ import { papers, surveyExplorers } from '../content/papers'
 import type { Block, PaperTable } from '../content/papers'
 import { paperTables } from '../content/tables'
 import { paperCharts } from '../content/charts'
-import { paperAbstracts } from '../content/abstracts'
+import { paperIntros } from '../content/intros'
 import './../styling/pages/Paper.css'
 
 // Columns of figures read better flush right, where the decimal points line
@@ -119,19 +121,25 @@ function Paper() {
   const { slug } = useParams()
   const paper = slug ? papers[slug] : undefined
   const { theme, switchTheme, isChecked } = useTheme()
+  const navigate = useNavigate()
+  useScrollRestore()
   const [activeId, setActiveId] = useState('')
   const explorer = slug ? surveyExplorers[slug] : undefined
 
-  // Papers with an abstract open on it alone, with the full text behind a
-  // button; papers without one (the capstone poster) render as they always
-  // have. One-way on purpose — once you've asked for the paper, collapsing it
-  // back out from under you is not something a reader wants.
-  const abstract = slug ? paperAbstracts[slug] : undefined
+  // An intro is either an ABSTRACT, which stands in for the document and puts
+  // the rest of the page behind a button, or an OVERVIEW, which is just a lede
+  // and hides nothing — `gated` is what decides. A page with no intro renders
+  // in full on arrival, as they all did before this existed.
+  //
+  // The gate is one-way on purpose: once you've asked for the paper, collapsing
+  // it back out from under you is not something a reader wants.
+  const intro = slug ? paperIntros[slug] : undefined
   const [expanded, setExpanded] = useState(false)
-  const showFull = !abstract || expanded
+  const showFull = !intro?.gated || expanded
 
+  // Scrolling on navigation belongs to useScrollRestore — this only resets the
+  // gate, so a second paper doesn't open already expanded.
   useEffect(() => {
-    window.scrollTo(0, 0)
     setExpanded(false)
   }, [slug])
 
@@ -156,7 +164,7 @@ function Paper() {
   useEffect(() => {
     if (!paper) return
     const ids = [
-      ...(abstract ? ['abstract'] : []),
+      ...(intro ? ['intro'] : []),
       ...(showFull ? paper.sections.map((s) => s.id) : []),
       ...(showFull && paper.references?.length ? ['references'] : []),
     ]
@@ -184,7 +192,7 @@ function Paper() {
     // `showFull` is a dependency because expanding adds every heading to the
     // page at once: without a re-run the probe keeps measuring the old id list
     // until the next scroll event.
-  }, [paper, abstract, showFull])
+  }, [paper, intro, showFull])
 
   const jumpTo = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault()
@@ -206,7 +214,21 @@ function Paper() {
   return (
     <div className="paper" data-theme={theme}>
       <div className="paper-topbar">
-        <Link to="/" className="paper-back">Kian Javaheri</Link>
+        <div className="paper-topbar-left">
+          {/* Icon only. `navigate(-1)` is a real history POP, which is what
+              lets useScrollRestore put the reader back where they were —
+              navigating to "/" instead would be a PUSH and land at the top. */}
+          <button
+            type="button"
+            className="paper-back-btn"
+            onClick={() => (hasAppHistory() ? navigate(-1) : navigate('/'))}
+            aria-label="Go back"
+            title="Go back"
+          >
+            <ArrowBack />
+          </button>
+          <Link to="/" className="paper-back">Kian Javaheri</Link>
+        </div>
         <span className="paper-theme-toggle" onClick={switchTheme}>
           {isChecked() ? 'Light' : 'Dark'}
         </span>
@@ -248,13 +270,13 @@ function Paper() {
               jump sideways when the paper opens. */}
           <nav className="paper-toc" aria-label="Contents">
             {showFull ? <p className="paper-toc-label">Contents</p> : null}
-            {abstract ? (
+            {intro ? (
               <a
-                href="#abstract"
-                onClick={jumpTo('abstract')}
-                className={`paper-toc-link ${activeId === 'abstract' ? 'paper-toc-active' : ''}`}
+                href="#intro"
+                onClick={jumpTo('intro')}
+                className={`paper-toc-link ${activeId === 'intro' ? 'paper-toc-active' : ''}`}
               >
-                Abstract
+                {intro.title}
               </a>
             ) : null}
             {showFull && paper.sections.map((s) => (
@@ -279,16 +301,16 @@ function Paper() {
           </nav>
 
           <article className="paper-article">
-            {abstract ? (
+            {intro ? (
               <section className="paper-section">
-                <h2 id="abstract" className="paper-section-title">Abstract</h2>
-                {abstract.map((text, i) => (
+                <h2 id="intro" className="paper-section-title">{intro.title}</h2>
+                {intro.paragraphs.map((text, i) => (
                   <p key={i} className="paper-para">{text}</p>
                 ))}
               </section>
             ) : null}
 
-            {abstract && !expanded ? (
+            {intro?.gated && !expanded ? (
               <div className="paper-expand">
                 <button
                   type="button"

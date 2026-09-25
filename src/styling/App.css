@@ -1,3 +1,12 @@
+/* The site's typeface. To change it, this @import and the `font-family` on the
+   `*` reset below are the only two places — nothing else names a font.
+   Roboto was tried and reverted; its @import is kept here for reference:
+   family=Roboto:wght@300;400;500;600;700;800
+   Metrics differ between the two, and several layout constants on this site are
+   measured against rendered type — the nav's collapsed 60px monogram, the
+   Experience meta column against "Laboratories", the Projects tag chips fitting
+   two rows. Re-measure those after any swap, and note that Roboto's 700 reads
+   heavier than this face's, so the display weights move with it. */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
 
 [data-theme='light'] {
@@ -40,8 +49,6 @@
     /* Two-part: a soft cast for float, a tight one to define the edge. */
     --nav-shadow: 0 6px 24px rgba(0, 0, 0, 0.10), 0 1px 3px rgba(0, 0, 0, 0.07);
 
-    --footer-bg: #000000;
-    --footer-text: #ffffff;
     --toggle-btn-bg: rgba(0, 0, 0, 0.09);
     --toggle-btn-bg-hover: rgba(0, 0, 0, 0.13);
 }
@@ -91,8 +98,6 @@
                inset 0 0 0 1px rgba(255, 255, 255, 0.06);
     --nav-shadow: 0 6px 28px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.5);
 
-    --footer-bg: #ffffff;
-    --footer-text: #000000;
     --toggle-btn-bg: rgba(255, 255, 255, 0.12);
     --toggle-btn-bg-hover: rgba(255, 255, 255, 0.18);
 }
@@ -128,12 +133,16 @@ a {
    default, so the rule above is enough on its own. */
 
 /* ── Expandable cards (useClampedExpand) ──────── */
-/* Experience cards and Selected Work rows. Tint layered ABOVE the sub-card
-   gradient — a bare background-image would replace it and flatten the card. */
-/* The hover tint. Split from the pointer cursor, because Selected Work's rows
-   want the tint without it: they're always open, so there is nothing on the
-   card to click, and a pointer on an inert card is a promise it can't keep.
-   Experience's cards still toggle, so they take .expandable-card and get both.
+/* The Experience role cards and the Education sub-card: both toggle, so both
+   take .expandable-card and get the tint AND the pointer.
+
+   `.hover-card` is the tint on its own, without the pointer. NOTHING USES IT
+   RIGHT NOW — the Projects tiles took it while they were inert, and they are
+   whole-card links now, so they carry their own hover with an honest pointer.
+   The rule is kept because the distinction it encodes is the useful part: a
+   pointer on a card with nothing to click is a promise it can't keep, so a
+   future inert-but-tinted card should reach for this rather than re-deriving
+   it. Delete it if that never comes.
 
    Per the hover convention, both re-declare --sub-card-grad beneath the tint —
    a bare background-image would replace the gradient and flatten the card. */
@@ -222,7 +231,11 @@ a {
     transition: background 0.2s ease;
 }
 
-.section-card:hover {
+/* Not About. Every other section card has a header that toggles it, so the
+   tint reads as "this responds"; About is `card-header-static` and has nothing
+   to click, where a hover tint is a promise it can't keep — the same rule that
+   keeps `.hover-card` and `.expandable-card` separate. */
+.section-card:not(.about-section):hover {
     background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
 }
 

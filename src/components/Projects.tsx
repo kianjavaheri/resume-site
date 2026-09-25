@@ -1,116 +1,148 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import PdfModal, { withViewerParams } from './PdfModal'
 import LinkIcon from './LinkIcon'
-import ArrowOut from './ArrowOut'
+import ArrowBox from './ArrowBox'
 import Tags from './Tags'
 import './../styling/components/Projects.css'
 
-// Annotated so each link's `icon` is checked against the union below rather
-// than widening to string.
-const works: Array<Omit<WorkProps, 'onOpenPdf'>> = [
+// Every card links to a page under /papers/:slug, and that is the ONLY thing a
+// card does — the whole tile is one <Link>.
+//
+// `blurb` is a TEASER, not the project's description. Two or three lines, in
+// the register of the reference portfolio's cards: what the thing is, and the
+// one fact worth knowing. The full text lives on the project's own page, and
+// the two are written separately on purpose — a truncated long description
+// reads like a truncated long description.
+//
+// There is no `tag` any more. The project type ("CS Capstone", "Personal
+// Project") moved onto each page, where it was already rendered as the
+// `eyebrow` — it was duplicated, and on the card it was competing with the
+// counter for the same corner.
+const works: Array<WorkProps> = [
   {
-    tag: 'CS Capstone',
-    title: 'Shipment Quoting Microservice',
-    desc: 'Architected a high-throughput relational caching layer using PostgreSQL and Flask within a Dockerized microservice environment, intercepting and caching external carrier API responses to reduce redundant network calls. Achieved a 64.4% reduction in processing latency (334ms →︎ 119ms) — a 2.8x speedup over live API calls.',
+    title: 'Revolution Parts Shipment Quoting Microservice',
+    to: '/papers/cs-capstone',
+    image: { src: '/images/projects/shipment-quoting.webp', width: 900, height: 534, alt: 'The quoting tool: shipment and package details on the left, live carrier rates and cache status on the right' },
+    blurb: 'A Dockerized caching layer sitting in front of carrier quote APIs, in Flask and PostgreSQL. Cut quoting latency 64.4%, a 2.8x speedup over live calls.',
     tags: ['Python', 'Flask', 'PostgreSQL', 'Docker'],
-    links: [
-      { label: 'Read Poster', short: 'Read', icon: 'paper', to: '/papers/cs-capstone' },
-      { label: 'View PDF', short: 'PDF', icon: 'pdf', pdfSrc: '/pdfs/cs-capstone/cs-capstone.pdf' },
-    ],
   },
   {
-    tag: 'Barrett Honors Thesis',
     title: 'Public Perception vs. Actual Economic Effects of U.S.–China Trade Policy',
-    desc: 'Investigated the divergence between the economic outcomes of the 2018–2020 U.S.–China trade war and the public\'s perception of those outcomes. The thesis utilizes a survey to gather public perception of international trade policy and employs Natural Language Processing (NLP) to identify the key drivers of public perception towards trade. The paper identifies key substructures in the results and finds formal education, price sensitivity, and media influence to be the largest factors affecting trade opinions.',
+    to: '/papers/thesis',
+    links: [{ label: 'View in ASU Library', icon: 'library', href: 'https://keep.lib.asu.edu/items/203948' }],
+    image: { src: '/images/projects/thesis-survey.webp', width: 900, height: 474, alt: 'The thesis survey as respondents saw it, asking whether the U.S. runs a trade deficit or a surplus' },
+    blurb: 'Why the public read the 2018–2020 trade war so differently from the economy itself. A survey, and NLP over the open-ended answers. Barrett honors thesis.',
     tags: ['NLP', 'Survey Research', 'Qualtrics'],
-    links: [
-      { label: 'Read Paper', short: 'Read', icon: 'paper', to: '/papers/thesis' },
-      { label: 'View in ASU Library', short: 'ASU Library', icon: 'library', href: 'https://keep.lib.asu.edu/items/203948' },
-    ],
   },
   {
-    tag: 'Economics Capstone',
-    title: 'Universal Basic Income vs. Targeted Welfare: A Macroeconomic Assessment',
-    desc: 'Analyzed the macroeconomic feasibility and behavioral trade-offs of UBI versus targeted welfare systems. Drawing on empirical data and policy models from five recent global studies across developing nations (South Africa, Indonesia, Peru) and developed economies (U.S., Finland, New Zealand), the paper evaluates how funding mechanisms — consumption vs. income taxes — affect GDP growth, employment incentives, and long-term fiscal sustainability.',
+    title: 'Universal Basic Income vs. Targeted Welfare',
+    to: '/papers/basic-income',
+    image: { src: '/images/projects/basic-income.webp', width: 900, height: 504, alt: 'A slide comparing targeted transfers to UBI, with inclusion and exclusion error plots for Indonesia and Peru' },
+    blurb: 'Five recent studies on whether a basic income is affordable, across developing and developed economies, and what the choice of funding does to growth.',
     tags: ['Macroeconomics', 'Policy Analysis'],
-    links: [
-      { label: 'Read Paper', short: 'Read', icon: 'paper', to: '/papers/basic-income' },
-      { label: 'View PDF', short: 'PDF', icon: 'pdf', pdfSrc: '/pdfs/basic-income/basic-income.pdf' },
-    ],
   },
   {
-    tag: 'Independent Research',
     title: 'Estimating the Wage Effects of a Universal Basic Income',
-    desc: 'Applied Double Machine Learning (LinearDML and CausalForestDML) to longitudinal CPS ASEC microdata to estimate the causal effect of unconditional cash transfers on future labor income, then used the model to simulate the predicted wage impact of a $6,000/year UBI program. Used XGBoost within the DoubleML framework to control for nonlinear confounding across demographic and socioeconomic variables.',
+    to: '/papers/wage-effects',
+    links: [{ label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/welfare-model' }],
+    image: { src: '/images/projects/wage-effects.webp', width: 900, height: 545, alt: 'A histogram of per-mother wage-impact estimates from the causal forest, against the average treatment effect' },
+    blurb: 'Double Machine Learning over CPS ASEC microdata, estimating what an unconditional $6,000 a year does to future labor income.',
     tags: ['Python', 'EconML', 'XGBoost', 'Causal Inference'],
-    links: [{ label: 'View GitHub', short: 'GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/welfare-model' }],
   },
   {
-    tag: 'Personal Project',
     title: 'Santa Cruz Rental Price Model',
-    desc: 'Built an end-to-end rent prediction model for studios and one-bedrooms in Santa Cruz and Monterey counties, from a RentCast data pipeline through geographic feature engineering to a gradient-boosted model with calibrated prediction intervals. Deployed it as a static web app that reruns the model client-side in JavaScript, so anyone can type an address and get a price with an honest uncertainty range.',
-    tags: ['LightGBM', 'Ridge Regression', 'Gradient Boosting', 'Feature Engineering'],
+    to: '/papers/rental-prices',
     links: [
-      { label: 'View Live Site', short: 'Live Site', icon: 'site', href: 'https://rental-prices.vercel.app/' },
-      { label: 'View GitHub', short: 'GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/rental-prices' },
+      { label: 'View Live Site', icon: 'site', href: 'https://rental-prices.vercel.app/' },
+      { label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/rental-prices' },
     ],
+    image: { src: '/images/projects/rental-prices.webp', width: 900, height: 506, alt: 'The rent model web app: a map of Santa Cruz with priced blocks, and an estimate panel showing a prediction interval' },
+    blurb: 'A rent model for studios and one-bedrooms across Santa Cruz and Monterey counties. Type an address, get a price and an honest uncertainty range.',
+    tags: ['LightGBM', 'Ridge Regression', 'Gradient Boosting', 'Feature Engineering'],
   },
   {
-    tag: 'Personal Project',
     wip: true,
     release: 'Version 1.1.0',
     title: 'Material Boxes',
-    desc: 'Built a client-side Fabric mod for Minecraft 26.2 that tracks the materials needed for a build, and works on servers that don\'t have it installed. Players import a material list by pasting text, loading a Litematica export, or dropping in a screenshot that Claude reads. Chests, barrels and shulker boxes marked as Material Boxes then count what\'s already stored, color-code each slot by progress, and route shift-clicked items straight to the slots that still need them.',
-    tags: ['Java', 'Fabric', 'Minecraft Modding', 'Claude API'],
+    to: '/papers/material-boxes',
     links: [
-      { label: 'View CurseForge', short: 'Curse\u200BForge', icon: 'curseforge', href: 'https://www.curseforge.com/minecraft/mc-mods/material-boxes' },
-      { label: 'View GitHub', short: 'GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/material-boxes' },
+      { label: 'View CurseForge', icon: 'curseforge', href: 'https://www.curseforge.com/minecraft/mc-mods/material-boxes' },
+      { label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/material-boxes' },
     ],
+    image: { src: '/images/projects/material-boxes.webp', width: 854, height: 480, alt: 'The mod in Minecraft: a chest marked as a Material Box, its slots colour-coded by progress beside a materials checklist' },
+    blurb: 'A client-side Fabric mod that tracks the materials a Minecraft build needs, colour-coding chests by what is still missing.',
+    tags: ['Java', 'Fabric', 'Minecraft Modding', 'Claude API'],
   },
 ]
 
-// A link opens the PDF modal (pdfSrc), an outbound page (href), or a page on
-// this site (to — e.g. a paper's reading page).
+// The card's visual. Required, not optional: this section is a grid of
+// thumbnails, and one card without art would read as a broken tile rather than
+// as a quieter entry. Making it required means a new project can't be added
+// without one. width/height are the file's real pixel size — they cost nothing
+// here because `.project-visual` already reserves the box by aspect-ratio, but
+// they keep the <img> honest if that rule is ever dropped.
+interface WorkImage {
+  src: string
+  width: number
+  height: number
+  // Describes what the picture SHOWS. Not a repeat of the title, which sits
+  // next to it and is already read out.
+  alt: string
+}
+
+// Icon-only, so `label` is the ONLY name this link has: it is both the
+// accessible name and the tooltip. Every one is an ordinary outbound href —
+// the card itself already covers the "read this on my site" case.
+//
+// `links` is optional and two cards have none: the paper PDFs were withdrawn
+// (see papers.ts), which left the capstone poster and the Economics capstone
+// with nothing outbound to point at. That used to misalign the footer, but the
+// go-arrow is on every card now and holds the row's height on its own.
 interface WorkLink {
-  // The button's accessible name and tooltip. Keep the visible `short` text a
-  // subset of it ("Read" ⊂ "Read Paper"), so the name matches what's on screen.
   label: string
-  // Visible text beside the icon — short, because the column is 200px wide.
-  short: string
   icon: 'paper' | 'pdf' | 'library' | 'site' | 'github' | 'curseforge'
-  pdfSrc?: string
-  href?: string
-  to?: string
+  href: string
 }
 
 interface WorkProps {
-  tag: string
+  image: WorkImage
+  // Where the card goes. Always a route on this site — every project has a
+  // page under /papers/:slug, so there is no outbound-link case to handle.
+  to: string
   wip?: boolean
-  // Shipped version, e.g. 'Version 1.0.0'. Green badge, left of the WIP one.
+  // Shipped version, e.g. 'Version 1.1.0'. Green badge, left of the WIP one.
   release?: string
   title: string
-  desc: string
+  // Two or three lines. See the note on the `works` array.
+  blurb: string
   tags?: string[]
   links?: WorkLink[]
-  onOpenPdf?: (src: string) => void
 }
 
-// Always open. These rows used to clamp to a two-line preview like the
-// Experience cards, but the descriptions are short enough that most of them
-// cleared the clamp outright — so the section was a row of `+` icons where
-// only some did anything, and the one card that couldn't expand also lost the
-// hover tint, which read as a bug. Nothing is hidden now, so there is no
-// toggle, and `.hover-card` gives every row the tint without the pointer
-// cursor that `.expandable-card` carries (see App.css).
-function WorkCard({ tag, wip, release, title, desc, tags, links, onOpenPdf }: WorkProps) {
+// The card is a DIV wrapping two things: a <Link> over the picture, title and
+// blurb, and a footer that is outside it.
+//
+// That split is the whole reason for the structure. The icon links are real
+// <a>s, and an <a> inside an <a> is invalid and unreachable by keyboard — so
+// the card cannot be one big link any more. Keeping the footer as a sibling of
+// the main link is simpler than the alternative (a "stretched link" whose
+// ::after covers the card while the icons sit above it on z-index), and it
+// needs no :has() support. The cost is that clicking the tag row doesn't
+// navigate, which is the right behaviour anyway.
+function WorkCard({ image, to, wip, release, title, blurb, tags, links }: WorkProps) {
   return (
-    <div className="sub-card project-card hover-card">
-      <div className="project-card-meta">
-        <span className="project-tag">{tag}</span>
-      </div>
-      <div className="project-body">
-        {/* Badge is inline in the title, so on a wrapping title it follows
+    <div className="sub-card project-card">
+      <Link to={to} className="project-main">
+        <div className="project-visual">
+          <img
+            src={image.src}
+            alt={image.alt}
+            width={image.width}
+            height={image.height}
+            loading="lazy"
+          />
+        </div>
+        {/* Badges are inline in the title, so on a wrapping title they follow
             the last word rather than floating beside the first line. */}
         <h2 className="project-title">
           {title}
@@ -123,35 +155,16 @@ function WorkCard({ tag, wip, release, title, desc, tags, links, onOpenPdf }: Wo
             </span>
           )}
         </h2>
-        <p className="project-desc">{desc}</p>
+        <p className="project-blurb">{blurb}</p>
+      </Link>
+      <div className="project-foot">
         <Tags tags={tags} />
-      </div>
-      {/* Optional — a project with nothing to link to yet renders no links. */}
-      {links?.length ? (
-        // No stopPropagation any more: the card itself has no click handler to
-        // swallow, so the links are the only thing here that acts on a click.
-        <div className="project-links">
-          {links.map((l) => (
-            l.to ? (
-              <Link key={l.label} to={l.to} className="project-icon-link" aria-label={l.label} title={l.label}>
-                <LinkIcon kind={l.icon} />
-                <span className="project-icon-label">{l.short}</span>
-                <ArrowOut />
-              </Link>
-            ) : l.pdfSrc ? (
-              <button
-                key={l.label}
-                type="button"
-                className="project-icon-link"
-                aria-label={l.label}
-                title={l.label}
-                onClick={() => onOpenPdf?.(l.pdfSrc!)}
-              >
-                <LinkIcon kind={l.icon} />
-                <span className="project-icon-label">{l.short}</span>
-                <ArrowOut />
-              </button>
-            ) : (
+        {/* Three tracks so the link row is centred on the CARD, not on whatever
+            space the arrow leaves — the empty first cell balances the third. */}
+        <div className="project-foot-row">
+          <span aria-hidden="true" />
+          <div className="project-links">
+            {links?.map((l) => (
               <a
                 key={l.label}
                 href={l.href}
@@ -162,50 +175,42 @@ function WorkCard({ tag, wip, release, title, desc, tags, links, onOpenPdf }: Wo
                 title={l.label}
               >
                 <LinkIcon kind={l.icon} />
-                <span className="project-icon-label">{l.short}</span>
-                <ArrowOut />
               </a>
-            )
-          ))}
+            ))}
+          </div>
+          {/* Goes where the card goes. `aria-hidden` + `tabIndex={-1}` keeps it
+              out of the accessibility tree and the tab order, because
+              `.project-main` already links there and announcing the same
+              destination twice is noise — but it stays clickable, since an
+              arrow that looks like a control and isn't is worse. */}
+          <Link to={to} className="project-go" aria-hidden="true" tabIndex={-1}>
+            <ArrowBox />
+          </Link>
         </div>
-      ) : null}
+      </div>
     </div>
   )
 }
 
 function Projects() {
   const [open, setOpen] = useState(true)
-  const [activePdf, setActivePdf] = useState<string | null>(null)
-
-  const openPdf = (src: string) => {
-    if (window.innerWidth <= 768) {
-      window.open(withViewerParams(src), '_blank', 'noopener,noreferrer')
-    } else {
-      setActivePdf(src)
-    }
-  }
-  const closePdf = () => setActivePdf(null)
 
   return (
-    <>
-      <section id="projects" className={`section-card projects-section ${open ? 'section-open' : ''}`}>
-        <div className="card-header" onClick={() => setOpen(!open)}>
-          <span className="card-title">Selected Work</span>
-          <span className="card-toggle-icon">{open ? '−' : '+'}</span>
-        </div>
-        <div className="section-body-wrapper">
-          <div className="section-body-inner">
-            <div className="sub-cards-stack work-stack">
-              {works.map((w, i) => (
-                <WorkCard key={i} {...w} onOpenPdf={openPdf} />
-              ))}
-            </div>
+    <section id="projects" className={`section-card projects-section ${open ? 'section-open' : ''}`}>
+      <div className="card-header" onClick={() => setOpen(!open)}>
+        <span className="card-title">Projects</span>
+        <span className="card-toggle-icon">{open ? '−' : '+'}</span>
+      </div>
+      <div className="section-body-wrapper">
+        <div className="section-body-inner">
+          <div className="sub-cards-stack work-grid">
+            {works.map((w) => (
+              <WorkCard key={w.to} {...w} />
+            ))}
           </div>
         </div>
-      </section>
-
-      {activePdf && <PdfModal src={activePdf} onClose={closePdf} />}
-    </>
+      </div>
+    </section>
   )
 }
 

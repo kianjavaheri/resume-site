@@ -1,19 +1,57 @@
+/* The footer is the counterpart to the paper pages' top bar and takes its
+   design: quiet in-flow type on the page itself, the name left and the year
+   right, with no fill of its own.
+
+   It used to be an inverted full-bleed slab (--footer-bg / --footer-text,
+   0.7rem/400 on both sides). Those tokens now feed nothing and are gone from
+   App.css. On a reading page the slab was the only heavy element on an
+   otherwise light page, and it sat under a header that was already this quiet
+   — so the two ends of the document didn't match. They do now. */
 footer {
-    background-color: var(--footer-bg);
-    color: var(--footer-text);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 48px;
+    /* Matches .paper-topbar exactly. */
+    padding: 22px 36px;
 }
 
-footer p {
-    font-size: 0.7rem;
-    font-weight: 400;
+/* Same 0.9rem/600 as .paper-back, the name at the head of a paper page. */
+.footer-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--textcolor);
+}
+
+/* Same 0.82rem/500 --muted as .paper-theme-toggle, the top bar's right-hand
+   item. The hierarchy is weight and colour, as everywhere else on the site. */
+.footer-meta {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--muted);
+}
+
+/* The footer renders on BOTH pages, and each one gutters differently — so the
+   page context, not the component, decides where its text sits. Both rules
+   live here rather than in Home.css/Paper.css so they stay in step.
+
+   Paper: the same 1180px box as .paper-topbar, so the name at the foot lands
+   directly under the name at the head. */
+.paper footer {
+    max-width: 1180px;
+    margin: 0 auto;
 }
 
 @media (max-width: 768px) {
     footer {
-        padding: 16px 20px;
+        padding: 18px 20px;
+    }
+
+    /* Home: .cards-wrapper drops to a 16px gutter on a phone where
+       .paper-topbar drops to 20px, and at 20px the footer's text sat 4px
+       inside the card edge above it. Desktop needs no equivalent — both are
+       36px there. */
+    .home footer {
+        padding-left: 16px;
+        padding-right: 16px;
     }
 }

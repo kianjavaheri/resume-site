@@ -1,155 +1,274 @@
-/* Full-width rows, stacked. Each card is a two-column row — meta and link on
-   the left, title and description on the right — so an entry is wide and
-   short rather than a tall grid tile. The stack itself reuses .sub-cards-stack.
-   The rows are always open (no clamp, no toggle) and take .hover-card for the
-   tint without the pointer cursor — see App.css. */
+/* A grid of uniform tiles, one per project, each one a link to that project's
+   page. Modelled on the reference portfolio Kian supplied: an edge-to-edge
+   picture, a flush-right title, a short justified blurb, then a rule and a
+   pipe-separated tag line — the footer bottom-pinned.
 
-/* Equal heights: the stack becomes a grid so `1fr` auto rows all resolve to
-   the tallest card's content, instead of each row sizing to its own. Measured
-   before: 176 / 224 / 200 / 200 / 200, a 48px spread that read as
-   almost-but-not-quite aligned. All five are 224px now.
+   The reference's big corner counter was tried and CUT: at 2.6rem/700 it was
+   the loudest thing on a card that already leads with a picture, and it
+   numbered the grid without telling the reader anything. Don't reinstate it
+   without a reason beyond matching the reference.
 
-   Written as `.sub-cards-stack.work-stack`, not `.work-stack` — both are
-   0-1-0 on their own, and App.css's `.sub-cards-stack { display: flex }` loads
-   after this file, so the single class silently lost and the stack stayed
-   flex. The media query adds no specificity. Qualifying it is enough; no
-   !important needed.
+   The blurb is a TEASER, two or three lines. The cards briefly carried the
+   projects' full descriptions, which ran 6 to 9 lines and set every card's
+   height individually, so the grid read as six different-sized things; they
+   then carried nothing at all, which lost the reference's look. Short purpose-
+   written copy is the version that does both. The full text is on each
+   project's page, which is also where the outbound links and the project type
+   live. */
 
-   Desktop only. Below 769px the card restacks to one column and a description
-   runs eight to twelve lines, so equalising there would pad the short cards
-   with most of a screen of dead space to match the longest one.
+/* Three across. It has to be written `.sub-cards-stack.work-grid`, not
+   `.work-grid`: both are 0-1-0 on their own, and App.css's
+   `.sub-cards-stack { display: flex }` loads AFTER this file, so the single
+   class silently loses and the container stays flex. Qualifying is enough;
+   no !important needed.
 
-   `gap` and `padding` carry over from .sub-cards-stack to grid unchanged. */
-@media (min-width: 769px) {
-    .sub-cards-stack.work-stack {
-        display: grid;
-        grid-auto-rows: 1fr;
-    }
-}
-
-/* Cards also carry .sub-card, which supplies radius, fill, shadow and padding.
-   The type and the link tiles centre in the card as a pair: two equal flexible
-   rows above and below pin them to the middle, and the body spans all four.
-   They used to sit on the card's 1/4 and 3/4 lines, each centred in its own
-   half, which left the tiles low.
-   Centring the TILES alone isn't possible while the type keeps a quarter line:
-   a 72px tile centred in a 152px card runs 40px–112px and overlaps the type's
-   baseline. Wrapping the pair in one element doesn't work either — the body
-   sits between them in the markup, so the wrapper swallows it and the card
-   stretches to ~350px. Below 768px the areas restack to meta → body → link. */
-.project-card {
+   `grid-auto-rows: 1fr` is deliberate HERE, where it was deliberately absent
+   from the row layout that preceded it. One height for every row is the
+   requirement, and the gap above the footer absorbs the difference. */
+.sub-cards-stack.work-grid {
     display: grid;
-    grid-template-columns: 200px 1fr;
-    /* Three rows with the flexible one in the MIDDLE, so the left column
-       brackets the card exactly as the right one does: the type label pins to
-       the top of the content box beside the title, the tiles pin to the bottom
-       beside the tags, and the slack sits between them. The label and the tiles
-       used to travel together as a centred pair — they're independent now,
-       each tied to the body row it belongs with. */
-    grid-template-rows: auto 1fr auto;
-    grid-template-areas:
-        "meta body"
-        ".    body"
-        "link body";
-    column-gap: 40px;
-    /* Zero, and only on desktop. The middle row is `1fr`, so a row gap here is
-       invisible — it just comes out of the flexible track — while still costing
-       the card real height if it ever has to squeeze. The mobile block restates
-       14px, where the rows stack and the gap is the thing separating them. */
-    row-gap: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
 }
 
-/* Two anchors, one line. The cards are all one height, so the body has slack
-   to put somewhere; putting it BETWEEN the description and the tags pins the
-   two things that should line up and leaves the two that shouldn't alone:
-   every title starts at the same offset from the card's top, and every tag row
-   ends at the same offset from its bottom — which is the line the link tiles
-   are anchored to as well.
+/* A div, not a link: the icon buttons in the footer are real <a>s and can't be
+   nested inside one. Column flex, with the footer taking `margin-top: auto`,
+   pins the rule and tags to the bottom edge of every card however the title
+   and blurb wrapped.
 
-   This is why the card keeps its normal `.sub-card` padding now. It used to be
-   zeroed top/bottom, with `padding: 20px 0` moved onto the body, so that the
-   meta pair could be centred against the whole card rather than its content
-   box. Nothing is centred any more, so that indirection is gone: the grid's
-   content box is inset 20px, the last row ends there, and the tags end there.
-
-   Desktop only — below 769px the card restacks to one column, where the label
-   heads the title and the tiles simply follow the tags. */
-@media (min-width: 769px) {
-    /* Beats `.tag-list { margin-top: 2px }` in App.css on specificity (0-2-0
-       against 0-1-0). It's the tags that absorb the slack, not the body, so
-       `justify-content` stays at its default. */
-    .project-body .tag-list {
-        margin-top: auto;
-    }
-}
-
-/* Centred in the left column, as .project-links is, so the type label sits
-   centred over the tiles it belongs to rather than hanging off their left
-   edge. Both are centred on the same axis, so the pair stays aligned whether
-   a project carries one tile or two. */
-.project-card-meta {
-    grid-area: meta;
+   `overflow: hidden` clips the bled image to the card's rounded corners — the
+   radius comes from `.sub-card`. */
+.sub-card.project-card {
     display: flex;
     flex-direction: column;
+    color: var(--textcolor);
+    overflow: hidden;
+    transition: background-image 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+/* The clickable region: picture, title and blurb. `flex: 1` lets it absorb the
+   card's spare height so the footer stays on the bottom edge. */
+.project-main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    color: var(--textcolor);
+    cursor: pointer;
+}
+
+.project-main:focus-visible {
+    outline: 2px solid var(--textcolor);
+    outline-offset: 3px;
+}
+
+/* Per the hover convention: the tint is LAYERED over the existing fill, and
+   the sub-card gradient has to be re-declared beneath it or a bare
+   background-image would replace the gradient and flatten the card.
+   The lift is what tells you the whole tile is clickable. */
+.sub-card.project-card:hover {
+    background-image:
+        linear-gradient(var(--hover-tint), var(--hover-tint)),
+        var(--sub-card-grad);
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow), var(--sub-card-shadow);
+}
+
+/* One frame for every card, which is the whole point — a grid of six different
+   silhouettes stops reading as one set of things, the same rule the course
+   cards' identical watermark follows.
+
+   16/9 is measured, not assumed. With the replacement thesis screenshot the six
+   sources run 1.65 to 1.93, and 16/9 (1.778) sits in the middle of that: the
+   worst crop is 8.6% horizontally and 7.7% vertically. `center top` takes the
+   loss off the bottom of the taller ones, which on a UI screenshot is the least
+   informative part.
+
+   It BLEEDS to the card's left and right edges. That is how the picture got
+   bigger without costing any more crop: negative margins cancel `.sub-card`'s
+   26px of horizontal padding, so the image gains 52px of width and 29px of
+   height (329x185 -> 381x214, +16% in both) while the frame's ratio — and
+   therefore everything measured above — is untouched. Widening the ratio
+   instead would have made it taller only by cropping the sides harder.
+
+   The box is reserved by aspect-ratio, so the lazy-loaded images cannot shift
+   the grid as they arrive — the same failure the paper pages hit, solved the
+   same way. */
+.project-visual {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background-color: var(--well-bg);
+    /* Bleeds to the TOP as well, now that the counter that used to sit above it
+       is gone: cancels `.sub-card`'s 20px of top padding so the picture starts
+       at the card's edge instead of floating under a band of empty fill. */
+    margin-top: -20px;
+    /* Cancels `.sub-card`'s 26px of horizontal padding exactly. App.css drops
+       that to 24px at ≤768px, so the mobile block below has to restate this or
+       the image overshoots the card by 2px a side — clipped by the card's
+       overflow, so it shows up as extra crop rather than as a visible bleed. */
+    margin-left: -26px;
+    margin-right: -26px;
+}
+
+.project-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+}
+
+/* Left-aligned. The reference sets its titles flush right and that was tried
+   here, but these titles run to eleven words where the reference's run to three,
+   and four lines of ragged-left text is materially harder to read than one.
+   Kian's call, and the right one. The card's shortened titles are kept — e.g.
+   "Universal Basic Income vs. Targeted Welfare" without its subtitle, the page
+   carries the full one — because a short label suits a grid tile either way. */
+.project-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    text-align: left;
+    margin-top: 20px;
+}
+
+/* Short by design — two or three lines. Justified, like the reference, which
+   is what gives the block its flush rectangular edge against the right-aligned
+   title above it. */
+.project-blurb {
+    font-size: 0.8rem;
+    font-weight: 400;
+    line-height: 1.6;
+    color: var(--muted);
+    text-align: justify;
+    margin-top: 14px;
+}
+
+/* Pinned to the bottom, which puts ALL of a card's slack in the one gap the
+   reference also leaves open — between the blurb and the footer. Every card in
+   a row then draws its rule on the same line however the title and blurb
+   wrapped, and `grid-auto-rows: 1fr` has somewhere to put the extra height. */
+.project-foot {
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid var(--card-border);
+}
+
+/* Back to the site's `.tag` chips. They were briefly a pipe-separated line in
+   the reference's style, which read as a caption rather than as the same kind
+   of thing Experience lists — chips are the shared idiom and this section is
+   the odd one out without them.
+
+   `min-height` reserves TWO rows, which is what keeps the rule on one line
+   across a row of cards: the footer is bottom-pinned, so a card whose chips
+   wrap to two rows would start them — and draw its rule — ~29px higher than a
+   card whose chips fit on one. Derived from `.tag`'s own metrics in App.css so
+   it tracks them. A THREE-row card breaks it again; keep tag counts at four.
+
+   `align-content` and `align-items` are BOTH required, and leaving them out is
+   a bug that shipped once: `.tag-list` is a wrapping flex container, so with
+   spare vertical space the default `normal` resolves to `stretch` and a single
+   row of chips grew to fill the whole reserved box — 51px tall against a
+   natural 23px. `align-content` distributes the flex lines, `align-items`
+   sizes the chips within a line; one without the other leaves the stretch. */
+.project-card .tag-list {
+    min-height: calc(2 * (0.7rem + 12px) + 6px);
+    align-content: flex-start;
+    align-items: flex-start;
+}
+
+/* The bottom row: outbound icons centred on the card, go-arrow on the right.
+   Three tracks with matching `1fr` outers, so the icons centre on the CARD
+   rather than on the space the arrow leaves — with `auto 1fr auto` they would
+   sit slightly left on every card, and further left on the cards carrying two
+   icons than on the ones carrying one. */
+.project-foot-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
+    margin-top: 12px;
+    min-height: 34px;
+}
+
+/* Icon-only, and deliberately small: these are a secondary affordance under a
+   card whose own job is to take you to the project's page, so they shouldn't
+   compete with it. The 72px labelled tiles they replaced did. */
+.project-links {
+    display: flex;
+    justify-content: center;
     gap: 6px;
 }
 
-/* The label centres on the GAP between the title and the description, not on
-   the title itself. Level with the title it competed with it for the same
-   line; a step down puts it in the card's own whitespace, where it reads as a
-   caption on the entry rather than as a second heading.
-
-   Measured, not guessed: the title's box ends 39.8px below the card's top and
-   the description starts at 49.8px, so the gap's centre is 44.8px. The label's
-   13.5px box was centred at 28.8px, hence 18px of padding (2 + 16).
-
-   This assumes a one-line title, which holds at every desktop width — checked
-   at 1280 and 1000px, where the longest ("Universal Basic Income vs. Targeted
-   Welfare: A Macroeconomic Assessment") still fits the body column on one line.
-   A title that wrapped would push its gap down 19.76px and leave the label
-   high; re-measure if the copy or the column widths change.
-
-   Desktop only; the areas restack below 769px. */
-@media (min-width: 769px) {
-    .project-card-meta {
-        padding-top: 18px;
-    }
-}
-
-.project-body {
-    grid-area: body;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-/* The promoted micro-label: 600 on --textcolor, where the quiet version is 500
-   on --muted. This is not a new decision — `.skill-group-label` is already this
-   exact declaration (0.65rem, 0.15em, uppercase, 600, --textcolor) against
-   `.skill-name`'s 500/--muted, and the rule it follows is stated in CLAUDE.md:
-   **the hierarchy is carried by weight and colour alone.**
-
-   So the size stays at 0.65rem. Enlarging it is what would make the label
-   compete with `.project-title` (0.95rem/600) rather than sit beside it — at a
-   third smaller, uppercase and letterspaced to 0.15em, it reads as a different
-   register no matter how dark it gets, and the two are 40px apart in separate
-   columns. Raising the size would collapse that distance. */
-.project-tag {
-    font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--textcolor);
-    display: flex;
+/* Bottom-right, the mark that says the card opens something. Quiet on its own
+   — it is a signpost, not a button, so it takes no fill and no border, unlike
+   the recessed chips beside it. It brightens with the card's hover. */
+.project-go {
+    justify-self: end;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    gap: 8px;
+    color: var(--muted);
+    transition: color 0.15s ease;
+}
+
+.project-go svg {
+    display: block;
+    width: 18px;
+    height: 18px;
+}
+
+.project-card:hover .project-go {
+    color: var(--textcolor);
+}
+
+/* Recessed chips, NOT .scroll-top's inversion — a black square on a near-white
+   card (and white on the dark one) fought the card carrying it. Same treatment
+   as the tags above them, a step down from the sub-card per Nesting goes DOWN. */
+.project-icon-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 8px !important;
+    background-color: var(--well-bg);
+    color: var(--textcolor);
+    box-shadow: var(--well-shadow);
+    cursor: pointer;
+    transition: background-image 0.15s ease;
+}
+
+/* Stated for :visited too. A visited <a> is styled by `a:visited` at 0-1-1,
+   which outranks this class on its own (0-1-0) — that's what turned visited
+   links' icons black-on-black back when the fill was inverted. Browsers hide
+   :visited from JS, so it only ever shows up on screen. */
+a.project-icon-link,
+a.project-icon-link:visited {
+    color: var(--textcolor);
+}
+
+/* --well-hover-tint, not --hover-tint: the latter is calibrated against the
+   page and is effectively invisible on --well-bg. */
+.project-icon-link:hover {
+    background-image:
+        linear-gradient(var(--well-hover-tint), var(--well-hover-tint));
+}
+
+.project-icon-link:focus-visible {
+    outline: 2px solid var(--textcolor);
+    outline-offset: 2px;
+}
+
+/* LinkIcon draws at 20px; scaled down to suit the smaller tile. */
+.project-icon-link svg {
+    display: block;
+    width: 16px;
+    height: 16px;
 }
 
 /* Badges sit inline after the project title, release first then WIP.
-   inline-block + their own line-height so the title's 1.3 doesn't stretch
+   inline-block + their own line-height so the title's 1.35 doesn't stretch
    them; nudged up to sit on the title's x-height rather than its baseline. */
 .project-wip,
 .project-release {
@@ -183,127 +302,39 @@
     white-space: nowrap;
 }
 
-.project-title {
-    font-size: 0.95rem;
-    font-weight: 600;
-    line-height: 1.3;
-    letter-spacing: 0.01em;
-}
-
-.project-desc {
-    font-size: 0.9rem;
-    font-weight: 400;
-    line-height: 1.65;
-    color: var(--muted);
-}
-
-.project-links {
-    grid-area: link;
-    /* Side by side: two 72px tiles + the gap is 152px, inside the 170px
-       column at ≤1024px. */
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-}
-
-/* Square tiles: icon over label. Wide chips with the label beside the icon
-   only fitted one per row; stacked, they ran down the card. --well-bg fill and
-   --textcolor icon, NOT .scroll-top's inversion — a black square on a
-   near-white card (and white on the dark one) fought the card carrying it. */
-.project-icon-link {
-    position: relative;
-    width: 72px;
-    height: 72px;
-    flex-shrink: 0;
-    border-radius: 12px !important;
-    background-color: var(--well-bg);
-    color: var(--textcolor);
-    box-shadow: var(--well-shadow);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    padding: 6px;
-    cursor: pointer;
-    transition: background-image 0.15s ease;
-}
-
-/* Top-right corner, out of the icon + label column. */
-.project-icon-link .arrow-out {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    font-size: 0.62rem;
-    opacity: 0.45;
-}
-
-/* Sits under the icon and wraps: "ASU Library" and "CurseForge" both take two
-   lines inside the 60px the tile leaves after padding. CurseForge is one
-   unbreakable word, so its `short` carries a zero-width space (U+200B) between
-   "Curse" and "Forge" — invisible, but it gives the line a place to break.
-   The accessible name comes from aria-label, so it's unaffected. */
-.project-icon-label {
-    font-size: 0.55rem;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    line-height: 1.25;
-    text-transform: uppercase;
-    text-align: center;
-    white-space: normal;
-}
-
-/* Stated for :visited too. A visited <a> is styled by `a:visited` at 0-1-1,
-   which outranks this class on its own (0-1-0) — that's what turned visited
-   links' icons black-on-black back when the fill was inverted. Browsers hide
-   :visited from JS, so it only ever shows up on screen. */
-a.project-icon-link,
-a.project-icon-link:visited {
-    color: var(--textcolor);
-}
-
-/* --well-hover-tint, not --hover-tint: the latter is calibrated against the
-   page and is effectively invisible on --well-bg. */
-.project-icon-link:hover {
-    background-image:
-        linear-gradient(var(--well-hover-tint), var(--well-hover-tint));
-}
-
-.project-icon-link svg {
-    display: block;
-}
-
-@media (max-width: 1024px) {
-    .project-card {
-        grid-template-columns: 170px 1fr;
-        column-gap: 28px;
+/* Two across. Matches the Skills breakpoint rather than the site's ≤1024px
+   one: a card here has to hold a 16/9 picture AND a title that wraps beneath
+   it, so three stop working before the other grids do. */
+@media (max-width: 1100px) {
+    .sub-cards-stack.work-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
 @media (max-width: 768px) {
-    .project-card {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto;
-        grid-template-areas:
-            "meta"
-            "body"
-            "link";
-        row-gap: 14px;
+    /* Tracks `.sub-card`'s 22px 24px padding at this width. */
+    .project-visual {
+        margin-top: -22px;
+        margin-left: -24px;
+        margin-right: -24px;
     }
 
-    /* Full-width rows here, so centring would strand the label and tiles in
-       the middle of the card against a left-aligned title and description. */
-    .project-card-meta {
-        align-items: flex-start;
+    .sub-cards-stack.work-grid {
+        grid-template-columns: minmax(0, 1fr);
+        /* One column, so every row is its own card and equalising heights
+           would only pad the short ones. */
+        grid-auto-rows: auto;
+    }
+}
+
+/* The lift is a transform, which is exactly the motion this setting exists to
+   suppress. The tint stays — it carries the hover on its own. */
+@media (prefers-reduced-motion: reduce) {
+    .sub-card.project-card {
+        transition: background-image 0.15s ease;
     }
 
-    .project-tag {
-        justify-content: flex-start;
-        text-align: left;
-    }
-
-    .project-links {
-        justify-content: flex-start;
-        margin-top: 4px;
+    .sub-card.project-card:hover {
+        transform: none;
     }
 }

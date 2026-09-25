@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import PdfModal, { withViewerParams } from './PdfModal'
 import ArrowOut from './ArrowOut'
 import './../styling/components/About.css'
@@ -10,20 +10,92 @@ const images = [
   // '/images/img4.jpg',
 ]
 
+// Resolves once the bitmap is actually ready to paint, so a slide never starts
+// on an image the browser still has to fetch — that showed as an empty frame
+// sliding in, with the photo popping in afterwards.
+//
+// It NEVER rejects. A decode failure, a 404 or a browser without
+// HTMLImageElement.decode must not leave the arrows dead, so every path falls
+// through to "go anyway" and the worst case is the old behaviour.
+function preload(src: string): Promise<void> {
+  return new Promise((resolve) => {
+    let done = false
+    const finish = () => {
+      if (done) return
+      done = true
+      clearTimeout(timer)
+      resolve()
+    }
+    // A hard cap, and it is NOT belt-and-braces. `decode()` can stay pending
+    // indefinitely while the document is hidden, because the browser defers
+    // rasterising for a page nobody is looking at — and a preload that never
+    // settles would leave `busy` stuck and kill the arrows for the rest of the
+    // session. Every path out of here has to settle.
+    const timer = setTimeout(finish, 3000)
+
+    const img = new Image()
+    // `load` is the signal that actually fires regardless of visibility, so it
+    // is the primary one; decode() only sharpens it to "ready to paint".
+    img.onload = finish
+    img.onerror = finish
+    img.src = src
+    if (img.complete) {
+      finish()
+      return
+    }
+    if (typeof img.decode === 'function') img.decode().then(finish, finish)
+  })
+}
+
 function Gallery() {
   const [idx, setIdx] = useState(0)
+  // Indices whose bitmap is known decoded. A click on one of these advances
+  // synchronously, so the common case keeps its old instant feel.
+  const ready = useRef<Set<number>>(new Set())
+  // Guards the await window: without it a second click during a fetch would
+  // queue a slide from a stale `idx`.
+  const busy = useRef(false)
   // The slide the frame is moving AWAY from. Kept mounted for the length of the
   // animation so both images move together — animating only the incoming one
   // reads as a pop, not a slide. Cleared on animationend.
   const [outgoing, setOutgoing] = useState<number | null>(null)
   const [direction, setDirection] = useState<'right' | 'left'>('right')
 
-  const go = (delta: number, dir: 'right' | 'left') => (e: React.MouseEvent) => {
+  // Warm both neighbours so a click almost never has to wait. This runs in an
+  // effect rather than at module scope, so it starts after the first slide is
+  // mounted and competes with nothing for the initial paint.
+  useEffect(() => {
+    let cancelled = false
+    for (const n of [idx + 1, idx - 1]) {
+      const i = (n + images.length) % images.length
+      if (i === idx || ready.current.has(i)) continue
+      preload(images[i]).then(() => {
+        if (!cancelled) ready.current.add(i)
+      })
+    }
+    return () => { cancelled = true }
+  }, [idx])
+
+  const go = (delta: number, dir: 'right' | 'left') => async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    if (busy.current) return
+    const next = (idx + delta + images.length) % images.length
+    if (!ready.current.has(next)) {
+      busy.current = true
+      try {
+        await preload(images[next])
+      } finally {
+        // Always, even if preload somehow throws: a stuck flag is a dead
+        // gallery, and falling back to the old un-preloaded slide is far
+        // better than an arrow that stops responding.
+        busy.current = false
+      }
+      ready.current.add(next)
+    }
     setDirection(dir)
     setOutgoing(idx)
-    setIdx((i) => (i + delta + images.length) % images.length)
+    setIdx(next)
   }
 
   // A track translated by -idx would be simpler, but wrapping from the last
@@ -50,6 +122,7 @@ function Gallery() {
           src={images[idx]}
           alt={`Photo ${idx + 1}`}
           className={`gallery-img${sliding ? ` gallery-img-enter-${direction}` : ''}`}
+          onLoad={() => ready.current.add(idx)}
           onAnimationEnd={() => setOutgoing(null)}
         />
       </div>

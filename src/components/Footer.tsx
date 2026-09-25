@@ -4,8 +4,8 @@ import './../styling/components/Footer.css'
 function Footer() {
   return (
     <footer>
-      <p>Kian Javaheri</p>
-      <p>©︎ {new Date().getFullYear()}</p>
+      <p className="footer-name">Kian Javaheri</p>
+      <p className="footer-meta">©︎ {new Date().getFullYear()}</p>
     </footer>
   )
 }

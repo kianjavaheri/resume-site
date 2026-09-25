@@ -54,7 +54,7 @@ function Navbar({ switchTheme, isChecked }: any) {
           <a href="#about" onClick={scrollTo('about')}>About</a>
           <a href="#education" onClick={scrollTo('education')}>Education</a>
           <a href="#experience" onClick={scrollTo('experience')}>Experience</a>
-          <a href="#projects" onClick={scrollTo('projects')}>Work</a>
+          <a href="#projects" onClick={scrollTo('projects')}>Projects</a>
           <a href="#skills" onClick={scrollTo('skills')}>Skills</a>
           <a href="#contact" onClick={scrollTo('contact')}>Contact</a>
           <span className="theme-toggle" onClick={switchTheme}>
@@ -72,7 +72,7 @@ function Navbar({ switchTheme, isChecked }: any) {
           <a href="#about" onClick={scrollTo('about')}>About</a>
           <a href="#education" onClick={scrollTo('education')}>Education</a>
           <a href="#experience" onClick={scrollTo('experience')}>Experience</a>
-          <a href="#projects" onClick={scrollTo('projects')}>Work</a>
+          <a href="#projects" onClick={scrollTo('projects')}>Projects</a>
           <a href="#skills" onClick={scrollTo('skills')}>Skills</a>
           <a href="#contact" onClick={scrollTo('contact')}>Contact</a>
           <span className="mobile-theme-toggle" onClick={() => { switchTheme(); close(); }}>

@@ -4,7 +4,7 @@ import React from 'react'
  * Calendar glyph for the date chips.
  *
  * Inline SVG rather than a file in `public/svgs/` like the skill icons, for
- * the same reason the Selected Work link icons are inline: it sits on a chip
+ * the same reason the Projects link icons are inline: it sits on a chip
  * whose text is `--textcolor` and has to take its colour from it, which an
  * `<img>` can't do. Drawn as strokes at the same 1.3–1.4 weight as ArrowOut,
  * so the two read as one icon set.

@@ -1,8 +1,9 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 
-// Shared by the Experience cards and the Selected Work rows: a card starts
-// clamped to `lines` lines of its first text block and expands in place.
+// Used by the Experience cards — a card starts clamped to `lines` lines of its
+// first text block and expands in place. It drove the Projects rows too until
+// those became always-open grid tiles, so there is one caller now.
 //
 // Markup is two boxes — an outer one taking `clampClass` + `style`, around an
 // inner wrapper taking `innerRef`. The inner wrapper is what gets measured and
