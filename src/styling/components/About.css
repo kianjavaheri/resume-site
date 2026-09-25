@@ -68,10 +68,11 @@
     position: relative;
     aspect-ratio: 4 / 3;
     overflow: hidden;
-    /* 14px, the same radius as `.sub-card` and every other panel nested inside
-       a section card. It was 75px, which made the gallery the one element on
-       the site with a radius of its own. */
-    border-radius: 14px !important;
+    /* 24px. It was 75px (a radius nothing else on the site used), then 14px to
+       match `.sub-card`; Kian asked for ~10px more than that, which lands here.
+       Softer than the panels around it without going back to a shape of its
+       own. */
+    border-radius: 24px !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.09);
 }
 

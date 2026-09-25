@@ -7,8 +7,9 @@ import ArrowBack from '../components/ArrowBack'
 import { hasAppHistory, useScrollRestore } from '../components/useScrollRestore'
 import { useTheme } from '../components/useTheme'
 import SurveyExplorer from '../components/SurveyExplorer'
+import FigureCarousel from '../components/FigureCarousel'
 import FigureChart from '../components/FigureChart'
-import { papers, surveyExplorers } from '../content/papers'
+import { paperEdits, papers, surveyExplorers } from '../content/papers'
 import type { Block, PaperTable } from '../content/papers'
 import { paperTables } from '../content/tables'
 import { paperCharts } from '../content/charts'
@@ -75,6 +76,37 @@ function PaperTableBlock({ table }: { table: PaperTable }) {
   )
 }
 
+// A run of consecutive figures in a carousel section becomes one block. Only a
+// run of two or more is worth the controls; a lone figure renders as a figure.
+type FigureBlock = Extract<Block, { type: 'figure' }>
+type Carousel = { type: 'carousel'; figures: (FigureBlock & { label?: string })[] }
+
+function groupFigures(blocks: Block[], labels: Record<string, string>): (Block | Carousel)[] {
+  const out: (Block | Carousel)[] = []
+  for (const b of blocks) {
+    const last = out[out.length - 1]
+    if (b.type === 'figure' && last) {
+      if (last.type === 'carousel') {
+        last.figures.push({ ...b, label: labels[b.src] })
+        continue
+      }
+      if (last.type === 'figure') {
+        out.pop()
+        out.push({
+          type: 'carousel',
+          figures: [
+            { ...last, label: labels[last.src] },
+            { ...b, label: labels[b.src] },
+          ],
+        })
+        continue
+      }
+    }
+    out.push(b)
+  }
+  return out
+}
+
 function renderBlock(b: Block, i: number) {
   if (b.type === 'figure') {
     // Tables and charts that have been rebuilt from their data render from it;
@@ -125,6 +157,11 @@ function Paper() {
   useScrollRestore()
   const [activeId, setActiveId] = useState('')
   const explorer = slug ? surveyExplorers[slug] : undefined
+  // Render-time half of the paper edits declared in content/papers.ts; the
+  // drops are already applied to `paper` by the time it reaches the registry.
+  const edit = slug ? paperEdits[slug] : undefined
+  const carouselSections = new Set(edit?.carouselSections ?? [])
+  const figureLabels = edit?.figureLabels ?? {}
 
   // An intro is either an ABSTRACT, which stands in for the document and puts
   // the rest of the page behind a button, or an OVERVIEW, which is just a lede
@@ -307,6 +344,16 @@ function Paper() {
                 {intro.paragraphs.map((text, i) => (
                   <p key={i} className="paper-para">{text}</p>
                 ))}
+                {intro.figure ? (
+                  <figure className="paper-figure paper-intro-figure">
+                    <img
+                      src={intro.figure.src}
+                      alt={intro.figure.alt}
+                      width={intro.figure.width}
+                      height={intro.figure.height}
+                    />
+                  </figure>
+                ) : null}
               </section>
             ) : null}
 
@@ -359,7 +406,16 @@ function Paper() {
                   className={`paper-section${s.id === 'references' ? ' paper-section-references' : ''}`}
                 >
                   <h2 id={s.id} className="paper-section-title">{s.title}</h2>
-                  {visible.map(renderBlock)}
+                  {(carouselSections.has(s.id)
+                    ? groupFigures(visible, figureLabels)
+                    : visible
+                  ).map((b, i) =>
+                    b.type === 'carousel' ? (
+                      <FigureCarousel key={i} figures={b.figures} />
+                    ) : (
+                      renderBlock(b, i)
+                    )
+                  )}
                   {cut !== -1 && explorer ? (
                     <SurveyExplorer heading={explorer.afterHeading} />
                   ) : null}

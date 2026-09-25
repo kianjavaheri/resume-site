@@ -30,6 +30,36 @@
     background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
 }
 
+/* Icon and label travel together on the left; the arrow keeps the right end,
+   which is what `space-between` on the card is now separating. */
+.contact-card-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+/* LinkIcon draws on a 24-unit viewBox at 20px; scaled here to sit WITH a 1rem
+   label rather than over it. `--muted`, so the brand marks read as quiet
+   wayfinding and the label stays the card's only full-strength element. */
+.contact-card-icon {
+    display: inline-flex;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: color 0.15s ease;
+}
+
+.contact-card-icon svg {
+    display: block;
+    width: 18px;
+    height: 18px;
+}
+
+/* Brightens with the card, the same way the Projects go-arrow does. */
+.contact-card:hover .contact-card-icon {
+    color: var(--textcolor);
+}
+
 .contact-card-label {
     font-size: 1rem;
     font-weight: 600;
@@ -55,5 +85,10 @@
 
     .contact-card-label {
         font-size: 1.1rem;
+    }
+
+    .contact-card-icon svg {
+        width: 20px;
+        height: 20px;
     }
 }

@@ -136,14 +136,14 @@ The general rule: **an inset shadow needs enough headroom below the fill to fall
 `src/styling/App.css` applies `border-radius: 0 !important` globally — intentional. Anything that needs rounding must use `!important` (`.section-card`, `.sub-card`, `.coursework-block`, `.course-card`, `.contact-card`, `.gallery-frame`, `.nav`, `.scroll-top`, `.skill-icon-wrap`, `.project-wip`, `.tag`, `.pdf-close`, `.paper-expand-btn`). The list isn't exhaustive — grep for `border-radius` before assuming a class is missing one.
 
 ### Typography
-**Plus Jakarta Sans** from Google Fonts, weights `300;400;500;600;700;800`.
+**Inter** from Google Fonts, weights `300;400;500;600;700;800`.
 
 **Exactly two places name a font**, both in `App.css`: the `@import` at the top of the file and the `font-family` on the `*` reset. Nothing else does, so swapping a typeface is a two-line change.
 
-**Roboto was tried and reverted.** Its `@import` is kept in a comment beside the current one. Two things that swap taught, worth keeping:
+**Kian is trying faces out.** Plus Jakarta Sans and Roboto have both been in here; both `@import` URLs are kept in a comment beside the current one, so going back is a one-line change. Two things those swaps taught, worth keeping:
 
-- **Metrics differ, and several layout constants here are measured against rendered type** — the nav's collapsed monogram, the Experience meta column against "Laboratories", the Projects tag chips fitting two rows. Re-measure those after any swap. Under Roboto all of them still held except the monogram, which is documented where it lives.
-- **Weight is not portable either.** Roboto's 700 reads noticeably heavier than this face's, and `.about-hero-name` and `.project-title` both had to drop to 600 to stop shouting; they are back at 700 now. If a future swap makes the display type look heavy, that is the lever — not the size.
+- **Metrics differ, and several layout constants here are measured against rendered type** — the nav's collapsed monogram, the Experience meta column against "Laboratories", the Projects tag chips fitting two rows. Re-measure those after any swap. The monogram is the one that actually moves; it is documented where it lives.
+- **Weight is not portable either.** Roboto's 700 reads noticeably heavier than Plus Jakarta Sans's, and `.about-hero-name` and `.project-title` both had to drop to 600 to stop shouting under it; they are at 700 under Inter. If a future face makes the display type look heavy, weight is the lever — not size.
 
 Section card titles are 0.95rem / 500. Normal casing everywhere — no `text-transform: uppercase` on nav links or section headers. Small uppercase letterspaced labels are used only for micro-labels (project tags, skill names, link buttons).
 
@@ -181,31 +181,32 @@ src/
     useScrollRestore.ts # Per-history-entry scroll save/restore — used by Home AND Paper
     useModalChrome.ts  # Escape / click-outside / scroll lock for PdfModal
     FigureChart.tsx    # Inline SVG line charts for the thesis's Background figures
+    FigureCarousel.tsx # Consecutive figures shown one at a time — the capstone's design diagrams
     SurveyExplorer.tsx # The thesis's survey section: question + dimension pickers, drawn bars
     Tags.tsx           # Tech tag pills — Experience cards and Projects card footers
-    LinkIcon.tsx       # Inline SVGs for the Projects icon links (paper/pdf/library/site/github/curseforge)
-    Contact.tsx        # NOT a section-card; label above, 3 contact-card links
+    LinkIcon.tsx       # Shared inline icon set — Projects links AND Contact cards
+    Contact.tsx        # NOT a section-card; label above, 3 contact-card links w/ icons
     PdfModal.tsx       # Shared PDF modal (iframe); exports withViewerParams()
     Navbar.tsx         # Floating glass bar, card-aligned; collapses to "KJ" past 50% scroll; hamburger ≤768px
     Footer.tsx         # "Kian Javaheri" left, "© 2026" right; quiet, matches the paper top bar
     Scroll.tsx         # Back-to-top button; inverted fill, fades in past 400px
     ArrowOut.tsx       # Inline SVG ↗ for outbound links — replaces the emoji-prone U+2197
     ArrowBack.tsx      # Inline SVG ← for the paper pages' back button; 1em via .arrow-back
-    ArrowBox.tsx       # Inline SVG box-and-arrow — the go mark in each project card's corner
     CalendarIcon.tsx   # Inline SVG calendar for the Experience date chips; 1em via .cal-icon
     Resume.tsx         # DEAD — not imported anywhere
   pages/
     Home.tsx           # Root; .cards-wrapper; theme via useTheme
     Paper.tsx          # /papers/:slug — abstract + "Read the full paper" gate, contents list, article
   content/
-    papers.ts          # Paper/Block types + slug registry
+    papers.ts          # Paper/Block types, slug registry, and the paperEdits layer
     basic-income.ts    # GENERATED from public/pdfs/basic-income/ — regenerate, don't hand-edit
     thesis.ts          # GENERATED from public/pdfs/thesis/ — regenerate, don't hand-edit
     cs-capstone.ts     # GENERATED from public/pdfs/cs-capstone/ by scripts/extract-cs-capstone.py
     tables.ts          # Thesis tables rebuilt as markup, keyed by the PNG they replace
     charts.ts          # Background figures 1-4, derived from tables.ts (never re-typed)
     survey.ts          # All 10 survey questions x 7 subgroups; Q16 derived from tables.ts
-    intros.ts          # Intro block by slug (abstract or overview) + the gate flag. Hand-written
+    intros.ts          # Intro block by slug (abstract or overview), the gate flag and the
+                       #   capstone's lead figure. Hand-written
     project-pages.ts   # Stub reading pages for the 3 projects with no source document. Hand-written
   App.tsx              # <Routes>: "/" → Home, "/papers/:slug" → Paper
   index.tsx            # createRoot + <BrowserRouter>
@@ -218,8 +219,8 @@ src/
     pages/Home.css
     pages/Paper.css    # Reading page, abstract gate, survey explorer, charts, tables
     components/
-      About.css        # Hero, gallery (4/3, border-radius 14px, two-way slide)
-      Contact.css      # 3-col grid of .contact-card
+      About.css        # Hero, gallery (4/3, border-radius 24px, two-way slide)
+      Contact.css      # 3-col grid of .contact-card; icon + label left, arrow right
       Courses.css      # .courses-grid + .course-card + .course-card-num — imported by Education.tsx
       Footer.css       # Quiet in-flow bar + the two page-context gutter rules
       Nav.css          # Floating pill, glass, .nav-collapsed monogram + easings
@@ -292,7 +293,11 @@ Contrast holds over the photo: at `.50` over the darkest part of the gallery ima
 - **The mobile `.nav-collapsed` is restated inside the media query.** It has the same specificity as the `.nav` rule there, so on source order alone the mobile width would win and the pill would never collapse on a phone.
 - `overflow: hidden` clips the full name and the links as the pill closes over them. The links keep their layout width while collapsed, so they need an explicit `pointer-events: none`.
 - Both labels stay mounted. `.name-full` only goes transparent, which keeps the link's accessible name intact; `.name-mark` is `aria-hidden` and absolutely positioned at `.name`'s left edge, so the monogram lands where the "K" already was.
-- The 60px width and its `22px` padding are a pair, and the sum **depends on the typeface**: "KJ" at 0.9rem/600 measures **15.3px in Plus Jakarta Sans**, against a 16px content box (`60 − 22 − 22`), so `22 + 15.3 + 22 ≈ 60` centres it. Measured at **17.2px in Roboto** during that experiment, where it ran 1.2px into the right padding and sat 0.6px off centre — not clipped, but the reason this pair is worth re-measuring after any font change. Retune both together, and note the mobile `.nav-collapsed` restates the width, so both rules move at once.
+- The 60px width and its `22px` padding are a pair, and the sum **depends on the typeface**. "KJ" at 0.9rem/600 measures **15.3px in Plus Jakarta Sans** (which is what 60px was tuned for: `22 + 15.3 + 22 ≈ 60`), **17.2px in Roboto**, and **18.5px in Inter** — against a 16px content box (`60 − 22 − 22`).
+
+  Under Inter the mark therefore runs 2.5px into the right padding and sits **1.2px right of centre**. Measured, and **not clipped**: it starts 22px from the pill's left edge and ends 19.5px short of the right, well inside a pill with `overflow: hidden`. The ideal width for Inter would be ~62px.
+
+  **Left at 60px deliberately while the typeface is unsettled** — retuning to 62 would be right for Inter and ~1.3px wrong for either of the others, and every one of these errors is sub-pixel at a glance. Retune the pair once the font is settled, and note the mobile `.nav-collapsed` restates the width, so both rules move at once. **If a future face pushes "KJ" past ~16px of visible overhang, it will start to clip** — that is the number to watch.
 
 #### Two easing curves, not one
 `--ease-settle` and `--ease-spring` are both sampled from a damped oscillation, `1 − e^(−ct)·cos(ωt)` at `ω = 2.5π`, expressed as CSS `linear()`. They differ only in damping, and **the pair is necessary**:
@@ -437,7 +442,7 @@ The **title sits at the top of the text column** (`.about-text`), not in a full-
 
 ## About gallery
 
-`<Gallery>` in `About.tsx`. Three photos from the `images` array, prev/next arrows and an `n / N` counter. The frame is `aspect-ratio: 4 / 3`, `border-radius: 14px !important`, `overflow: hidden` — 14px because that is `.sub-card`'s radius and every other panel nested inside a section card uses it. It was 75px, which made the gallery the one element on the site with a radius of its own.
+`<Gallery>` in `About.tsx`. Three photos from the `images` array, prev/next arrows and an `n / N` counter. The frame is `aspect-ratio: 4 / 3`, `border-radius: 24px !important`, `overflow: hidden`. The radius went 75px (a shape nothing else on the site used) to 14px (matching `.sub-card`) to **24px** — Kian asked for about 10px more than the sub-card radius. Softer than the panels around it without going back to a shape of its own.
 
 ### Both slides animate, not just the incoming one
 The transition keeps **two** images mounted: `idx` (incoming) and `outgoing`. They animate in step — the old one exits a full frame width while the new one enters — and the frame's `overflow: hidden` clips both. `outgoing` is cleared in `onAnimationEnd` on the incoming image.
@@ -492,17 +497,25 @@ A **`<div>`** wrapping two things: a `<Link>` (`.project-main`) over the picture
 
 There is no counter and no type label.
 - **The title is left-aligned.** The reference sets its titles flush right and that was tried here, but its titles run to three words where these run to eleven, and four lines of ragged-left text is materially harder to read than one. Kian's call after seeing both. The card's **shortened titles are kept** either way — "Universal Basic Income vs. Targeted Welfare" drops its "A Macroeconomic Assessment" subtitle, and the page carries the full one — because a short label suits a grid tile regardless of alignment.
-- **It is 1.15rem/700.** This and `.about-hero-name` both dropped to 600 during the Roboto experiment, because that face's 700 is much heavier at the same nominal weight; both went back to 700 with the typeface. Weight is the lever to reach for if a future face looks heavy — see *Typography*.
+- **It is 1.15rem/600.** At this size, across a 371px card, the title is the largest type on the tile and 700 made it shout over the picture above it. 600 also puts it in line with `.exp-role` and `.edu-institution`, which makes it **the site's normal heading weight** — 700 is now reserved for `.about-hero-name`, the one place that should be loudest.
+  - Both this and the hero briefly dropped to 600 during the Roboto experiment for a different reason: that face's 700 is much heavier at the same nominal weight. The hero went back to 700 with the typeface; this one landed at 600 on its own merits. Weight is still the first lever to reach for if a future face looks heavy — see *Typography*.
 - **The blurb is a teaser, not the description** — two or three lines, in the reference's register: what the thing is, and the one fact worth knowing. It is written separately from the page's own text on purpose; a truncated long description reads like a truncated long description. It is **justified**, which gives it a flush rectangular edge, as in the reference.
 - **The footer is `.tag` chips plus a row of icon links**, under a hairline rule. The chips were briefly a pipe-separated line in the reference's style; that read as a caption rather than as the same kind of thing Experience lists, so they came back. `.project-foot` takes `margin-top: auto`, so **all of a card's slack goes into the single gap between blurb and footer** — the same gap the reference leaves open — and every card in a row draws its rule on the same line however the title and blurb wrapped.
-- **The footer's bottom row is a three-track grid**, `1fr auto 1fr`: outbound icons centred, go-arrow right, an empty cell on the left to balance it. The outer tracks must BOTH be `1fr` — with `auto 1fr auto` the icons would centre on the space the arrow *leaves*, putting them slightly left on every card and further left on the two-icon cards than the one-icon ones. Measured: every card's icon row shares its centre with the card to 0.0px, and the arrow sits flush with the content box's right edge.
-- **The icon links are 34px and unlabelled.** They replaced 72px labelled tiles: these are a secondary affordance under a card whose own job is to take you to the project's page, and at the old size they competed with it. `aria-label` is therefore the link's ONLY name, and it doubles as the tooltip. Recessed chips (`--well-bg`, `--well-shadow`, `--well-hover-tint`), the same step down as the tags above them — **not** `.scroll-top`'s inversion, which was tried and fought the card carrying it.
-- **`.project-go` is the mark in the bottom-right corner.** `ArrowBox.tsx` — a box with an arrow leaving it, drawn on ArrowOut's 12-unit viewBox at the same 1.4 stroke so the two read as one family. Quiet by design: `--muted`, no fill and no border, unlike the chips beside it, brightening to `--textcolor` with the card's hover. It is a signpost, not a button.
+- **The footer's bottom row is `display: flex; justify-content: space-between`** with exactly TWO children: the icon list in the left corner, the go-arrow in the right. It was briefly a `1fr auto 1fr` grid with the icons centred; when they moved back to the corner the grid's empty spacer `<span>` was left in the markup, and `space-between` then pushed the icons to the *middle* of the row — measured 127px from the left edge instead of 0. **Two children, no spacer.** Its `min-height` is the icon tile's own height, which keeps the footer the same height on the two cards that carry no icons, and so keeps the rules aligned across a row.
+- **The icon links are 40px and unlabelled.** At 34px they read as decoration rather than as controls; 40 is still well short of the 72px labelled tiles they replaced, which competed with the card's own link. `aria-label` is therefore the link's ONLY name, and it doubles as the tooltip. Recessed chips (`--well-bg`, `--well-shadow`, `--well-hover-tint`), the same step down as the tags above them — **not** `.scroll-top`'s inversion, which was tried and fought the card carrying it.
+- **`.project-go` is the mark in the bottom-right corner**, and it is **`ArrowOut`** — the same arrow as "View Resume" and the contact cards. A bespoke box-and-arrow glyph (`ArrowBox.tsx`) was drawn for this slot and went through two revisions before being **deleted**: at 24px it never read as well as the arrow the site already had. Reach for the existing glyph before drawing a new one.
+  - It carries no px size. `.project-go` sets `font-size: 22px` and `ArrowOut` sizes itself at `1em`, which is the contract `.resume-link`, `.contact-card-arrow` and `.cal-icon` all use — the glyph tracks its context instead of every caller hard-coding dimensions.
+  - Quiet by design: `--muted`, no fill and no border unlike the chips beside it, brightening to `--textcolor` with the card's hover. It is a signpost, not a button.
+  - Check icon geometry by *looking* at it: `qlmanage -t -s 320 -o . icon.svg` renders an SVG to a PNG on macOS, which is the quickest way to see a glyph without a browser screenshot.
   - It links to the **same place** as `.project-main`, and carries `aria-hidden` **plus `tabIndex={-1}`**. Announcing the same destination twice is noise, and `aria-hidden` on a *focusable* element is itself a violation — the negative tabindex is what makes the pair legitimate. It stays clickable, because an arrow that looks like a control and isn't is worse than a redundant one.
-- **`links` is optional, and two cards have none.** That used to misalign the footer — it is bottom-pinned, so a card with no icon row drew its rule lower than its neighbours. The go-arrow is on every card now and holds the row's height on its own (`min-height: 34px`), so the old "every card must carry at least one icon" constraint is gone.
+- **`links` is optional, and two cards have none.** That used to misalign the footer — it is bottom-pinned, so a card with no icon row drew its rule lower than its neighbours. The go-arrow is on every card now and holds the row's height on its own (`min-height: 40px`, the icon tile's own height), so the old "every card must carry at least one icon" constraint is gone.
 - **Every link is an ordinary outbound `href`**, opened in a new tab. There is no internal `to` (the card already covers that) and no PDF modal, which is why `Projects.tsx` doesn't import `PdfModal`.
 
-**`grid-auto-rows: 1fr`** gives every row one height, and the gap above the footer is what absorbs the difference. Measured at 1280: all six cards **499px**, every visual **381x214**, every rule at the same offset.
+**`grid-auto-rows: 1fr`** gives every row one height, and the gap above the footer is what absorbs the difference.
+
+**The grid's own `gap` is 24px**, against `.sub-cards-stack`'s 8px — the wider gutter is the point, and the cards narrow only as a consequence (381px to 371px at 1280, about 2.5%). The double class `.sub-cards-stack.work-grid` already outranks App.css, so this needs no `!important` either.
+
+Measured at 1280: cards **371px wide and 535px tall**, all six identical, visual **371x208**, footer row a constant 40px, every rule at the same offset.
 
 **`.project-card .tag-list` reserves TWO rows** (`min-height`, derived from `.tag`'s own metrics in App.css). The footer is bottom-pinned, so a card whose chips wrap to two rows would start them — and draw its rule — ~29px higher than a card whose chips fit on one. Measured: chips run one row on five cards and two on Santa Cruz, and all six rules sit at the same offset. **A three-row card breaks it again — keep tag counts at four.**
 
@@ -511,9 +524,9 @@ There is no counter and no type label.
 ### The visual
 One frame for every card — a grid of six different silhouettes stops reading as one set of things, the same rule the course cards' identical watermark follows.
 
-- `aspect-ratio: 16 / 9`, `object-fit: cover`, `object-position: center top`. **16/9 is measured, not assumed:** the six sources run 1.65 to 1.90, so 16/9 (1.778) sits in the middle — the worst crop is 6.4% horizontally and 7.1% vertically. `top` takes the loss off the bottom of the taller ones, which on a UI screenshot is the least informative part.
+- `aspect-ratio: 16 / 9`, `object-fit: cover`, `object-position: center top`. **16/9 is measured, not assumed:** once the two outliers are padded the sources run 1.685 to 1.923, so 16/9 (1.778) sits among them and the worst crop is 7.6%. `top` takes the loss off the bottom of the taller ones, which on a UI panel is the least informative part.
 - The box is reserved by `aspect-ratio`, so lazy-loaded images **cannot shift the grid** as they arrive — the same failure the paper pages hit, solved the same way.
-- **It bleeds to the card's top, left and right edges**, via negative margins that cancel `.sub-card`'s padding on those three sides. The top bleed came with the counter's removal: with nothing above it, the picture starts at the card's edge instead of floating under a band of empty fill. That is how the picture got bigger *without costing any more crop*: it gains 52px of width and 29px of height (**329x185 → 381x214, +16% in both**) while the frame's ratio, and therefore every number above, is untouched. Widening the ratio instead would only have made it taller by cropping the sides harder.
+- **It bleeds to the card's top, left and right edges**, via negative margins that cancel `.sub-card`'s padding on those three sides. The top bleed came with the counter's removal: with nothing above it, the picture starts at the card's edge instead of floating under a band of empty fill. Bleeding sideways is also how the picture was enlarged once *without costing any more crop* — it gains the card's horizontal padding on both sides while the frame's ratio, and every crop number above, is untouched. Widening the ratio instead would only have made it taller by cropping the sides harder.
 - **The bleed has to be restated at ≤768px.** `.sub-card`'s padding drops from `20px 26px` to `22px 24px` there, so flat `-20px`/`-26px` values overshoot — clipped by the card's `overflow: hidden`, which means it shows up as *extra crop*, not as a visible bleed. Measured after the fix: the visual's edges sit at 0.0px from the card's at 1280, 1000 and 375.
 
 ### The visuals themselves
@@ -521,24 +534,44 @@ Files live in **`public/images/projects/`**, one per project, all `.webp`:
 
 | File | Project | Size | Ratio | What the 16/9 crop eats |
 |---|---|---|---|---|
-| `shipment-quoting.webp` | Revolution Parts Shipment Quoting Microservice | 900x534 | 1.685 | 5.2% off the bottom |
-| `thesis-survey.webp` | Barrett Honors Thesis | 900x474 | 1.899 | 6.4% off the sides |
-| `basic-income.webp` | Economics Capstone | 900x504 | 1.786 | 0.4% |
-| `wage-effects.webp` | Estimating the Wage Effects of a UBI | 900x545 | 1.651 | 7.1% off the bottom |
-| `rental-prices.webp` | Santa Cruz Rental Price Model | 900x506 | 1.779 | **0.0% — padded, see below** |
-| `material-boxes.webp` | Material Boxes | 854x480 | 1.779 | 0.1% |
+| `shipment-quoting.18712804.webp` | Revolution Parts Shipment Quoting Microservice | 900x534 | 1.685 | 5.2% off the bottom |
+| `thesis-survey.bd86e9f6.webp` | Barrett Honors Thesis | 900x506 | 1.779 | **0.0% — padded** |
+| `basic-income.9eabe994.webp` | Economics Capstone | 700x394 | 1.777 | **0.0% — pre-cropped** |
+| `wage-effects.120b1d50.webp` | Estimating the Wage Effects of a UBI | 1001x563 | 1.778 | **0.0% — padded** |
+| `rental-prices.3ab58f9d.webp` | Santa Cruz Rental Price Model | 900x506 | 1.779 | **0.0% — padded** |
+| `material-boxes.fbf45ff3.webp` | Material Boxes | 854x480 | 1.779 | 0.1% |
 
-**`rental-prices.webp` is padded to exactly 16/9, and that is a fix, not a quirk.** At its native 1.931 the `cover` crop took 4.3% off each side — small as a percentage, but that screenshot carries UI text flush to *both* edges, so the card sliced the title down to "a Cruz Rent Model" on the left and cut the estimate panel mid-number on the right. It read as the picture being zoomed in. The source now has its 5px dark top strip cropped off and white padding added top and bottom (461 → 506), so nothing is cropped horizontally and the app sits ~8% smaller in the frame. The white blends into the screenshot's own white chrome at the top and reads as the window's bottom edge below the map.
+### Filenames carry a content hash, and that is not decoration
+`<slug>.<first 8 of md5>.webp`. **Replacing an image while keeping its filename does not reach anyone who has already loaded the page.** That happened: a full set of new art was installed correctly, served correctly (`cache-control: no-cache` + ETag, verified fresh and cached fetches returning identical new bytes), and still showed as the old pictures in a browser that had the previous files at those exact URLs — which then read as "the images didn't get done".
 
-**The other five are cropped and that is fine — check what a crop actually eats before "fixing" it.** Rendered at their card crop: the survey screenshot loses only white margin, the shipment UI cuts through a form that visibly continues, and the wage-effects chart loses its x-axis caption while keeping the title, the plot and the tick row. None slices a line of text in half. **A percentage alone doesn't tell you whether a crop matters** — render it and look. Tooling: `cwebp -crop x y w h` does offset crops, which `sips` can't; `sips -p H W --padColor FFFFFF` pads (centred); `dwebp` decodes a WebP so the others can read it.
+Vite copies `public/` **verbatim**, with no hashing of its own, so a stable name is a permanently stable URL. Renaming is the fix, and a content hash is the version of it you cannot forget to bump: recompute it in the same step that re-encodes the file.
 
-- **They are re-encoded, not dropped in as supplied.** The originals were ~2000px PNG/WebP for slots that render at ~330px. `cwebp -q 85 -resize 900 0` keeps the whole set near 220KB. 900px is ~2.7x the widest rendered size, which covers retina.
+```bash
+h=$(md5 -q "$n.webp" | cut -c1-8); mv "$n.webp" "$n.$h.webp"
+```
+
+Then update the `src` in `Projects.tsx`. If a picture ever looks stale again, check the served bytes before re-cutting the art — the file on disk is usually right.
+
+**A PORTRAIT set was tried and reverted.** Kian supplied taller, narrower art and the frame moved to 4/5 for it; the cards came out **790px tall**, too much for a three-up grid, so both the art and the frame went back to landscape. If portrait is ever revisited, that height is the thing to solve first — those ratios ran 0.582 to 1.080, a spread no single frame serves well.
+
+**Three of the six need no crop at all, by construction:**
+
+- **`rental-prices`, `wage-effects` and `thesis-survey` are padded to exactly 16/9**, each with **its own background colour sampled from the source's edges** (`#FFFFFF`, `#FCFBFC`, `#FFFFFF`). Sample before padding — white is only right if the image is actually white at the edge. Without it the rent app sliced its title to "a Cruz Rent Model" and cut the estimate panel mid-number, the wage chart sliced its x-axis caption in half, and the survey (2.148 — 17.2% off the sides) cut "Survey" down to "rvey" and clipped the question text.
+  - **The survey's padding is all at the TOP, not centred**, and that distinction matters: its top edge is pure white across the full width, but its bottom edge is mixed (`#F7F7F7` at the sides where the page background shows, white in the middle where the survey card sits). Centred padding would have left a visible seam along the bottom. **Sample the edge you intend to pad, not just a corner.**
+  - `sips -p H W --padColor` only pads *centred*. One-sided padding needs a raw-pixel step: `dwebp -ppm`, prepend rows in Python, then `cwebp` reads the PPM back.
+- **`basic-income` is pre-cropped to a 16/9 band** rather than fitted by CSS. It is an engraving of a hand holding banknotes ringed by line drawings of what a basic income buys — housing, groceries, a car, healthcare. The source is 700x420 (1.667), so `cover` would take 26px off the bottom, and the bottom is where the car sits with almost no margin under it. The band is **y=26, 700x394**: the whole 26px comes off the TOP, which is where the spare margin actually is, and every icon survives intact.
+  - It replaced a UBI mural photograph that was cropped the same way (a 672x867 portrait, banded at y=340 to catch the hand and the "PLANT THE SEED" banners). The rule that outlived it: **don't let CSS choose the slice on a picture with a subject.** Look at the source, find where the spare margin is, and take the crop from there — re-crop from the original if the frame ever changes.
+
+**The other three crop into margin, or into content that visibly continues**, checked by rendering each crop and looking at it. That check is the point: **the worst percentage is not always the worst crop.** Santa Cruz once had the second-*smallest* crop in its set and was the only broken one.
+
+- **They are re-encoded, not dropped in as supplied.** `cwebp -q 85 -resize 900 0` keeps the whole set near 210KB, at roughly 2.4x the rendered width. Sources narrower than that are left alone rather than upscaled.
+- **`cwebp`'s flags cannot be passed through a shell variable.** `R="-resize 700 0"; cwebp $R ...` fails with *Unknown option '-resize 700 0'* — the whole string arrives as one argument. Four files silently kept their previous contents that way. Write the flags out per call.
 - **`material-boxes.webp` is the exception: `-lossless`, at its native 854px.** It is a Minecraft screenshot — sharp pixel text and flat colour, which is what lossy WebP smears and what lossless WebP compresses well. Don't "optimise" it to match the others.
 - `sips` **cannot write WebP**, and resizing PNGs with it made them *bigger*. `cwebp` / `dwebp` (homebrew) are the tools, and a WebP source has to be decoded with `dwebp` first because `cwebp` won't read one.
 - `alt` describes what the picture **shows** — not a repeat of the title, which sits beside it and is already read out.
 
 ### Breakpoints
-Three across, **two at ≤1100px**, one at ≤768px. 1100 rather than the site's usual 1024, because a card here has to hold a 16/9 picture *and* a title that wraps beneath it, so three stop working before the other grids do. It is the same breakpoint Skills uses, for a related reason. **`grid-auto-rows` reverts to `auto` at ≤768px** — one column means every row is its own card, and equalising would only pad the short ones.
+Three across, **two at ≤1100px**, one at ≤768px. 1100 rather than the site's usual 1024, because a card here has to hold a picture *and* a title that wraps beneath it, so three stop working before the other grids do. It is the same breakpoint Skills uses, for a related reason. **`grid-auto-rows` reverts to `auto` at ≤768px** — one column means every row is its own card, and equalising would only pad the short ones.
 
 ### Still true
 **Projects carry no dates.** They were removed deliberately. Don't reintroduce a `date` field without checking with Kian.
@@ -588,7 +621,9 @@ They were first replaced with a carousel of the same PNGs, which fixed the heigh
 
 **Now the images are gone and the numbers are drawn.** `SurveyExplorer.tsx` renders one chart you steer with two pickers — a question (Q7-Q16) and a dimension to break it down by — over the full grid in `content/survey.ts`. The page measures **20,478px** (30,838px stacked, 20,614px as the carousel), and **the thesis page now contains zero images**: every figure is an SVG chart, every table is markup, and the survey is this.
 
-`FigureCarousel.tsx` and `ImageLightbox.tsx` are **deleted** along with their CSS (`.paper-carousel-*`, `.lightbox-*`) and `buildSlides`. `useModalChrome` stays — `PdfModal` still uses it — but nothing passes `pinViewport: false` any more.
+The thesis's own carousel and `ImageLightbox.tsx` are **deleted** along with `buildSlides` and the `.lightbox-*` CSS. `useModalChrome` stays — `PdfModal` still uses it — but nothing passes `pinViewport: false` any more.
+
+**A `FigureCarousel.tsx` exists again, and it is not that one.** The capstone's three design diagrams use it (see *A run of figures can be a carousel* below). The two cases are opposites: those twenty-three charts were *data* that wanted to be queried, and a carousel is the wrong tool for a question a reader arrives with; three architecture diagrams are *pictures* read one after another, which is exactly what a carousel is for. Its controls also sit below the frame — allowed here, because the frame reserves its height, so nothing under it moves.
 
 #### Why two pickers and not seventy slides
 - **The dimension is the unit of choice, not the subgroup.** `surveyDimensions` offers Overall / Economics coursework / Gender / Age, and picking one puts *both* halves on the same rows. The thesis's point is always a contrast ("Econ Yes against Econ No"), so flipping between two single-subgroup views is the wrong interaction. It also caps the chart at **two series**, which is exactly how many validated categorical slots the site has — the explorer reuses the Background charts' `--chart-s1`/`--chart-s2` hexes.
@@ -644,6 +679,38 @@ A page with **no entry** renders in full on arrival, the way they all did before
 - **`showFull` is a dependency of the scroll-probe effect.** Expanding puts every heading on the page at once, and without the re-run the probe keeps measuring the collapsed id list until the next scroll event — which on a click that doesn't scroll never comes. `intro` is in the same list because the id array leads with `intro` when there is one.
 - The button is filled with `--textcolor` and inverted against the page, the `.scroll-top` treatment rather than the quiet underlined `.paper-link` used for the PDF and library links in the header. It is the only action on a page that is otherwise all reading. Hover is a layered `--hover-tint-inverse`, per the site's hover convention — the page-keyed tint would be invisible on this fill.
 - Measured: expanding the thesis yields 9 sections, 6 tables, 4 charts, the survey explorer and **still zero `<img>` elements**; the ToC highlight tracks from the intro through References at max scroll on both gated papers. At 375px the button is 192x42 inside the 335px column and neither state opens a sideways scroll.
+- **An intro can carry ONE figure, and only the capstone does.** `figure` on `PaperIntro` renders under the paragraphs as a `.paper-figure.paper-intro-figure`. It is the poster's screenshot of the finished tool, which used to be the last block of Results — so the one picture showing what was actually built sat below everything written about it. It is **not** `loading="lazy"`, because it is above the fold on arrival.
+  - **The move is declared at both ends**: the figure is added here and removed from its own section by `dropFigures` in `paperEdits` (below). Neither end can live in `cs-capstone.ts`, which is generated. If a figure ever appears twice on a page, that pair is what's out of step.
+  - The `alt` is written here and describes what the screenshot *shows*. The generated figures carry `caption: ""` and so render `alt=""`; that is right for a diagram sitting under a paragraph explaining it, and wrong for the one picture a page opens on.
+
+### Edits to the generated papers are declared, not typed in
+
+`paperEdits` in **`src/content/papers.ts`** is the same idea as `withheldPdfs` beside it, and exists for the same reason: `basic-income.ts`, `cs-capstone.ts` and `thesis.ts` are rebuilt from their PDFs by a script, so an edit made *inside* one of them is dropped by the next regeneration and an edit made here isn't. It carries four fields:
+
+| Field | Applied | What it does |
+|---|---|---|
+| `dropSections` | registry | Removes a section by id, ToC entry and all |
+| `dropFigures` | registry | Removes a figure by src — for one that *moved*, see the intro's `figure` |
+| `carouselSections` | render | Section ids whose consecutive figures draw as one carousel |
+| `figureLabels` | render | Slide names, by figure src |
+
+The first two are applied by `withEdits()` as the registry is built, so everything downstream — the ToC, the scroll probe, the section loop — sees a paper that simply doesn't contain them. The last two are read by `Paper.tsx` at render.
+
+**Only `cs-capstone` has an entry.** It drops **EPIC and Customer Archetypes**, which is poster apparatus — two one-word EPICs and three customer types, no sentence between them — and reads as filler on a page that is already short. Dropping it and moving the screenshot took the page from **3,862px to 2,866px**.
+
+### A run of figures can be a carousel
+
+`FigureCarousel.tsx` draws consecutive figures one at a time instead of stacked. **Opt-in per section** via `carouselSections`, because stacking is right for the Economics capstone's trailing figures section and wrong for the capstone poster's three architecture diagrams, which ran **1,210px of a 3,862px page**.
+
+- **Grouping is by adjacency, not by a list of srcs.** `groupFigures()` in `Paper.tsx` folds each run of two or more consecutive `figure` blocks into one carousel; a lone figure in the same section still renders as a figure. So a regeneration that adds a fourth diagram picks it up with no further declaration.
+- **Every slide stays mounted** — the browser has all three in flight from first paint, so a click never waits on a fetch. That is deliberately *not* the About gallery's approach, and it sidesteps the trap documented there at length: with nothing to await, there is no `busy` flag to get wedged. Three diagrams is the scale that makes this affordable; a twenty-slide carousel would need the gallery's machinery.
+- **The frame reserves its height from the TALLEST slide**, as an inline `aspect-ratio` computed from the figures' own pixel sizes; the others letterbox into it with `object-fit: contain`. Unreserved, changing slides moved everything below by up to 106px — including the arrows being clicked. This is why controls *below* the frame are fine here and were not for the survey explorer.
+  - The frame is `box-sizing: content-box`, against the global border-box reset, so that ratio applies to the content box rather than to the box plus its 12px white plate.
+  - An absolutely positioned **replaced** element does not resolve `auto` width from its insets — it falls back to the image's intrinsic size — so the slides are given an explicit `calc(100% - 24px)` box.
+- **Slides are labelled, and the labels are written for the page.** The poster carries no captions, so `figureLabels` supplies "The capstone API in place of EasyPost", "Rate request sequence", "Cache hit and miss flow". A carousel whose only caption is "2 / 3" tells the reader nothing about what they're flipping between; the label doubles as the active slide's `alt`.
+- **The arrows and counter are the About gallery's, exactly** — same chevron paths, same bare no-fill treatment, same 0.65rem uppercase counter — so the site has one slider register rather than two.
+- **At ≤768px the bar is `align-items: flex-start`.** The longest label wraps to two lines there; centred, that pushed the arrows down as you clicked them. Measured at 375px: the label goes 15px → 29px and the controls stay at the same offset.
+- Crossfade, no slide: there is no direction to honour when the pictures aren't a sequence in space, and a fade is what `prefers-reduced-motion` would fall back to anyway, so there's no motion block to write.
 
 ### Content is converted from the PDF, not retyped
 `src/content/papers.ts` holds the types and the registry; each paper is its own generated module (`basic-income.ts`, `thesis.ts`, `cs-capstone.ts`). Only the capstone's conversion script survives in the repo, as `scripts/extract-cs-capstone.py`; the other two were one-off scripts.
@@ -677,6 +744,7 @@ A page with **no entry** renders in full on arrival, the way they all did before
 - PyMuPDF rects are **top-left origin**, so unlike the PDFKit path below they're used as the clip directly, with no y flip.
 - The poster has **no caption lines**, so its figures render uncaptioned.
 - Its typos are the poster's own ("Satisfication", "loads into in") and are kept **verbatim**.
+- One of its seven sections, **EPIC and Customer Archetypes, is not rendered** — dropped by `paperEdits`, not by editing the generated module. It is still in `cs-capstone.ts`, and a regeneration will still produce it.
 
 ### Figures 1-4 are drawn, not screenshotted
 
@@ -791,16 +859,32 @@ Each placed image is an object-replacement character whose `characterBoundsAtInd
 - For reading order, sort images by **descending y** (higher y = higher on the page). Ascending numbers them bottom-first on two-figure pages.
 - Tables are cropped by band instead: from the title line down to the next heading or table title, full text width.
 
+## Contact
+
+Three `.contact-card` links in a 3-column grid (one column at ≤768px), outside any section card, under a plain `.card-title` label.
+
+**Each card is icon + label on the left and `ArrowOut` on the right**, which is what the card's `space-between` separates — `.contact-card-main` groups the first two so they travel together. The icons come from **`LinkIcon`, the same set the Projects cards use**, at 18px (20px on mobile). They are `--muted` and **brighten to `--textcolor` with the card's hover**, so the label stays the card's only full-strength element and the marks read as quiet wayfinding rather than as three competing logos.
+
+**The third card is Email, not YouTube.** Its `href` is a `mailto:`, and it is the one card rendered **without `target="_blank"`/`rel`** — a mail client is not a browsing context, and saying it is would mislead assistive tech. The component branches on the `mailto:` prefix rather than carrying a flag, so a future mail link gets it for free.
+
+`mail` is the only Contact icon with no brand behind it, which is why it is **stroked** like `paper`/`pdf`/`library` instead of filled like the `linkedin` and `github` marks beside it.
+
 ## Footer
 
-`footer` is the counterpart to the paper pages' top bar and **takes its design**: no fill of its own, `.footer-name` at 0.9rem/600 `--textcolor` left and `.footer-meta` at 0.82rem/500 `--muted` right, `padding: 22px 36px`. Those are `.paper-back`'s and `.paper-theme-toggle`'s declarations exactly — verified equal in both themes — so a reading page is bracketed by two bars in the same register instead of opening quietly and closing on a slab.
+`footer` is the counterpart to the paper pages' top bar and **takes its design**: no fill of its own, `.footer-name` at 0.9rem/600 `--textcolor` left and `.footer-meta` at 0.82rem/500 `--muted` right. Those are `.paper-back`'s and `.paper-theme-toggle`'s declarations exactly — verified equal in both themes — so a reading page is bracketed by two bars in the same register instead of opening quietly and closing on a slab.
 
 It used to be an **inverted full-bleed slab** (0.7rem/400 on both sides). `--footer-bg` / `--footer-text` fed nothing else and **have been deleted from `App.css`**; don't reintroduce them to "restore" the bar.
+
+**A hairline separates the footer from the page above it**, in `--card-border` — the internal-divider token, which is exactly what this is.
+
+**It is a `::before` inset by the gutter, NOT a `border-top`.** The footer is full-bleed on the home page, so a border would run the whole viewport width while everything above it — the cards, the nav, the footer's own text — stops at the gutter. Insetting lines the rule up with the content it separates.
+
+**That is why the gutter is a variable.** `--footer-gutter` drives the padding *and* the rule's `left`/`right`, so the two cannot drift apart at a breakpoint.
 
 **The footer renders on both pages, and each gutters differently — so the page context decides where its text sits, not the component.** Both rules live in `Footer.css`, not split across `Home.css` and `Paper.css`, so they stay in step:
 
 - **`.paper footer`** takes `max-width: 1180px; margin: 0 auto`, the same box as `.paper-topbar`, so the name at the foot lands directly under the name at the head.
-- **`.home footer`** overrides the horizontal padding to **16px at ≤768px**. The base mobile padding is `18px 20px`, which is `.paper-topbar`'s — but `.cards-wrapper` drops to a 16px gutter where the top bar drops to 20px, so on a phone the footer's text sat 4px inside the card edge above it. Desktop needs no equivalent: both are 36px there.
+- **Gutters are 36px everywhere on desktop.** At ≤768px the base drops to 20px (matching `.paper-topbar`) and **`.home footer` overrides `--footer-gutter` to 16px**, because `.cards-wrapper` drops to 16px there and at 20px the footer's text sat 4px inside the card edge above it. Setting the variable moves the padding and the rule together.
 
 Measured flush to **0.0px** — footer name against the reference left edge, `©` against the right — on `/`, `/papers/thesis` and `/papers/cs-capstone` at 1280, 1024, 768 and 375px.
 

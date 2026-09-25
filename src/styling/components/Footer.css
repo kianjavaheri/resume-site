@@ -11,8 +11,30 @@ footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* Matches .paper-topbar exactly. */
-    padding: 22px 36px;
+    position: relative;
+    /* A variable because the RULE below has to track it, not just the padding.
+       36px matches .paper-topbar exactly. */
+    --footer-gutter: 36px;
+    padding: 22px var(--footer-gutter);
+}
+
+/* A hairline separating the footer from the page above it. `--card-border` is
+   the internal-divider token, which is exactly what this is.
+
+   Drawn as a pseudo-element inset by `--footer-gutter`, NOT as `border-top` on
+   the footer itself: the footer is full-bleed on the home page, so a border
+   would run the whole viewport width while everything above it — the cards,
+   the nav, the footer's own text — stops at the gutter. Insetting lines the
+   rule up with the content it separates, at every breakpoint and on both
+   pages, because it reads the same variable the padding does. */
+footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: var(--footer-gutter);
+    right: var(--footer-gutter);
+    height: 1px;
+    background: var(--card-border);
 }
 
 /* Same 0.9rem/600 as .paper-back, the name at the head of a paper page. */
@@ -43,15 +65,16 @@ footer {
 
 @media (max-width: 768px) {
     footer {
-        padding: 18px 20px;
+        --footer-gutter: 20px;
+        padding: 18px var(--footer-gutter);
     }
 
     /* Home: .cards-wrapper drops to a 16px gutter on a phone where
        .paper-topbar drops to 20px, and at 20px the footer's text sat 4px
        inside the card edge above it. Desktop needs no equivalent — both are
-       36px there. */
+       36px there. Setting the variable moves the padding AND the rule
+       together; that is the reason it is a variable. */
     .home footer {
-        padding-left: 16px;
-        padding-right: 16px;
+        --footer-gutter: 16px;
     }
 }

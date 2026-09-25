@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import LinkIcon from './LinkIcon'
-import ArrowBox from './ArrowBox'
+import ArrowOut from './ArrowOut'
 import Tags from './Tags'
 import './../styling/components/Projects.css'
 
@@ -22,7 +22,7 @@ const works: Array<WorkProps> = [
   {
     title: 'Revolution Parts Shipment Quoting Microservice',
     to: '/papers/cs-capstone',
-    image: { src: '/images/projects/shipment-quoting.webp', width: 900, height: 534, alt: 'The quoting tool: shipment and package details on the left, live carrier rates and cache status on the right' },
+    image: { src: '/images/projects/shipment-quoting.18712804.webp', width: 900, height: 534, alt: 'The quoting tool: shipment and package details on the left, live carrier rates and cache status on the right' },
     blurb: 'A Dockerized caching layer sitting in front of carrier quote APIs, in Flask and PostgreSQL. Cut quoting latency 64.4%, a 2.8x speedup over live calls.',
     tags: ['Python', 'Flask', 'PostgreSQL', 'Docker'],
   },
@@ -30,14 +30,14 @@ const works: Array<WorkProps> = [
     title: 'Public Perception vs. Actual Economic Effects of U.S.–China Trade Policy',
     to: '/papers/thesis',
     links: [{ label: 'View in ASU Library', icon: 'library', href: 'https://keep.lib.asu.edu/items/203948' }],
-    image: { src: '/images/projects/thesis-survey.webp', width: 900, height: 474, alt: 'The thesis survey as respondents saw it, asking whether the U.S. runs a trade deficit or a surplus' },
+    image: { src: '/images/projects/thesis-survey.bd86e9f6.webp', width: 900, height: 506, alt: 'The thesis survey as respondents saw it, asking whether the U.S. runs a trade deficit or a surplus' },
     blurb: 'Why the public read the 2018–2020 trade war so differently from the economy itself. A survey, and NLP over the open-ended answers. Barrett honors thesis.',
     tags: ['NLP', 'Survey Research', 'Qualtrics'],
   },
   {
     title: 'Universal Basic Income vs. Targeted Welfare',
     to: '/papers/basic-income',
-    image: { src: '/images/projects/basic-income.webp', width: 900, height: 504, alt: 'A slide comparing targeted transfers to UBI, with inclusion and exclusion error plots for Indonesia and Peru' },
+    image: { src: '/images/projects/basic-income.9eabe994.webp', width: 700, height: 394, alt: 'An engraving of a hand holding banknotes, ringed by line drawings of the things a basic income pays for: housing, groceries, a car, healthcare' },
     blurb: 'Five recent studies on whether a basic income is affordable, across developing and developed economies, and what the choice of funding does to growth.',
     tags: ['Macroeconomics', 'Policy Analysis'],
   },
@@ -45,7 +45,7 @@ const works: Array<WorkProps> = [
     title: 'Estimating the Wage Effects of a Universal Basic Income',
     to: '/papers/wage-effects',
     links: [{ label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/welfare-model' }],
-    image: { src: '/images/projects/wage-effects.webp', width: 900, height: 545, alt: 'A histogram of per-mother wage-impact estimates from the causal forest, against the average treatment effect' },
+    image: { src: '/images/projects/wage-effects.120b1d50.webp', width: 1001, height: 563, alt: 'A histogram of per-mother wage-impact estimates from the causal forest, against the average treatment effect' },
     blurb: 'Double Machine Learning over CPS ASEC microdata, estimating what an unconditional $6,000 a year does to future labor income.',
     tags: ['Python', 'EconML', 'XGBoost', 'Causal Inference'],
   },
@@ -56,7 +56,7 @@ const works: Array<WorkProps> = [
       { label: 'View Live Site', icon: 'site', href: 'https://rental-prices.vercel.app/' },
       { label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/rental-prices' },
     ],
-    image: { src: '/images/projects/rental-prices.webp', width: 900, height: 506, alt: 'The rent model web app: a map of Santa Cruz with priced blocks, and an estimate panel showing a prediction interval' },
+    image: { src: '/images/projects/rental-prices.3ab58f9d.webp', width: 900, height: 506, alt: 'The rent model web app: a map of Santa Cruz with priced blocks, and an estimate panel showing a prediction interval' },
     blurb: 'A rent model for studios and one-bedrooms across Santa Cruz and Monterey counties. Type an address, get a price and an honest uncertainty range.',
     tags: ['LightGBM', 'Ridge Regression', 'Gradient Boosting', 'Feature Engineering'],
   },
@@ -69,7 +69,7 @@ const works: Array<WorkProps> = [
       { label: 'View CurseForge', icon: 'curseforge', href: 'https://www.curseforge.com/minecraft/mc-mods/material-boxes' },
       { label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/material-boxes' },
     ],
-    image: { src: '/images/projects/material-boxes.webp', width: 854, height: 480, alt: 'The mod in Minecraft: a chest marked as a Material Box, its slots colour-coded by progress beside a materials checklist' },
+    image: { src: '/images/projects/material-boxes.fbf45ff3.webp', width: 854, height: 480, alt: 'The mod in Minecraft: a chest marked as a Material Box, its slots colour-coded by progress beside a materials checklist' },
     blurb: 'A client-side Fabric mod that tracks the materials a Minecraft build needs, colour-coding chests by what is still missing.',
     tags: ['Java', 'Fabric', 'Minecraft Modding', 'Claude API'],
   },
@@ -159,10 +159,10 @@ function WorkCard({ image, to, wip, release, title, blurb, tags, links }: WorkPr
       </Link>
       <div className="project-foot">
         <Tags tags={tags} />
-        {/* Three tracks so the link row is centred on the CARD, not on whatever
-            space the arrow leaves — the empty first cell balances the third. */}
+        {/* Icons in the left corner, go-arrow in the right. `space-between` on
+            two children, so the row holds its shape even on the two cards whose
+            link list is empty. */}
         <div className="project-foot-row">
-          <span aria-hidden="true" />
           <div className="project-links">
             {links?.map((l) => (
               <a
@@ -184,7 +184,7 @@ function WorkCard({ image, to, wip, release, title, blurb, tags, links }: WorkPr
               destination twice is noise — but it stays clickable, since an
               arrow that looks like a control and isn't is worse. */}
           <Link to={to} className="project-go" aria-hidden="true" tabIndex={-1}>
-            <ArrowBox />
+            <ArrowOut />
           </Link>
         </div>
       </div>

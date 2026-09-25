@@ -1,11 +1,14 @@
 import React from 'react'
 import ArrowOut from './ArrowOut'
+import LinkIcon from './LinkIcon'
 import './../styling/components/Contact.css'
 
-const links = [
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/kian-javaheri-abb134227/' },
-  { label: 'GitHub', href: 'https://github.com/kianjavaheri' },
-  { label: 'YouTube', href: 'https://www.youtube.com/channel/UC7diTWt3gPyKM8nIQpQAvZw' },
+// `icon` names come from LinkIcon's set, the same one the Projects cards draw
+// from. The email card replaced a YouTube one.
+const links: Array<{ label: string; href: string; icon: string }> = [
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/kian-javaheri-abb134227/', icon: 'linkedin' },
+  { label: 'GitHub', href: 'https://github.com/kianjavaheri', icon: 'github' },
+  { label: 'Email', href: 'mailto:kianjavaheri911@gmail.com', icon: 'mail' },
 ]
 
 function Contact() {
@@ -17,11 +20,17 @@ function Contact() {
           <a
             key={l.label}
             href={l.href}
-            target="_blank"
-            rel="noopener noreferrer"
+            {...(l.href.startsWith('mailto:')
+              ? {}
+              : { target: '_blank', rel: 'noopener noreferrer' })}
             className="contact-card"
           >
-            <span className="contact-card-label">{l.label}</span>
+            <span className="contact-card-main">
+              <span className="contact-card-icon" aria-hidden="true">
+                <LinkIcon kind={l.icon} />
+              </span>
+              <span className="contact-card-label">{l.label}</span>
+            </span>
             <ArrowOut className="contact-card-arrow" />
           </a>
         ))}

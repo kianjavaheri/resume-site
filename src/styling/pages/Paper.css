@@ -339,6 +339,111 @@
     margin-top: 10px;
 }
 
+/* The one figure lifted out of the document to sit with the intro — the
+   capstone's screenshot of the finished tool. Not lazy-loaded: it is above the
+   fold on arrival. */
+.paper-intro-figure {
+    margin-top: 24px;
+}
+
+/* ---- Figure carousel --------------------------------------------------- */
+/* A run of consecutive figures shown one at a time. Opt-in per section, via
+   `carouselSections` in content/papers.ts. See components/FigureCarousel.tsx
+   for why every slide stays mounted and why the frame reserves its height. */
+.paper-carousel {
+    margin: 0 0 28px;
+}
+
+/* The white plate .paper-figure img carries, moved onto the frame so the
+   slides letterbox onto white rather than onto the page.
+
+   content-box is deliberate: the inline aspect-ratio is computed from the
+   TALLEST slide's own pixels, so it has to apply to the content box, not to
+   the border box the global border-box reset would otherwise hand it. */
+.paper-carousel-frame {
+    position: relative;
+    box-sizing: content-box;
+    background: #ffffff;
+    border-radius: 10px !important;
+    padding: 12px;
+    overflow: hidden;
+}
+
+/* An absolutely positioned replaced element does NOT resolve `auto` width from
+   its insets — it falls back to the image's intrinsic size — so the box is
+   given explicitly and `contain` fits the slide inside it. */
+.paper-carousel-img {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    width: calc(100% - 24px);
+    height: calc(100% - 24px);
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.paper-carousel-img-on {
+    opacity: 1;
+}
+
+.paper-carousel-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 12px;
+    padding: 0 2px;
+}
+
+/* The figcaption's type: this label IS the slide's caption, it just shares a
+   row with the controls. */
+.paper-carousel-label {
+    margin: 0;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+}
+
+.paper-carousel-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: none;
+}
+
+/* The About gallery's arrows and counter exactly — same glyphs, same bare
+   treatment, same micro-label — so the site has one slider register rather
+   than two. */
+.paper-carousel-arrow {
+    display: inline-flex;
+    align-items: center;
+    background: none;
+    border: none;
+    color: var(--textcolor);
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.paper-carousel-arrow:hover {
+    opacity: 0.45;
+}
+
+.paper-carousel-arrow:focus-visible {
+    outline: 2px solid var(--textcolor);
+    outline-offset: 2px;
+}
+
+.paper-carousel-count {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+}
+
 /* ---- Survey explorer --------------------------------------------------- */
 /* The thesis's survey section, drawn from its response counts instead of shown
    as its twenty-three chart images. See components/SurveyExplorer.tsx for why
@@ -1038,6 +1143,13 @@ circle.paper-chart-s2 {
     .paper-list li {
         font-size: 0.95rem;
         line-height: 1.8;
+    }
+
+    /* A label long enough to wrap would push the arrows down as you clicked
+       them if the row stayed centred. Pinned to the top, the controls hold
+       still and only the label grows. */
+    .paper-carousel-bar {
+        align-items: flex-start;
     }
 }
 

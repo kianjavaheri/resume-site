@@ -17,6 +17,10 @@ export interface PaperIntro {
   paragraphs: string[]
   // True puts the rest of the page behind a button. See Paper.tsx.
   gated: boolean
+  // A figure lifted out of the document to sit with the intro. It is dropped
+  // from its own section by `paperEdits` in papers.ts — the move is declared at
+  // both ends because the generated module owns neither of them.
+  figure?: { src: string; width: number; height: number; alt: string }
 }
 
 export const paperIntros: Record<string, PaperIntro> = {
@@ -58,5 +62,14 @@ export const paperIntros: Record<string, PaperIntro> = {
     paragraphs: [
       'Architected a high-throughput relational caching layer using PostgreSQL and Flask within a Dockerized microservice environment, intercepting and caching external carrier API responses to reduce redundant network calls. Achieved a 64.4% reduction in processing latency (334ms \u2192\uFE0E 119ms) \u2014 a 2.8x speedup over live API calls.',
     ],
+    // The poster's screenshot of the finished tool. It was the last block of
+    // the last-but-three section, so the one picture that shows what was built
+    // sat below everything written about it; here it opens the page.
+    figure: {
+      src: '/pdfs/cs-capstone/figure4.png',
+      width: 1937,
+      height: 1149,
+      alt: 'The quoting tool: ship-from and ship-to address forms and package details on the left, carrier selection in the middle, and a panel of USPS rates on the right showing a cache hit and the historical median price it was served from.',
+    },
   },
 }

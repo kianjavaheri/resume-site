@@ -86,13 +86,69 @@ function withoutWithheldPdfs(paper: Paper): Paper {
   return actions.length === paper.actions.length ? paper : { ...paper, actions }
 }
 
+// Structural edits to the papers, declared HERE for the same reason as
+// withheldPdfs above: basic-income.ts, cs-capstone.ts and thesis.ts are
+// generated from their source PDFs, so an edit made inside one of them is
+// dropped by the next regeneration and an edit made here isn't.
+export interface PaperEdit {
+  // Section ids dropped from the page entirely.
+  dropSections?: string[]
+  // Figures dropped from the flow, by src. A figure that MOVED rather than
+  // went away is dropped here and re-declared wherever it now renders.
+  dropFigures?: string[]
+  // Sections whose runs of consecutive figures are drawn as one carousel
+  // instead of stacked down the page. Read at render time by Paper.tsx.
+  carouselSections?: string[]
+  // Names for the carousel's slides, by figure src. The poster carries no
+  // captions, so these are written for the page — a carousel whose only label
+  // is "2 / 3" tells the reader nothing about what they are flipping between.
+  figureLabels?: Record<string, string>
+}
+
+export const paperEdits: Record<string, PaperEdit> = {
+  'cs-capstone': {
+    // "EPIC and Customer Archetypes" is poster apparatus: two one-word EPICs
+    // and three customer types, no sentence between them. It reads as filler
+    // on a page that is already short.
+    dropSections: ['epic'],
+    // The UI screenshot now opens the page underneath the Summary, where it
+    // shows what was built before the reader is asked to read about it. It was
+    // the last thing in Results, at the very bottom of the page.
+    // Declared as the intro's `figure` in content/intros.ts.
+    dropFigures: ['/pdfs/cs-capstone/figure4.png'],
+    // Three architecture diagrams stacked ran 1,210px of a 3,862px page.
+    carouselSections: ['design'],
+    figureLabels: {
+      '/pdfs/cs-capstone/figure1.png': 'The capstone API in place of EasyPost',
+      '/pdfs/cs-capstone/figure2.png': 'Rate request sequence',
+      '/pdfs/cs-capstone/figure3.png': 'Cache hit and miss flow',
+    },
+  },
+}
+
+function withEdits(paper: Paper): Paper {
+  const edit = paperEdits[paper.slug]
+  if (!edit) return paper
+  const dropped = new Set(edit.dropSections ?? [])
+  const figures = new Set(edit.dropFigures ?? [])
+  return {
+    ...paper,
+    sections: paper.sections
+      .filter((s) => !dropped.has(s.id))
+      .map((s) => ({
+        ...s,
+        blocks: s.blocks.filter((b) => !(b.type === 'figure' && figures.has(b.src))),
+      })),
+  }
+}
+
 // Every project in the Projects grid has an entry here, because the cards link
 // to `/papers/:slug` and nothing else. A project added to `works` without a
 // page to point at is a dead card.
 export const papers: Record<string, Paper> = {
-  [basicIncome.slug]: withoutWithheldPdfs(basicIncome),
-  [csCapstone.slug]: withoutWithheldPdfs(csCapstone),
-  [thesis.slug]: withoutWithheldPdfs(thesis),
+  [basicIncome.slug]: withoutWithheldPdfs(withEdits(basicIncome)),
+  [csCapstone.slug]: withoutWithheldPdfs(withEdits(csCapstone)),
+  [thesis.slug]: withoutWithheldPdfs(withEdits(thesis)),
   [wageEffects.slug]: wageEffects,
   [rentalPrices.slug]: rentalPrices,
   [materialBoxes.slug]: materialBoxes,

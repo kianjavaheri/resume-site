@@ -1,13 +1,16 @@
 /* The site's typeface. To change it, this @import and the `font-family` on the
    `*` reset below are the only two places — nothing else names a font.
-   Roboto was tried and reverted; its @import is kept here for reference:
-   family=Roboto:wght@300;400;500;600;700;800
-   Metrics differ between the two, and several layout constants on this site are
+   Kian is trying faces out. Previously used, same weight set, kept here so a
+   swap back is a one-line change:
+     family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800
+     family=Roboto:wght@300;400;500;600;700;800
+   Metrics differ between faces, and several layout constants on this site are
    measured against rendered type — the nav's collapsed 60px monogram, the
    Experience meta column against "Laboratories", the Projects tag chips fitting
-   two rows. Re-measure those after any swap, and note that Roboto's 700 reads
-   heavier than this face's, so the display weights move with it. */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+   two rows. Re-measure those after any swap. Apparent weight is not portable
+   either: Roboto's 700 read much heavier than Plus Jakarta Sans's, and the two
+   display headings had to drop a step for it. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 [data-theme='light'] {
     --bgcolor: #ffffff;
@@ -111,7 +114,7 @@
     list-style: none;
     text-decoration: none;
     border-radius: 0 !important;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
 }
 
 *:focus,
