@@ -10,6 +10,7 @@ import { papers, surveyExplorers } from '../content/papers'
 import type { Block, PaperTable } from '../content/papers'
 import { paperTables } from '../content/tables'
 import { paperCharts } from '../content/charts'
+import { paperAbstracts } from '../content/abstracts'
 import './../styling/pages/Paper.css'
 
 // Columns of figures read better flush right, where the decimal points line
@@ -121,8 +122,17 @@ function Paper() {
   const [activeId, setActiveId] = useState('')
   const explorer = slug ? surveyExplorers[slug] : undefined
 
+  // Papers with an abstract open on it alone, with the full text behind a
+  // button; papers without one (the capstone poster) render as they always
+  // have. One-way on purpose — once you've asked for the paper, collapsing it
+  // back out from under you is not something a reader wants.
+  const abstract = slug ? paperAbstracts[slug] : undefined
+  const [expanded, setExpanded] = useState(false)
+  const showFull = !abstract || expanded
+
   useEffect(() => {
     window.scrollTo(0, 0)
+    setExpanded(false)
   }, [slug])
 
   useEffect(() => {
@@ -145,7 +155,11 @@ function Paper() {
   // and it eases back to 120px as soon as there's room to scroll again.
   useEffect(() => {
     if (!paper) return
-    const ids = [...paper.sections.map((s) => s.id), ...(paper.references?.length ? ['references'] : [])]
+    const ids = [
+      ...(abstract ? ['abstract'] : []),
+      ...(showFull ? paper.sections.map((s) => s.id) : []),
+      ...(showFull && paper.references?.length ? ['references'] : []),
+    ]
     const update = () => {
       const doc = document.documentElement
       const remaining = doc.scrollHeight - (window.scrollY + window.innerHeight)
@@ -167,7 +181,10 @@ function Paper() {
       window.removeEventListener('scroll', update)
       window.removeEventListener('resize', update)
     }
-  }, [paper])
+    // `showFull` is a dependency because expanding adds every heading to the
+    // page at once: without a re-run the probe keeps measuring the old id list
+    // until the next scroll event.
+  }, [paper, abstract, showFull])
 
   const jumpTo = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault()
@@ -225,10 +242,22 @@ function Paper() {
         </header>
 
         <div className="paper-layout">
-          {/* Hidden below 900px, where there's no room beside the text. */}
+          {/* Hidden below 900px, where there's no room beside the text. The
+              element stays in the tree even when it has nothing to list, so
+              the two-column grid keeps its 210px track and the article doesn't
+              jump sideways when the paper opens. */}
           <nav className="paper-toc" aria-label="Contents">
-            <p className="paper-toc-label">Contents</p>
-            {paper.sections.map((s) => (
+            {showFull ? <p className="paper-toc-label">Contents</p> : null}
+            {abstract ? (
+              <a
+                href="#abstract"
+                onClick={jumpTo('abstract')}
+                className={`paper-toc-link ${activeId === 'abstract' ? 'paper-toc-active' : ''}`}
+              >
+                Abstract
+              </a>
+            ) : null}
+            {showFull && paper.sections.map((s) => (
               <a
                 key={s.id}
                 href={`#${s.id}`}
@@ -238,7 +267,7 @@ function Paper() {
                 {s.title}
               </a>
             ))}
-            {paper.references?.length ? (
+            {showFull && paper.references?.length ? (
               <a
                 href="#references"
                 onClick={jumpTo('references')}
@@ -250,7 +279,28 @@ function Paper() {
           </nav>
 
           <article className="paper-article">
-            {paper.sections.map((s) => {
+            {abstract ? (
+              <section className="paper-section">
+                <h2 id="abstract" className="paper-section-title">Abstract</h2>
+                {abstract.map((text, i) => (
+                  <p key={i} className="paper-para">{text}</p>
+                ))}
+              </section>
+            ) : null}
+
+            {abstract && !expanded ? (
+              <div className="paper-expand">
+                <button
+                  type="button"
+                  className="paper-expand-btn"
+                  onClick={() => setExpanded(true)}
+                >
+                  Read the full paper
+                </button>
+              </div>
+            ) : null}
+
+            {showFull && paper.sections.map((s) => {
               // A section can end in a run of survey charts that renders as the
               // explorer rather than as a stack of pictures. The marker heading
               // stays put and labels it; everything after it is superseded by
@@ -295,7 +345,7 @@ function Paper() {
               )
             })}
 
-            {paper.references?.length ? (
+            {showFull && paper.references?.length ? (
               <section className="paper-section">
                 <h2 id="references" className="paper-section-title">References</h2>
                 <ul className="paper-references">

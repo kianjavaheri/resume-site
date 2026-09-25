@@ -41,7 +41,6 @@ const works: Array<Omit<WorkProps, 'onOpenPdf'>> = [
   },
   {
     tag: 'Independent Research',
-    wip: true,
     title: 'Estimating the Wage Effects of a Universal Basic Income',
     desc: 'Applied Double Machine Learning (LinearDML and CausalForestDML) to longitudinal CPS ASEC microdata to estimate the causal effect of unconditional cash transfers on future labor income, then used the model to simulate the predicted wage impact of a $6,000/year UBI program. Used XGBoost within the DoubleML framework to control for nonlinear confounding across demographic and socioeconomic variables.',
     tags: ['Python', 'EconML', 'XGBoost', 'Causal Inference'],
@@ -49,8 +48,18 @@ const works: Array<Omit<WorkProps, 'onOpenPdf'>> = [
   },
   {
     tag: 'Personal Project',
+    title: 'Santa Cruz Rental Price Model',
+    desc: 'Built an end-to-end rent prediction model for studios and one-bedrooms in Santa Cruz and Monterey counties, from a RentCast data pipeline through geographic feature engineering to a gradient-boosted model with calibrated prediction intervals. Deployed it as a static web app that reruns the model client-side in JavaScript, so anyone can type an address and get a price with an honest uncertainty range.',
+    tags: ['LightGBM', 'Ridge Regression', 'Gradient Boosting', 'Feature Engineering'],
+    links: [
+      { label: 'View Live Site', short: 'Live Site', icon: 'site', href: 'https://rental-prices.vercel.app/' },
+      { label: 'View GitHub', short: 'GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/rental-prices' },
+    ],
+  },
+  {
+    tag: 'Personal Project',
     wip: true,
-    release: 'Version 1.0.0',
+    release: 'Version 1.1.0',
     title: 'Material Boxes',
     desc: 'Built a client-side Fabric mod for Minecraft 26.2 that tracks the materials needed for a build, and works on servers that don\'t have it installed. Players import a material list by pasting text, loading a Litematica export, or dropping in a screenshot that Claude reads. Chests, barrels and shulker boxes marked as Material Boxes then count what\'s already stored, color-code each slot by progress, and route shift-clicked items straight to the slots that still need them.',
     tags: ['Java', 'Fabric', 'Minecraft Modding', 'Claude API'],
@@ -69,7 +78,7 @@ interface WorkLink {
   label: string
   // Visible text beside the icon — short, because the column is 200px wide.
   short: string
-  icon: 'paper' | 'pdf' | 'library' | 'github' | 'curseforge'
+  icon: 'paper' | 'pdf' | 'library' | 'site' | 'github' | 'curseforge'
   pdfSrc?: string
   href?: string
   to?: string

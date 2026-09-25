@@ -180,6 +180,35 @@
     margin-top: 0;
 }
 
+/* The gate under the abstract. Filled with --textcolor and inverted against
+   the page, the same treatment as .scroll-top: it is the only action on a page
+   that is otherwise all reading, so it takes the loudest thing the site has
+   rather than the quiet underlined .paper-link the PDF and library links use
+   in the header above. Hover is a layered --hover-tint-inverse, per the site's
+   hover convention — the normal tint is keyed to the page and would be
+   invisible on this fill. */
+.paper-expand {
+    display: flex;
+    margin: 4px 0 8px;
+}
+
+.paper-expand-btn {
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--bgcolor);
+    background-color: var(--textcolor);
+    border-radius: 10px !important;
+    padding: 14px 24px;
+    cursor: pointer;
+    transition: background-image 0.15s;
+}
+
+.paper-expand-btn:hover {
+    background-image: linear-gradient(var(--hover-tint-inverse), var(--hover-tint-inverse));
+}
+
 .paper-para {
     font-size: 1rem;
     line-height: 1.85;

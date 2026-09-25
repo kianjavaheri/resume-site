@@ -42,6 +42,15 @@ function LinkIcon({ kind }: { kind?: string }) {
           <path d="M3 21h18" />
         </svg>
       )
+    // Deployed web app / live site.
+    case 'site':
+      return (
+        <svg {...common} {...stroke}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18" />
+          <path d="M12 3a15.3 15.3 0 0 1 4 9 15.3 15.3 0 0 1-4 9 15.3 15.3 0 0 1-4-9 15.3 15.3 0 0 1 4-9z" />
+        </svg>
+      )
     case 'github':
       return (
         <svg {...common} fill="currentColor">

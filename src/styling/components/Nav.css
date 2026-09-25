@@ -10,8 +10,10 @@
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     backdrop-filter: blur(24px) saturate(180%);
     box-shadow: var(--nav-rim), var(--nav-shadow);
-    /* Beats the global `border-radius: 0 !important` reset. */
-    border-radius: 999px !important;
+    /* Beats the global `border-radius: 0 !important` reset. Matches
+       `.section-card`'s 20px, so the bar and the cards under it share one
+       corner. */
+    border-radius: 20px !important;
     padding: 0 14px 0 26px;
     display: flex;
     justify-content: space-between;
@@ -19,11 +21,13 @@
     color: var(--textcolor);
     position: fixed;
     top: 12px;
-    left: 16px;
+    /* Flush with `.cards-wrapper`'s 36px gutters, so the bar is exactly as wide
+       as the section cards beneath it. */
+    left: 36px;
     /* Width rather than `right`, because the collapse animates it. Resolves
-       against the initial containing block, so this equals the old
-       `right: 16px` exactly. */
-    width: calc(100% - 32px);
+       against the initial containing block, so this equals `right: 36px`
+       exactly. */
+    width: calc(100% - 72px);
     z-index: 100;
     height: 56px;
     /* Clips the full name and the links as the pill closes over them. */
@@ -171,10 +175,10 @@
 /* ── Mobile ─────────────────────────────────── */
 @media (max-width: 768px) {
     .nav {
-        left: 12px;
+        left: 16px;
         /* Width, not `right` — with `left` and `width` both set, `right` is
            dropped as over-constrained and the pill ends up off-centre. */
-        width: calc(100% - 24px);
+        width: calc(100% - 32px);
         padding: 0 8px 0 18px;
     }
 
@@ -219,14 +223,14 @@
         flex-direction: column;
         position: fixed;
         top: 78px;
-        left: 12px;
-        right: 12px;
+        left: 16px;
+        right: 16px;
         bottom: auto;
         max-height: calc(100vh - 92px);
         background: var(--nav-glass);
         -webkit-backdrop-filter: blur(24px) saturate(180%);
         backdrop-filter: blur(24px) saturate(180%);
-        border-radius: 26px !important;
+        border-radius: 20px !important;
         /* Same material as the pill — the rim replaces the solid border the
            panel used to carry, which read as a drawn line on glass. */
         box-shadow: var(--nav-rim), var(--nav-shadow);
