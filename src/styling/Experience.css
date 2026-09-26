@@ -33,12 +33,16 @@
     min-width: 0;
 }
 
-/* 600, matching `.edu-institution` — the name at the head of Education's meta
-   column does the same job. Experience was the only one of the three sub-card
-   sections still setting its name and its title at body weight. */
+/* 500, with `.exp-role` and `.project-title`. It was 600 to match
+   `.edu-institution`, the name at the head of Education's meta column, which
+   does the same job and is still 1rem/600 — so that pairing no longer holds,
+   deliberately: the Experience card carries a name AND a role stacked, and two
+   600 lines in a 185px column read as two headings competing rather than as a
+   hierarchy. Colour still separates them from the location and dates, which
+   are 400 `--muted`. */
 .exp-company {
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1.3;
 }
 
@@ -139,13 +143,13 @@
     gap: 12px;
 }
 
-/* Same 0.95rem/600 as `.project-title`, deliberately: it's the primary line of
-   the card in both sections. That's a type-scale decision and still stands —
-   unlike the old column pairing, it doesn't depend on the two sections sharing
-   a layout. */
+/* Same 0.95rem/500 as `.exp-company` above it, and the same weight as
+   `.project-title`: it's the primary line of the card in both sections. That's
+   a type-scale decision and still stands — unlike the old column pairing, it
+   doesn't depend on the two sections sharing a layout. */
 .exp-role {
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1.35;
 }
 
@@ -208,9 +212,12 @@
     border-top: none !important;
 }
 
+/* 500, with the card's own name and role. These are the TA card's collapsed
+   preview — CSE 310 is deliberately first — so they are the first thing read,
+   but they sit below a 0.95rem role and shouldn't compete with it. */
 .exp-ta-course {
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .exp-ta-prof {
@@ -221,8 +228,21 @@
 
 /* ── Responsive ───────────────────────────────── */
 @media (max-width: 1024px) {
+    /* 185px, up from 170. Both of this column's measured budgets had run out
+       under Google Sans Flex, which is a wider face than Inter:
+
+         - the date chip went 155px -> 173.2px and no longer fit the column at
+           all, overhanging it by 3.2px into the 28px gutter;
+         - "Laboratories", the longest unbreakable word in `.exp-company`, went
+           92.1px -> 95.8px against the 98px the name gets here (170 - 60 tile
+           - 12 gap), leaving 2.2px.
+
+       The old reason this couldn't grow — that the Projects rows carried the
+       same grid and had to line up — went away when Projects became a
+       thumbnail grid. At 185 the name gets 113px (17.2px of headroom) and the
+       chip 11.8px, which is margin a future face can survive. */
     .experience-item {
-        grid-template-columns: 170px 1fr;
+        grid-template-columns: 185px 1fr;
         column-gap: 28px;
     }
 }

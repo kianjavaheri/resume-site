@@ -268,6 +268,49 @@
     display: none;
 }
 
+/* ---- Palette trigger ---------------------------------------------------- */
+/* The same chip as the nav links and the theme toggle beside it — same size,
+   same 4px corner, same tint on hover. It is a control in that row, so it moves
+   with them; see the note on `.nav-links a`. */
+.nav-search {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    /* 6px vertical to match the links' chip height, and square horizontally so
+       the glyph sits centred rather than left of centre. */
+    padding: 6px 10px;
+    border-radius: 4px !important;
+    transition: background-image 0.15s, color 0.15s;
+}
+
+.nav-search .search-icon {
+    width: 15px;
+    height: 15px;
+}
+
+.nav-search:hover {
+    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
+    color: var(--textcolor);
+}
+
+/* Hidden below 900px, and the number is deliberately not the measured one.
+   Under Inter the chip fit from 790px up — at 769px the links row ran 16.4px
+   past the bar's right padding and `.nav`'s own `overflow: hidden` clipped the
+   theme toggle. 790 left 4.6px of slack, which is the kind of margin one
+   typeface swap erases, so this backed off to a breakpoint the site already
+   uses. The swap came one commit later and proved the point: Google Sans Flex
+   is wider, and the bar's own slack at 769px went from 18.6px to 5.9px with no
+   chip in the row at all. 900 still holds, with 100.9px of measured headroom.
+   The shortcut itself works in the band; only the button goes. */
+@media (max-width: 900px) {
+    .nav-search {
+        display: none;
+    }
+}
+
 /* ── Mobile ─────────────────────────────────── */
 @media (max-width: 768px) {
     .nav {
@@ -354,6 +397,7 @@
     }
 
     .mobile-menu a,
+    .mobile-menu-action,
     .mobile-theme-toggle {
         font-size: 0.9rem;
         font-weight: 500;
@@ -365,6 +409,11 @@
         transition: opacity 0.15s;
     }
 
+    .mobile-menu-action {
+        cursor: pointer;
+        user-select: none;
+    }
+
     .mobile-theme-toggle {
         cursor: pointer;
         user-select: none;
@@ -372,6 +421,7 @@
     }
 
     .mobile-menu a:hover,
+    .mobile-menu-action:hover,
     .mobile-theme-toggle:hover {
         opacity: 0.5;
     }

@@ -3,7 +3,7 @@
    column's 16px gap gives 28px down to the bio. */
 .about-hero-name {
     font-size: clamp(1.6rem, 3.5vw, 3rem);
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: -0.02em;
     line-height: 1.05;
     margin-bottom: 12px;

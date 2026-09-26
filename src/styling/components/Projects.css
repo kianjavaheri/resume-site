@@ -131,14 +131,17 @@
    "Universal Basic Income vs. Targeted Welfare" without its subtitle, the page
    carries the full one — because a short label suits a grid tile either way.
 
-   600, not 700: at 1.15rem across a 371px card these are the largest type on
-   the tile and 700 made them shout over the picture above them. `.exp-role`
-   and `.edu-institution` sit at 600 too, so this is the site's normal heading
-   weight — 700 is reserved for `.about-hero-name`, which is the one place
-   that should be loudest. */
+   500. At 1.15rem across a 371px card these are the largest type on the tile,
+   and the weight came down in two steps: 700 shouted over the picture above
+   them, and 600 still read heavier than the card needed once Google Sans Flex
+   went in. `.exp-role` and `.exp-company` moved to 500 in the same pass, so
+   the site's headings now separate from body copy by SIZE rather than by
+   weight, and 600 is left to `.about-hero-name` as the loudest thing on the
+   page. Weight remains the first lever if a future face reads heavy — see
+   Typography in CLAUDE.md. */
 .project-title {
     font-size: 1.15rem;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1.25;
     letter-spacing: -0.02em;
     text-align: left;

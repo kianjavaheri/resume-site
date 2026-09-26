@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { works } from '../content/projects'
+import SearchIcon from './SearchIcon'
+import { openPalette, shortcutLabel } from './openPalette'
 import './../styling/components/Nav.css'
 
 function Navbar({ switchTheme, isChecked }: any) {
@@ -117,6 +119,19 @@ function Navbar({ switchTheme, isChecked }: any) {
           </a>
           <a href="#skills" onClick={scrollTo('skills')}>Skills</a>
           <a href="#contact" onClick={scrollTo('contact')}>Contact</a>
+          {/* Icon only, and deliberately so: the bar's links already run to
+              509px of a 657px row at the 769px breakpoint, and a chip carrying
+              the shortcut as text would overflow a bar that clips what it can't
+              fit. The shortcut lives in the tooltip instead. */}
+          <button
+            type="button"
+            className="nav-search"
+            onClick={openPalette}
+            aria-label="Search"
+            title={`Search (${shortcutLabel()})`}
+          >
+            <SearchIcon />
+          </button>
           <span className="theme-toggle" onClick={switchTheme}>
             {isChecked() ? 'Light' : 'Dark'}
           </span>
@@ -155,6 +170,12 @@ function Navbar({ switchTheme, isChecked }: any) {
           <a href="#projects" onClick={scrollTo('projects')}>Projects</a>
           <a href="#skills" onClick={scrollTo('skills')}>Skills</a>
           <a href="#contact" onClick={scrollTo('contact')}>Contact</a>
+          <span
+            className="mobile-menu-action"
+            onClick={() => { close(); openPalette(); }}
+          >
+            Search
+          </span>
           <span className="mobile-theme-toggle" onClick={() => { switchTheme(); close(); }}>
             {isChecked() ? 'Light' : 'Dark'}
           </span>

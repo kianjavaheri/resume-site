@@ -17,7 +17,7 @@
 
 /* Child combinator, like .section-open and .coursework-open: the coursework
    blocks nested inside reuse .section-body-wrapper and must not inherit this. */
-.edu-open > .section-body-wrapper {
+.edu-open>.section-body-wrapper {
     grid-template-rows: 1fr;
 }
 
@@ -95,7 +95,7 @@
 }
 
 /* Same 0fr → 1fr animation as the outer sections, gated on its own class. */
-.coursework-open > .section-body-wrapper {
+.coursework-open>.section-body-wrapper {
     grid-template-rows: 1fr;
 }
 
@@ -119,7 +119,7 @@
 
 .edu-institution {
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
     /* Heavy tracking reads as spaced-out caps at this size — pull it back in. */
     letter-spacing: -0.01em;
     line-height: 1.3;
@@ -164,7 +164,7 @@
 
 .edu-degree {
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 500;
     line-height: 1.35;
 }
 

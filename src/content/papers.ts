@@ -15,7 +15,12 @@ export type Block =
   | { type: 'p'; text: string }
   | { type: 'quote'; text: string }
   // Subheading inside a section (the thesis has two heading levels).
-  | { type: 'h3'; text: string }
+  // `id` is NOT written by the generated modules — it is injected by
+  // `renderedSections()` in paper-view.ts, so a subheading can be linked to and
+  // can appear in the search index. It travels on the block rather than in a
+  // map keyed by position because the render path regroups blocks (a run of
+  // figures folds into one carousel) and every index shifts when it does.
+  | { type: 'h3'; text: string; id?: string }
   // Bulleted list. The capstone poster is written as bullets, not prose;
   // `nested` marks the poster's second-level (➢) items. `ordered` draws an
   // <ol> instead, for steps whose order is the point.

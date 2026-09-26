@@ -49,7 +49,7 @@ footer::before {
 /* Same 0.9rem/600 as .paper-back, the name at the head of a paper page. */
 .footer-name {
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--textcolor);
 }
 

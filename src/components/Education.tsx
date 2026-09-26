@@ -1,30 +1,7 @@
 import React, { useState } from 'react'
 import './../styling/Education.css'
 import './../styling/components/Courses.css'
-
-type Course = { code: string; name: string }
-
-const cseCourses: Course[] = [
-  { code: 'CSE 310', name: 'Data Structures & Algorithms' },
-  { code: 'CSE 330', name: 'Operating Systems' },
-  { code: 'CSE 340', name: 'Principles of Programming Languages' },
-  { code: 'CSE 355', name: 'Intro to Theoretical Computer Science' },
-  { code: 'CSE 434', name: 'Computer Networks' },
-  { code: 'CSE 445', name: 'Distributed Software Development' },
-  { code: 'CSE 446', name: 'Software Integration & Engineering' },
-  { code: 'CSE 460', name: 'Software Analysis and Design' },
-  { code: 'CSE 463', name: 'Human Computer Interaction' },
-  { code: 'CSE 464', name: 'Software QA and Testing' },
-  { code: 'CSE 471', name: 'Intro to Artificial Intelligence' },
-]
-
-const ecnCourses: Course[] = [
-  { code: 'ECN 306', name: 'Survey of International Economics' },
-  { code: 'ECN 416', name: 'Game Theory & Economic Behavior' },
-  { code: 'ECN 423', name: 'Economics of Education' },
-  { code: 'ECN 425', name: 'Introduction to Econometrics' },
-  { code: 'ECN 445', name: 'Environmental Economics' },
-]
+import { cseCourses, ecnCourses, type Course } from '../content/courses'
 
 // One collapsible coursework block per degree. Reuses the section-body-wrapper
 // grid-rows animation, gated on `coursework-open` instead of `section-open`.

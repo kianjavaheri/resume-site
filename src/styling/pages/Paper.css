@@ -132,9 +132,16 @@
     margin-bottom: 14px;
 }
 
+/* 500, down from 700. At clamp(1.7rem, 3.2vw, 2.5rem) the size alone carries
+   this — it is by far the largest type on the page — so the weight is free to
+   come back to the register the rest of the site now uses.
+   NOTE this puts the page title LIGHTER than its own `.paper-section-title`s,
+   which are 1.1rem/600. That is deliberate and it is a size-led hierarchy, not
+   a weight-led one: the title outsizes them more than twice over. If the two
+   ever look inverted, `.paper-section-title` is the one to bring down. */
 .paper-title {
     font-size: clamp(1.7rem, 3.2vw, 2.5rem);
-    font-weight: 700;
+    font-weight: 500;
     letter-spacing: -0.02em;
     line-height: 1.15;
     max-width: 20ch;
@@ -290,8 +297,10 @@
 
 .paper-para {
     font-size: 1rem;
-    line-height: 1.85;
+    /* line-height: 1.85; */
+    line-height: 26px;
     margin-bottom: 20px;
+    font-weight: 300;
 }
 
 /* The thesis's references print bare URLs, and a URL is one unbreakable token:
@@ -590,7 +599,7 @@
     margin-bottom: 10px;
 }
 
-.paper-survey-chips + .paper-survey-control-label {
+.paper-survey-chips+.paper-survey-control-label {
     margin-top: 18px;
 }
 
@@ -1166,7 +1175,7 @@ circle.paper-chart-s2 {
     color: var(--muted);
 }
 
-.paper-table-notes > *:last-child {
+.paper-table-notes>*:last-child {
     margin-bottom: 0;
 }
 
@@ -1217,6 +1226,7 @@ circle.paper-chart-s2 {
 }
 
 @media (max-width: 900px) {
+
     /* No room for the contents list beside the text; the headings still carry
        the structure. */
     .paper-toc {
@@ -1267,6 +1277,7 @@ circle.paper-chart-s2 {
 }
 
 @media (max-width: 768px) {
+
     /* The option labels are full sentences and the column is ~335px, so the
        190px label column would leave the bars about 80px wide. Stacked, the
        label gets the full width and the bar under it does too. */
@@ -1314,6 +1325,7 @@ circle.paper-chart-s2 {
 }
 
 @media (max-width: 768px) {
+
     /* The SVG scales to its container, so the type scales with it: at 335px
        the viewBox is drawn at 0.49x and 15px chrome lands at an unreadable
        7.4px. These are viewBox units, so 23 renders at about 11px — the size
@@ -1373,5 +1385,158 @@ circle.paper-chart-s2 {
 
     circle.paper-chart-dot-active {
         r: 11;
+    }
+}
+
+/* ── Top bar: search chip and reading progress ───────────────────────────── */
+
+/* The bar is `space-between` with two children. The toggle and the search chip
+   are one cluster on the right, so they go in a wrapper rather than becoming a
+   third child — which would have spread all three across the bar. */
+.paper-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* .paper-back-btn's treatment at the chip size the nav bar uses. */
+.paper-search-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px !important;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    transition: background-image 0.15s, color 0.15s;
+}
+
+.paper-search-btn .search-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.paper-search-btn:hover {
+    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
+    color: var(--textcolor);
+}
+
+/* How far down the page the reader is.
+ *
+ * Inset to the gutter rather than run to the screen's edges: the bar it hangs
+ * from is capped and centred, and a rule that overshoots the content it belongs
+ * to is the exact thing the footer's hairline is a ::before to avoid.
+ *
+ * `scaleX` from the left, not an animated `width`: transform is composited, so
+ * it costs nothing on a scroll frame. useReadingProgress writes it directly,
+ * without going through React. */
+.paper-progress {
+    position: absolute;
+    left: var(--paper-gutter);
+    right: var(--paper-gutter);
+    bottom: 0;
+    height: 2px;
+    background: var(--textcolor);
+    transform: scaleX(0);
+    transform-origin: left center;
+    /* No transition: it tracks the scroll position exactly, and easing toward
+       the reader's own scrolling would just lag behind it. */
+}
+
+/* ── Heading anchors ─────────────────────────────────────────────────────── */
+
+/* Invisible until the heading is hovered or the control itself is focused, and
+   NOT `display: none` — it stays in the tab order, or the whole feature is
+   mouse-only. It is always in flow, so revealing it shifts nothing. */
+.paper-anchor {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.4em;
+    /* Sized off the heading it sits in, like .arrow-out and .cal-icon. */
+    font-size: 0.75em;
+    color: var(--muted);
+    opacity: 0;
+    transition: opacity 0.15s, color 0.15s;
+    vertical-align: baseline;
+}
+
+.paper-anchor .anchor-icon {
+    width: 1em;
+    height: 1em;
+}
+
+.paper-section-title:hover .paper-anchor,
+.paper-subheading:hover .paper-anchor,
+.paper-anchor:focus-visible,
+.paper-anchor:hover {
+    opacity: 1;
+}
+
+.paper-anchor:hover,
+.paper-anchor:focus-visible {
+    color: var(--textcolor);
+}
+
+/* The global reset clears outline, so focus needs restating — and this is the
+   one control here that a keyboard user reaches before they can see it. */
+.paper-anchor:focus-visible {
+    outline: 2px solid var(--textcolor);
+    outline-offset: 3px;
+    border-radius: 3px !important;
+}
+
+/* A subheading is a jump target now, so it needs the same clearance under the
+   sticky bar that .paper-section-title has. */
+.paper-subheading {
+    scroll-margin-top: 104px;
+}
+
+/* ── 404 ─────────────────────────────────────────────────────────────────── */
+
+.notfound-body {
+    max-width: 640px;
+    padding-top: 30px;
+}
+
+.notfound-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 40px 0 14px;
+}
+
+.notfound-links {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.notfound-links a {
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--textcolor);
+    padding: 10px 12px;
+    margin-left: -12px;
+    border-radius: 8px !important;
+    transition: background-image 0.15s;
+}
+
+.notfound-links a:hover {
+    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
+}
+
+@media (max-width: 768px) {
+    .paper-subheading {
+        scroll-margin-top: 92px;
+    }
+
+    /* No hover on a phone, so the anchors would only ever be reachable by a
+       keyboard that isn't there. The heading ids still work as links. */
+    .paper-anchor {
+        display: none;
     }
 }

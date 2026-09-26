@@ -3,6 +3,25 @@
 ## Workflow rules
 - **Never push to GitHub.** Make commits locally only. The user pushes to remote themselves.
 
+## Outstanding work
+
+**Per-page link previews and a sitemap — NOT DONE, and Kian has asked to be reminded until it is.** Raise it at the end of any session that touches this repo, until this section says it shipped.
+
+The site is a single `index.html` with one `<title>Kian Javaheri</title>` and one description, and **no `og:` tags at all**. `Paper.tsx` sets `document.title` per paper, but that runs in JavaScript and the things that build link previews — LinkedIn's unfurler, Slack's, iMessage's, Discord's — fetch the raw HTML and read `<meta>` only. So all seven URLs unfurl identically, with no image. Pasting `/papers/thesis` into a recruiter DM shows a bare card. Search engines see seven URLs that look like one page, and `robots.txt` allows everything while pointing at nothing.
+
+The fix is a post-build Node script, not SSR and not a framework change:
+
+1. Read the `papers` and `works` registries, which already exist.
+2. For each of the seven routes, copy `dist/index.html` and swap in that route's `<title>`, `<meta name="description">`, `og:title` / `og:description` / `og:image` / `og:url` / `og:type`, `twitter:card=summary_large_image` and a canonical link.
+3. Write it to `dist/papers/<slug>/index.html`.
+4. Emit `dist/sitemap.xml` from the same registry, and add a `Sitemap:` line to `robots.txt`.
+
+Then `"build": "vite build && node scripts/prerender-meta.mjs"`.
+
+**Why that works here specifically:** `vercel.json`'s rewrite is `/(.*)` → `/index.html`, and Vercel checks the filesystem before rewrites (noted under *Paper pages* below). Once `dist/papers/thesis/index.html` exists, Vercel serves it directly and the rewrite never fires for that path; every other path still falls through to the SPA. A crawler gets real tags, a human gets the same file and React boots from it as before.
+
+The images are mostly done — the six project thumbnails are 700–1001px wide and content-hashed. OG wants ~1200x630 (1.91:1) against their 16/9 (1.78), so either accept the crop or pad them with the per-edge `sips` technique the wage-effects figures used. Two constraints that bite: `og:image` **must be an absolute URL**, and LinkedIn caches hard, which is the other reason the content hash in the filename earns its keep.
+
 Personal portfolio/resume website for Kian Javaheri, a May 2026 CS & Economics graduate from Barrett, The Honors College at ASU (Summa Cum Laude, 3.93 GPA). He holds **two degrees** — B.S. Computer Science and B.S. Economics — and the site is written to make that read as two credentials, not one. He is based in the Bay Area, CA and looking for full-time Software Engineering and Data Engineering roles.
 
 ## Running the project
@@ -140,14 +159,57 @@ The general rule: **an inset shadow needs enough headroom below the fill to fall
 `src/styling/App.css` applies `border-radius: 0 !important` globally — intentional. Anything that needs rounding must use `!important` (`.section-card`, `.sub-card`, `.coursework-block`, `.course-card`, `.contact-card`, `.gallery-frame`, `.nav`, `.scroll-top`, `.skill-icon-wrap`, `.project-wip`, `.tag`, `.pdf-close`, `.paper-expand-btn`). The list isn't exhaustive — grep for `border-radius` before assuming a class is missing one.
 
 ### Typography
-**Inter** from Google Fonts, weights `300;400;500;600;700;800`.
+**Google Sans Flex** from Google Fonts, weight axis requested as the range `300..800`.
 
 **Exactly two places name a font**, both in `App.css`: the `@import` at the top of the file and the `font-family` on the `*` reset. Nothing else does, so swapping a typeface is a two-line change.
 
-**Kian is trying faces out.** Plus Jakarta Sans and Roboto have both been in here; both `@import` URLs are kept in a comment beside the current one, so going back is a one-line change. Two things those swaps taught, worth keeping:
+**It is the first VARIABLE font here**, which changes two things. The weight is a range rather than a list of six static cuts — one file. And it carries an **optical-size axis** (`opsz` 6–144), which is requested in the URL and then left to the browser's default `font-optical-sizing: auto`: the 0.6rem micro-labels get an instance drawn for small sizes and the 2.5rem page titles one drawn for display. No previous face here had one. The range stays `300..800` to match what the static imports declared, although only 400/500/600/700 are actually used.
 
-- **Metrics differ, and several layout constants here are measured against rendered type** — the Experience meta column against "Laboratories", the Projects tag chips fitting two rows, the Projects dropdown's `min-width` against its longest `navLabel`. Re-measure those after any swap. (The nav used to be the worst of these, because its collapsed "KJ" monogram had a width tuned to one typeface. It docks instead of collapsing now, and nothing in the bar is measured against type any more.)
-- **Weight is not portable either.** Roboto's 700 reads noticeably heavier than Plus Jakarta Sans's, and `.about-hero-name` and `.project-title` both had to drop to 600 to stop shouting under it; they are at 700 under Inter. If a future face makes the display type look heavy, weight is the lever — not size.
+**Glyph coverage was checked against every non-ASCII codepoint in `src/` before the swap**, and nothing falls through to a system fallback. The `latin` subset carries U+2212 (the cards' `−`), U+2191/U+2193 (the palette's arrow hints), the dashes, the curly quotes and U+00B7; `math` carries Greek and the relational operators; `symbols` carries the remaining arrows. Note there is **no `greek` subset** — Greek arrives via `math`. Re-run that audit for any future face, because a missing glyph is exactly how an emoji presentation sneaks back in (see *No emoji glyphs in copy*).
+
+**Kian is trying faces out.** Inter, Plus Jakarta Sans and Roboto have all been in here; all three `@import` URLs are kept in a comment beside the current one, so going back is a one-line change. Three things those swaps taught, worth keeping:
+
+- **Metrics differ, and several layout constants here are measured against rendered type** — the Experience meta column against "Laboratories", the Projects tag chips fitting two rows, the Projects dropdown's `min-width` against its longest `navLabel`, the four charts' mobile geometry. Re-measure those after any swap. (The nav used to be the worst of these, because its collapsed "KJ" monogram had a width tuned to one typeface. It docks instead of collapsing now, and nothing in the bar is measured against type any more — but the bar's own slack still is; see below.)
+- **Weight is not portable either, and weight is the lever — not size.** Roboto's 700 read noticeably heavier than Plus Jakarta Sans's, and `.about-hero-name` and `.project-title` both had to drop a step under it. Google Sans Flex prompted the same move again, further: see *The headings separate by size, not weight* below.
+- **A wider face spends margin you cannot see.** Google Sans Flex runs about 4% wider than Inter on lowercase text and ~9% on the tabular date strings.
+
+#### What the Google Sans Flex swap actually broke, and what it only looked like
+
+Two real breaks, both fixed, and three false alarms. The false alarms are the useful part: **A/B the old face in the page before changing a number**, by appending an Inter stylesheet and a `* { font-family: 'Inter' !important }` override to the loaded document and re-measuring. Half of what looks like a regression after a swap was already there.
+
+Broke, and fixed:
+
+- **The Experience date chip stopped fitting its column.** `.exp-date` went 155px → 173.2px and overhung the 170px meta column by 3.2px at the ≤1024 breakpoint, into the 28px gutter. The column is now **185px** there — see *Experience*.
+- **The last x-tick on the mobile charts crossed the svg's edge.** `2024` is centred on the final data point, which sits on the plot's right edge, so half of it hangs into the right gutter; at `GEO.compact.right: 28` that half went 0.8px past the svg box on all four charts. It opened no page scroll, but "nothing paints outside its svg" is the standard the mobile geometry is held to. `right` is **32** now.
+
+Looked broken, wasn't:
+
+- **The Languages group wrapping to two rows at 1280.** It does — and it did under Inter too. The claim that seven tiles fit on one row holds at **≥1500px**, which is `--page-max` and where it was measured. Verified 1 row under both faces at 1500/1700/1900, 2 rows under both at 1101/1280.
+- **Desktop chart end labels painting outside the svg.** Pre-existing, and *better* now: under Inter two charts overhung (+7.3px, +1.9px), under Google Sans Flex one does (+9.1px). The wide geometry has always let the end label run into its gutter; it adds no page scroll.
+- **Two collision pairs per chart on desktop.** Already documented below as em-box leading, not ink. Unchanged.
+
+One genuine cosmetic difference was left alone: at exactly 1280, Developer Tools (6 tiles) wraps to two rows where it fit on one under Inter, **missing by 0.7px**. Languages and Frameworks already wrap at that width, so three groups wrapping reads more consistently than two of three, and chasing 0.7px with the grid gap would not fix Languages anyway.
+
+#### The headings separate by size, not weight
+
+One pass, after the Google Sans Flex swap, took most of the site's headings down a step. The result is that **hierarchy here is carried by size and colour, with weight nearly flat** — 500 for almost everything, 600 reserved for the two places that should be loudest.
+
+| | was | now |
+|---|---|---|
+| `.about-hero-name` | 700 | **600** |
+| `.paper-title` (a reading page's own title) | 700 | **500** |
+| `.project-title` | 600 | **500** |
+| `.exp-company` | 600 | **500** |
+| `.exp-role` | 600 | **500** |
+| `.exp-ta-course` (the CSE 310 / FSE 150 rows) | 600 | **500** |
+
+Three consequences worth knowing before "fixing" any of them:
+
+- **`.paper-title` is now lighter than its own `.paper-section-title`s**, which stayed at 1.1rem/600. That is a size-led hierarchy on purpose — the title outsizes them more than twice over (40px against 17.6px). If the two ever look inverted, `.paper-section-title` is the one to bring down, not the title back up.
+- **`.exp-company` is now the same 0.95rem/500 as `.card-title`**, the section header above it. The company name and the word "Experience" match.
+- **`.edu-institution` stayed at 1rem/600** and was not part of this pass, so Education's institution name is now heavier than Experience's company name. It was previously the reason `.exp-company` was 600 at all.
+
+The lighter name also bought back layout budget: "Laboratories" went 95.8px at 600 to **93.1px** at 500, so the Experience meta column's tightest measurement has 19.9px of headroom rather than 2.2px.
 
 Section card titles are 0.95rem / 500. Normal casing everywhere — no `text-transform: uppercase` on nav links or section headers. Small uppercase letterspaced labels are used only for micro-labels (project tags, skill names, link buttons).
 
@@ -195,6 +257,10 @@ src/
     Awards.tsx         # Collapsible, default OPEN. 3 honors on a horizontal rail, ASU seal
     useClampedExpand.ts # Clamp-and-expand hook — Experience cards only (Projects tiles don't clamp)
     useTheme.ts        # Shared theme hook (theme-pref) — used by Home AND Paper
+    CommandPalette.tsx # ⌘K palette over content/search.ts. Mounted once, in App.tsx
+    openPalette.ts     # Its event + the ⌘/Ctrl label. Split out to keep Fast Refresh
+    HeadingAnchor.tsx  # The copy-link control beside every paper heading
+    useReadingProgress.ts # The line across the paper top bar's bottom edge
     useScrollRestore.ts # Per-history-entry scroll save/restore — used by Home AND Paper
     useModalChrome.ts  # Escape / click-outside / scroll lock for PdfModal
     FigureChart.tsx    # Inline SVG line charts for the thesis's Background figures
@@ -210,13 +276,22 @@ src/
     Scroll.tsx         # Back-to-top button; inverted fill, fades in past 400px
     ArrowOut.tsx       # Inline SVG ↗ for outbound links — replaces the emoji-prone U+2197
     ArrowBack.tsx      # Inline SVG ← for the paper pages' back button; 1em via .arrow-back
+    AnchorIcon.tsx     # Inline SVG chain-link for HeadingAnchor; 1em via .anchor-icon
+    CheckIcon.tsx      # Its copied state — swaps into the same box, so nothing shifts
+    SearchIcon.tsx     # Inline SVG magnifier for the two palette triggers
     CalendarIcon.tsx   # Inline SVG calendar for the Experience date chips; 1em via .cal-icon
     Resume.tsx         # DEAD — not imported anywhere
   pages/
     Home.tsx           # Root; .cards-wrapper; theme via useTheme
     Paper.tsx          # /papers/:slug — abstract + "Read the full paper" gate, contents list, article
+    NotFound.tsx       # The catch-all route AND the unknown-slug case. Paper chrome
   content/
     papers.ts          # Paper/Block types, slug registry, and the paperEdits layer
+    paper-view.ts      # What a reading page ACTUALLY renders, as data. Read by
+                       #   Paper.tsx AND search.ts — see Paper pages
+    search.ts          # The command palette's index, BUILT from the other modules
+    courses.ts         # The 16 courses — read by Education.tsx AND search.ts
+    skills.ts          # The 25 skills in 4 groups — read by Proficiency.tsx AND search.ts
     projects.ts        # The Projects grid's entries + types — read by Projects.tsx AND Navbar
     contact-links.ts   # LinkedIn / GitHub / Email + isMailto() — read by Contact AND About
     basic-income.ts    # GENERATED from public/pdfs/basic-income/ — regenerate, don't hand-edit
@@ -230,7 +305,8 @@ src/
     project-pages.ts   # Reading pages for the 3 projects with no source document. Hand-written.
                        #   material-boxes and wage-effects have grown past their stubs;
                        #   rental-prices hasn't
-  App.tsx              # <Routes>: "/" → Home, "/papers/:slug" → Paper
+  App.tsx              # <Routes>: "/" → Home, "/papers/:slug" → Paper, "*" → NotFound;
+                       #   mounts <CommandPalette /> outside the routes
   index.tsx            # createRoot + <BrowserRouter>
   react-app-env.d.ts   # vite/client types + the *.svg module shim
   util/svgs/           # DEAD — 8 SVGs, referenced nowhere. See below.
@@ -246,6 +322,7 @@ src/
       Courses.css      # .courses-grid + .course-card + .course-card-num — imported by Education.tsx
       Footer.css       # Quiet in-flow bar + the two page-context gutter rules
       Nav.css          # Floating pill, glass, .nav-docked + its drawn hairline, dropdown
+      Palette.css      # The ⌘K panel: nav material, inverted selected row
       Awards.css       # .award-card — .exp-logo copy + .award-track dot rail
       Proficiency.css  # .skill-group + label; .skills-grid flex-wrap; 72px .skill-icon-wrap; .skill-monogram
       Projects.css     # 3-across grid; .project-main link + sibling footer of chips and icons
@@ -370,6 +447,28 @@ Duration is the only performance lever that doesn't change how the bar looks. `w
 
 **Why not `clip-path` instead of `width`,** which would avoid layout entirely: `clip-path` clips the element's drop shadow, so the pill loses `--nav-shadow` and stops floating. Moving the shadow to a parent as `filter: drop-shadow()` doesn't rescue it either — a `filter` on an ancestor creates a new backdrop root, which kills `backdrop-filter` on the child and takes the glass with it.
 
+## Command palette and site search
+
+`⌘K` / `Ctrl K`, a bare `/`, the magnifier chip at the right end of the nav bar, the one in a paper page's top bar, or the `Search` row in the mobile menu. `CommandPalette.tsx` is mounted once in `App.tsx`, outside the routes, so it works on every page.
+
+**Nothing in the index is a second copy of any content.** It is BUILT from the modules the pages already render — `works`, `courseGroups`, `skillGroups`, the `papers` registry and `renderedSections()` — so a project, a course or a paragraph cannot be searchable and absent, or present and unsearchable. That invariant is the entire reason `content/paper-view.ts` exists; see *The render layer is shared with the search index* under Paper pages.
+
+It indexes 7 sections, 6 projects, 16 courses, 25 skills, every section heading and subheading, and the full prose of all six papers. Verified: **all 47 linkable hashes across all six papers resolve to a real element** on the rendered page.
+
+- **Built LAZILY, on the first search, then held.** Walking ~120KB of paper text costs a couple of milliseconds — nothing on a keystroke, and worth not paying on first paint.
+- **Scoring is substring, not fuzzy subsequence.** On an index this size a subsequence matcher finds a path through almost every long paragraph and the results stop meaning anything. A hit at a word boundary beats one inside a word, an early hit beats a late one, and **every term must land somewhere** or a two-word query matches anything containing either half.
+- **Navigation outranks prose** at equal match quality (`KIND_WEIGHT`), so typing "projects" gives the section, not the six paragraphs that mention it. **An exact title match outranks a prefix**: without that bonus `r` put the heading "References" above the skill R, and `git` put GitHub above Git — both match a word boundary at position 0 and the kind weight broke the tie the wrong way.
+- **No one paper may take more than 3 prose rows**, or a query the thesis happens to use a lot fills the list with one document. 12 results total.
+- **The highlighted row INVERTS** — `--textcolor` fill, `--bgcolor` ink, 21:1 in both themes — rather than taking a tint. Same call, for the same reason, as the survey explorer's selected chip: it has to be unmistakable against a dozen neighbours, and `--hover-tint` is 0.022 alpha in dark, held down deliberately for the pure-black page. Pointer and keyboard drive the same state, so there is no second hover style to keep in step.
+- The panel takes the **nav bar's material** (`--nav-glass`, blur 24 + saturate 180%, rim and shadow) at the bar's own 20px corner. It renders outside `.home`/`.paper`, so it reads its tokens off `<html>` — which is only possible because `useTheme` mirrors `data-theme` there for the scrollbar. Verified resolving in both themes.
+- **Arrow keys move a highlight, not focus** (`aria-activedescendant`), so the input keeps taking keystrokes. A live region announces the result count.
+- **Results run in a `requestAnimationFrame` after the palette closes.** `useModalChrome` restores the body's scrolling in a *passive* effect cleanup, which runs after the click handler returns; scrolling before that fights a locked page.
+- **A jump to a section of the page you are already on does not push a history entry** — it scrolls. Cross-page, it navigates with the section id in `location.state`, which `Home` reads in a layout effect declared *after* `useScrollRestore` (that hook scrolls a new entry to the top in a layout effect of its own, and effects run in hook-call order). Re-applied on `document.fonts.ready`, the same trap `useScrollRestore` documents.
+- **`openPalette` and `shortcutLabel` live in `openPalette.ts`, not in the component.** A module exporting both a React component and plain functions can't be Fast Refreshed — Vite invalidates it on every edit and says so in the console. The trigger is an event rather than a context because there is one thing to say and no state to hold.
+- **The nav chip is icon-only and hidden ≤900px.** See *Palette trigger* in `Nav.css` — the bar clips what it can't fit, and the measured fit is much tighter than it looks.
+
+**Two known limits, both deliberate.** A course result scrolls to Education without opening the coursework block — revealing it needs a channel through three components and isn't worth it for 16 entries, so the subtitle names the list instead. And **About's and Experience's prose isn't indexed**, because it lives in JSX rather than in `content/`; the Experience section entry carries the three employer names as a hand-written `body` so "Sandia" finds it, flagged in `search.ts` as something to delete when that data moves.
+
 ## Expandable cards and tags
 
 **`useClampedExpand`** (`src/components/useClampedExpand.ts`) is used by the Experience cards. It used to drive the Projects rows too; those are always-open grid tiles now (see *Projects*), so the hook has one caller.
@@ -389,17 +488,19 @@ Duration is the only performance lever that doesn't change how the bar looks. `w
 ### Experience
 Three cards: Sandia, ASU Junior Researcher and ASU Undergraduate Teaching Assistant.
 
-**The company name and the role are both 0.95rem / 600.** Not a style preference — Experience was the last of the three sub-card sections still setting them at body weight. `.edu-institution` (the name at the head of Education's meta column) is 1rem/600 and `.project-title` is 0.95rem/600, so `.exp-company` matches the first in role and `.exp-role` matches the second exactly. A card's hierarchy is then weight and colour, not colour alone: role and company at 600 `--textcolor`, location and dates at 400 `--muted`.
+**The company name and the role are both 0.95rem / 500**, matching `.project-title`'s weight and `.card-title` exactly. They were 600, raised from body weight to match `.edu-institution`; that pairing was dropped in the weight pass (see *The headings separate by size, not weight*) because a card carrying a name AND a role stacked in a 185px column reads as two competing headings at 600. **The hierarchy inside a card is colour, not weight**: role and company at 500 `--textcolor`, location and dates at 400 `--muted`. The TA course rows (`.exp-ta-course`) moved to 500 with them.
 
 **Wording:** the **bullets follow Kian's resume** (`~/Library/CloudStorage/Dropbox/resume.pdf`), lightly adapted into sentences. The **paragraphs above them are hand-written**, so keep edits to them minimal and never smooth them into generic resume-speak.
 
-**The paragraph is context, not a second copy of the bullets.** Both descriptions were cut roughly in half (Sandia 76 words in four sentences to 52 in two; the researcher role 50 to 34) because they restated the bullets almost claim for claim — the same tool, the same plugin, the same scraper, the same OCR — which is most of what made the section feel wordy. What survives is what the resume bullets *don't* carry: the feedstock gloss, the user-facing framing, the mentor, the supervising professor. The paragraph is also the collapsed preview's two lines, so it still has to open with what he built. No buzzwords, and no outcome claims the resume doesn't make. (To read the PDF here: `pdftotext` is installed — `pdftotext -layout` is the quickest way in. Python PDF libraries are not; macOS PDFKit via `osascript -l JavaScript` also works.) The two ASU roles used to share one card with a timeline. They were split so each role collapses on its own. Cards use a `200px 1fr` grid (170px at ≤1024px, stacked at ≤768px). This **used to be paired with the Projects rows**, which carried the same grid so the two sections lined up down the page; Projects is a thumbnail grid now and has no left column, so the width is Experience's own to change. The TA card has no summary paragraph, so its preview is the first course row. **CSE 310 is deliberately first**, ahead of the earlier FSE 150. It's the role that matters most to employers, so it's the one visible while the card is collapsed.
+**The paragraph is context, not a second copy of the bullets.** Both descriptions were cut roughly in half (Sandia 76 words in four sentences to 52 in two; the researcher role 50 to 34) because they restated the bullets almost claim for claim — the same tool, the same plugin, the same scraper, the same OCR — which is most of what made the section feel wordy. What survives is what the resume bullets *don't* carry: the feedstock gloss, the user-facing framing, the mentor, the supervising professor. The paragraph is also the collapsed preview's two lines, so it still has to open with what he built. No buzzwords, and no outcome claims the resume doesn't make. (To read the PDF here: `pdftotext` is installed — `pdftotext -layout` is the quickest way in. Python PDF libraries are not; macOS PDFKit via `osascript -l JavaScript` also works.) The two ASU roles used to share one card with a timeline. They were split so each role collapses on its own. Cards use a `200px 1fr` grid (**185px** at ≤1024px, stacked at ≤768px). This **used to be paired with the Projects rows**, which carried the same grid so the two sections lined up down the page; Projects is a thumbnail grid now and has no left column, so the width is Experience's own to change. The TA card has no summary paragraph, so its preview is the first course row. **CSE 310 is deliberately first**, ahead of the earlier FSE 150. It's the role that matters most to employers, so it's the one visible while the card is collapsed.
 
 **The TA course rows carry NO dates.** Each used to print its own term (`Jan – May 2024`, `Aug – Dec 2023`) opposite the course name, which is why `.exp-ta-meta` existed as a `space-between` row — that wrapper and `.exp-ta-date` are both gone, and the course name is now a direct child of `.exp-ta-row`. The card's own `.exp-date` chip already says `Aug 2023 – May 2024`, and the two terms inside that span were a second, finer date scale that no reader needed. If dates come back, the chip is the thing to question first, not the rows.
 
 **The meta column is two rows: icon and name side by side, then the date chip underneath.** `.exp-meta` is a flex *column*; `.exp-meta-head` is the row inside it, holding a 60px `.exp-logo` tile (`border-radius: 15px !important`, logo inset 6px, `object-fit: contain`) beside `.exp-company`. **Radius scales with the tile at 0.25** — keep 60/15 in step. It's decorative (`alt=""`) — the company name is right next to it. `.exp-meta-head` needs `min-width: 0` or the flex item refuses to shrink below its longest word and pushes the tile out of the column.
 
-**The inset is 10% of the tile, not a sixth.** It was 9px on 56px, which left a 38px mark in a 56px tile and read as stranded — worst on the circular ASU seal, since `object-fit: contain` on a circle wastes the tile's corners and reads smaller still than a square glyph in the same box. 6px on 60px is an app-icon proportion and puts the mark at 48px, 26% bigger. **60px is the ceiling, and the constraint is the name beside it, not the tile**: at the 1024px breakpoint the column is 170px, so the name gets `170 − 60 − 12 = 98px` against "Laboratories" at 93.4px. 64px would leave 0.6px, which one font fallback erases. Measure that word before growing it again.
+**The inset is 10% of the tile, not a sixth.** It was 9px on 56px, which left a 38px mark in a 56px tile and read as stranded — worst on the circular ASU seal, since `object-fit: contain` on a circle wastes the tile's corners and reads smaller still than a square glyph in the same box. 6px on 60px is an app-icon proportion and puts the mark at 48px, 26% bigger. **60px is the ceiling, and the constraint is the name beside it, not the tile**: at the 1024px breakpoint the column is **185px**, so the name gets `185 − 60 − 12 = 113px` against "Laboratories" at 95.8px. Measure that word before growing it again.
+
+**That column was 170px until the Google Sans Flex swap, and both of its budgets had run out at once.** The date chip went 155px → 173.2px and no longer fit the column at all, overhanging it by 3.2px into the 28px gutter; "Laboratories" went 92.1px → 95.8px against the 98px the name got there, leaving 2.2px. The old reason the column couldn't grow — that the Projects rows carried the same grid and had to line up down the page — went away when Projects became a thumbnail grid, so 185 was available. It buys 17.2px of headroom on the name and 11.8px on the chip, which is margin a future face can survive.
 
 **There is no location line.** It was the least useful thing in the column — the resume carries it, and nobody reads a portfolio to learn a former employer's city. Dropping it left the column with a name and a date, which is what made a chip worth the space.
 
@@ -409,13 +510,13 @@ It first shipped as a *copy* of the tag treatment — same fill, same boxy radiu
 
 The rim uses `--card-border`, the internal-divider token. That's a mild extension of *No card borders* — that rule governs cards, which carry shadows instead, and this is a chip. The text stays at full `--textcolor`: a quiet container around confident type, not a muted caption. The `*` reset sets `border: 0` without `!important`, so a class rule wins on specificity alone; only `border-radius` needs the `!important`.
 
-Measured: the pill is 155px, inside the 170px column at the 1024px breakpoint with 15px to spare, and 25px tall, which keeps the meta column's intrinsic height at 97px against 115–117px of content.
+Measured under Google Sans Flex: the pill is 173.2px, inside the 185px column at the 1024px breakpoint with 11.8px to spare, and 25px tall. All three cards' meta columns are exactly as tall as their content (117/117, 117/117, 115/115 at 1280; 322/322, 253/253, 321/321 at 1024 with every card expanded).
 
 **`CalendarIcon.tsx` is inline SVG, not a file in `public/svgs/`** — same reason as `LinkIcon.tsx`: it sits on a chip whose text is `--textcolor` and has to take its colour from it, which an `<img>` can't. It's stroked at 1.3 on a 14-unit viewBox, matching `ArrowOut`'s weight so the two read as one icon set, and sized `1em` by `.cal-icon` in `App.css` (beside `.arrow-out`, which works the same way) so it tracks its label instead of carrying a px size per caller. **It has no day dots inside the body**: the chip renders it at 11.2px, where a grid of 1px dots is mush. The header rule alone reads as a calendar. **It sits on its own row, and that's what fixed the wrap this section used to log as a known trade.** Beside the tile it had 132px on desktop and 102px in the 769-1024px band against the 117px `May 2023 – Aug 2024` needs, so that string broke onto two lines at every tablet width. On its own row it gets the column's full 200px (170px at the breakpoint); measured at both, the chip is 132px on one line with 38px to spare.
 
 The tile used to sit *above* the name. Moving it beside the text is what finally removed the height overhang this section used to log as a known trade: measured at 1280px, all three cards have `.exp-meta` exactly as tall as `.exp-content` (117/117, 117/117, 115/115), so every card is content-driven. Growing the tile from 48px to 56px cost nothing there — same heights, same line counts.
 
-**The whole constraint is the name's width**, which is whatever the tile and the 12px gap leave: 128px of the 200px column, and 98px at the 1024px breakpoint. Measured against the bold 0.95rem/600 name, the longest unbreakable word is "Laboratories" at 93.4px, so there is 4.6px of headroom at the tightest size. **That number is the budget — check it before growing the tile again.** The date no longer competes for it (see above). The old reason not to widen the column past 170px — that Projects' left column had to match it — is gone with that layout, so the only constraint left is this one.
+**The whole constraint is the name's width**, which is whatever the tile and the 12px gap leave: 128px of the 200px column, and 113px at the 1024px breakpoint. Measured against the 0.95rem/500 name in Google Sans Flex, the longest unbreakable word is "Laboratories" at 93.1px, so there is 19.9px of headroom at the tightest size. **That number is the budget — check it before growing the tile again.** The date no longer competes for it (see above). The old reason not to widen the column past 170px — that Projects' left column had to match it — is gone with that layout, so the only constraint left is this one.
 
 **This reverses an earlier decision, deliberately.** The logo used to be half the column's width and revealed only on expand, inside a `.exp-logo-wrap` that used the same `0fr → 1fr` trick as the clamp, because at full size it set each collapsed card's height on its own — about 250px on desktop and 450px on a phone against ~150px of content. Shrinking that *bare* mark to around 56px was tried then and read as an awkward middle size — neither a logo nor an icon.
 
@@ -481,6 +582,8 @@ Spacing has to keep a group break louder than a row wrap: `.skills-wrapper` row 
 - Columns are **`auto`**, so each is only as wide as its longest row of tiles. `justify-content: start` keeps the pair left-aligned rather than spread across the card.
 - The **64px column gap** is what separates two groups sitting side by side. It has to stay well clear of `.skills-grid`'s **20px** tile gap, which was cut from 36px so seven Languages tiles fit on one row inside half the card.
 - **≤1100px** stacks the groups again, because the two top-row groups no longer fit side by side on one line each.
+
+**"Seven Languages tiles on one row" is true at ≥1500px, not at every width.** 1500 is `--page-max`, which is where it was measured. Below the cap the two columns share whatever the viewport gives them, and at 1101–1280 the seven-tile groups wrap to two rows — under Inter as well as under Google Sans Flex, verified by A/B. Don't treat that wrap as a regression; the thing to check after a font swap is the ≥1500px case.
 
 - Icons are `<img src="/svgs/name.svg">` from `public/svgs/` — **not** Vite imports.
 - Most are **simple-icons** glyphs with the brand hex added as a `fill` attribute on the `<svg>` tag (matching how `react.svg` was already built).
@@ -588,7 +691,7 @@ A **`<div>`** wrapping two things: a `<Link>` (`.project-main`) over the picture
 
 There is no counter and no type label.
 - **The title is left-aligned.** The reference sets its titles flush right and that was tried here, but its titles run to three words where these run to eleven, and four lines of ragged-left text is materially harder to read than one. Kian's call after seeing both. The card's **shortened titles are kept** either way — "Universal Basic Income vs. Targeted Welfare" drops its "A Macroeconomic Assessment" subtitle, and the page carries the full one — because a short label suits a grid tile regardless of alignment.
-- **It is 1.15rem/600.** At this size, across a 371px card, the title is the largest type on the tile and 700 made it shout over the picture above it. 600 also puts it in line with `.exp-role` and `.edu-institution`, which makes it **the site's normal heading weight** — 700 is now reserved for `.about-hero-name`, the one place that should be loudest.
+- **It is 1.15rem/500.** At this size, across a 371px card, the title is the largest type on the tile, and the weight came down in two steps: 700 shouted over the picture above it, and 600 still read heavy once Google Sans Flex went in. It sits with `.exp-role` and `.exp-company` at 500, which is **the site's normal heading weight** — 600 is left to `.about-hero-name`, the one place that should be loudest.
   - Both this and the hero briefly dropped to 600 during the Roboto experiment for a different reason: that face's 700 is much heavier at the same nominal weight. The hero went back to 700 with the typeface; this one landed at 600 on its own merits. Weight is still the first lever to reach for if a future face looks heavy — see *Typography*.
 - **The blurb is a teaser, not the description** — two or three lines, in the reference's register: what the thing is, and the one fact worth knowing. It is written separately from the page's own text on purpose; a truncated long description reads like a truncated long description. It is **justified**, which gives it a flush rectangular edge, as in the reference.
 - **The footer is `.tag` chips plus a row of icon links**, under a hairline rule. The chips were briefly a pipe-separated line in the reference's style; that read as a caption rather than as the same kind of thing Experience lists, so they came back. `.project-foot` takes `margin-top: auto`, so **all of a card's slack goes into the single gap between blurb and footer** — the same gap the reference leaves open — and every card in a row draws its rule on the same line however the title and blurb wrapped.
@@ -608,7 +711,7 @@ There is no counter and no type label.
 
 Measured at 1280: cards **371px wide and 535px tall**, all six identical, visual **371x208**, footer row a constant 40px, every rule at the same offset.
 
-**`.project-card .tag-list` reserves TWO rows** (`min-height`, derived from `.tag`'s own metrics in App.css). The footer is bottom-pinned, so a card whose chips wrap to two rows would start them — and draw its rule — ~29px higher than a card whose chips fit on one. Measured: chips run one row on five cards and two on Santa Cruz, and all six rules sit at the same offset. **A three-row card breaks it again — keep tag counts at four.**
+**`.project-card .tag-list` reserves TWO rows** (`min-height`, derived from `.tag`'s own metrics in App.css). The footer is bottom-pinned, so a card whose chips wrap to two rows would start them — and draw its rule — ~29px higher than a card whose chips fit on one. Measured: chips run one row on five cards and two on Santa Cruz, and all six rules sit at the same offset. **A three-row card breaks it again — keep tag counts at four.** (At ≤768px Santa Cruz's four long tags *do* reach three rows under Google Sans Flex, where they reached two under Inter. That is harmless and not the failure this rule guards: the grid is one column there with `grid-auto-rows: auto`, so each card is its own row and there is nothing for its rule to line up with. The reservation is a minimum, not a cap.)
 
 **That reservation needs `align-content: flex-start` AND `align-items: flex-start`, and leaving them out is a bug that shipped once.** `.tag-list` is a wrapping flex container, so with spare vertical space the default `normal` resolves to `stretch`: a single row of chips grew to fill the whole reserved box — **51px tall against a natural 23px** — and four of the six cards rendered their tags as tall slabs. `align-content` distributes the flex *lines* and `align-items` sizes the chips *within* a line; one without the other leaves the stretch in place.
 
@@ -693,7 +796,7 @@ Full-text reading pages for the written work, at **`/papers/:slug`** (`src/pages
 - **The page's box is `--paper-max` (1320px) and `--paper-gutter` (36px, 20px at ≤768px)**, declared on `.paper` and read by both `.paper-topbar` and `.paper-inner` so the bar and the article beneath it cannot drift apart. It was a flat 1180 in both rules. The layout inside uses about 1050 (210 contents + 60 gap + 780 article), so the old box left the whole page floating mid-screen with the back control stranded 80px in from the edge; at 1280 the content now starts at x 36 rather than 86, and the back button at 30 rather than 80.
 - **`.paper-article` is 780px, up from 700.** At 1rem/1.85 that is about 95 characters — the top of a comfortable measure, and roughly where a line starts getting hard to track back from. Past this, widen the gutter instead.
 - **The top bar is `position: sticky`**, so the back control stays reachable however far down the reader is. It needs an opaque fill or the article scrolls through it, and the fill is `--page-base` — this is chrome, not a surface, the same call the home page's nav makes when it docks. **Two things have to clear its 76px** (68 on mobile): `.paper-toc`'s sticky `top` (92) and the headings' `scroll-margin-top` (104, 92 on mobile). Measured: a contents jump lands its heading 28px below the bar.
-- **Routing.** `App.tsx` has `/` and `/papers/:slug`. A slug with no entry renders a short "doesn't exist" block with a link home, rather than crashing. **`vercel.json` carries an SPA rewrite** (`/(.*)` → `/index.html`); without it a direct hit on `/papers/basic-income` 404s on Vercel, since only `index.html` exists on disk. Vercel checks the filesystem before rewrites, so assets still serve normally.
+- **Routing.** `App.tsx` has `/`, `/papers/:slug` and a catch-all `*`. A slug with no entry and an address that matches nothing render the **same** `NotFound` page — paper chrome, the theme, a footer, and links to all six projects, because the reader was looking for something. Before the catch-all existed, anything outside the two routes matched nothing and React rendered an empty div: a blank white page with no theme and no way out. **`vercel.json` carries an SPA rewrite** (`/(.*)` → `/index.html`); without it a direct hit on `/papers/basic-income` 404s on Vercel, since only `index.html` exists on disk. Vercel checks the filesystem before rewrites, so assets still serve normally.
 - **Theme.** `useTheme` (`src/components/useTheme.ts`) is shared by `Home` and `Paper`, so both follow `theme-pref` identically. Home was refactored onto it; don't duplicate that logic in a new page.
 - **No navbar.** The nav's links scroll to sections that only exist on the home page. A paper page's top bar has a back button and a "Kian Javaheri" link on the left, and its own theme toggle on the right.
 - **The back button is icon-only** (`ArrowBack.tsx`, stroked at 1.3 on a 14-unit viewBox to match `ArrowOut`, sized by `.arrow-back` in CSS rather than per caller — the same arrangement as `.arrow-out` and `.cal-icon`). It calls **`navigate(-1)`**, a real history POP, which is what lets scroll restoration put the reader back where they were; `navigate('/')` would be a PUSH and land at the top. **When there is no in-app history behind it** — someone deep-linked or opened the page in a new tab — it goes to `/` instead, because a back button inside the page should never throw the reader off the site. `hasAppHistory()` reads the running `idx` react-router keeps on the history entry; at 0 there is nothing of ours behind us.
@@ -740,6 +843,45 @@ The three expected divergences are all Table 3's **"Q10: Price Increase Awarenes
 - **`sliceLabels` keeps the thesis's own inconsistency.** Q13, Q14 and Q16 label the second age slice "Age Other" where the rest say "Age 25+". It's the same partition (both halves sum to that question's full sample), but it's printed differently, so it's rendered differently — same rule as `Satisfication` and the two "Figure 4"s.
 - Gender is the one dimension that doesn't sum to the full sample on any question: two respondents didn't state one.
 - The generated figure blocks after the cut heading are **dropped from the flow**, not rendered. `surveyExplorers` in `content/papers.ts` names the paper, section and heading to cut at; the heading itself stays visible above the explorer.
+
+### The render layer is shared with the search index
+
+**`src/content/paper-view.ts` is what a reading page actually renders, as data.** `Paper.tsx` used to compute this inline, which was fine while it was the only consumer. The command palette's index is a second one, and it has to agree with the page exactly: an indexed paragraph the page drops is a result that scrolls to nothing, and an indexed subheading whose id the page never renders is a dead deep link. So the three transforms that decide what survives live there, once:
+
+1. `paperEdits` — already applied by the `papers` registry itself.
+2. The **survey cut** — everything after the marker heading in a section the explorer supersedes.
+3. The table **absorbs** — the paragraphs the rebuilt tables now draw themselves.
+
+`renderedSections(slug)` returns the surviving blocks and is memoised; the registry is a module constant, so the result can't go stale. Verified after the split: 9 sections on the thesis, the survey explorer, 6 tables, 4 drawn charts, **still zero `<img>`**, no stray absorbed text, and cs-capstone's three-slide carousel and dropped EPIC section both unchanged.
+
+**Subheading ids are minted here too**, and injected onto the `h3` block as an optional `id` rather than returned in a map keyed by position — because the render path regroups blocks (a run of figures folds into one carousel) and every index shifts when it does. The id is `<sectionId>-<slugified text>`, scoped so two sections can carry the same subheading, with a counted suffix for a repeat inside one section. Derived from the text rather than counted, so it is stable across builds — these strings end up in URLs.
+
+`linkableIds(slug)` is the set of every id a link can land on. The page uses it to tell one of its own fragments from a stray one: **a nonsense `#100%` must not be read as the reader asking to open a gated paper.**
+
+**Memoising the blocks made one latent bug worth guarding.** `groupFigures()` appends into the last block when it is a carousel — and a `carousel` written by hand comes from the content module itself, so appending would mutate that module in place. It never fired (the only generated section it runs on carries no inline carousel), but with the blocks now held in a cache the mutation would persist. It only folds into carousels it built this pass.
+
+### Reading progress
+
+A 2px line across the bottom edge of the sticky top bar, driven by `useReadingProgress`. The thesis page is 20,478px and gave no sense of position.
+
+- **It writes `transform` straight to the node**, not through React state: this updates on every scroll frame, and a `setState` there would re-render the whole paper. `scaleX` on a composited transform is the same call `.nav::after` makes for the docked hairline.
+- **It has no transition**, deliberately — it tracks the scroll exactly, and easing toward the reader's own scrolling would only lag behind it. That also makes it measurable in a hidden preview pane, where the transition clock is frozen.
+- **Inset to `--paper-gutter`, not run to the screen's edges.** The bar it hangs from is capped and centred, and a rule overshooting the content it belongs to is what the footer's `::before` exists to avoid. Measured flush with `.paper-title` to 0.00px.
+- The page's height is **observed as well as measured** — expanding the abstract gate puts a whole document on the page without firing a resize, the same reason the nav's dock watches `body`.
+- A page with nothing to scroll draws no line at all. A full bar on a page that was never scrolled would be claiming something false. Measured: 0 / 0.25 / 0.50 / 1.00 at those scroll fractions.
+
+### Heading anchors
+
+Every `h2` and `h3` carries a `HeadingAnchor` — a chain-link glyph that appears on hover or focus and copies the absolute URL of that heading.
+
+- **It is a real `<a href="#id">`, not a button**, so the browser's own "Copy link address" works and the destination shows on hover. Its click copies instead of jumping, because a reader who wants to point someone at a section is already looking at it.
+- **It stays in the tab order.** Hiding it with `display: none` until hover would make the feature mouse-only; `opacity: 0` on a focusable element is the standard way around that, and it is always in flow, so revealing it shifts nothing.
+- **The copied state swaps `CheckIcon` into the same 1em box** rather than showing a "Copied" label beside it. A label would either shift the heading or need absolute positioning past the article's right edge — which is how this page last opened a sideways scroll at 375px.
+- **`history.replaceState`, not `location.hash`**, which would also scroll. The address bar gets the link either way, so a clipboard that refuses (insecure origin, denied permission) still leaves something to copy by hand — and in that case there is no flash, because nothing was copied.
+- **Hidden at ≤768px**: no hover to reveal them with, and no keyboard to focus them from. The ids still work as links.
+- The glyph is inline SVG, stroked at 1.3 on a 14-unit viewBox with the rest of the set. That also sidesteps the obvious alternative, a typed `#`: U+0023 carries `Emoji=Yes` and forms keycap sequences.
+
+**Arriving at a heading opens a gated paper.** Someone following a link to "Results" asked for the paper by asking for a part of it. The initialiser matters as much as the effect — the sections have to be in the DOM in the first commit or the layout effect has nothing to scroll to — and the hash scroll is a layout effect declared *after* `useScrollRestore`, for the reason that hook documents. Measured: a palette deep link lands the heading 104px down against a 76px bar, the same 28px clearance a contents jump gets.
 
 ### Scroll restoration
 
@@ -1074,8 +1216,8 @@ A floating pill, not a groove: no track, a 12px gutter with a 6px mark inside it
 | Query | Where | What |
 |---|---|---|
 | **≤1100px** | Skills, Projects | Skill groups go from 2×2 back to stacked; project grid 3 columns → 2 |
-| **≤1024px** | Experience, Education, About, Courses | Reduced padding; `.edu-main` → `auto 170px 1fr`; courses → 3 columns; Experience's meta column → 170px. Projects left this breakpoint when it became a grid |
-| **≤900px** | Paper pages only | The contents list is hidden — no room beside the text |
+| **≤1024px** | Experience, Education, About, Courses | Reduced padding; `.edu-main` → `auto 210px 1fr` becomes `auto 170px 1fr`; courses → 3 columns; Experience's meta column → **185px** (was 170 until Google Sans Flex). Projects left this breakpoint when it became a grid |
+| **≤900px** | Paper pages, Navbar | The contents list is hidden — no room beside the text. The nav's palette chip goes too: the bar clips what it can't fit, and the fit there is tighter than it looks (see *Palette trigger* in `Nav.css`) |
 | **≤768px** | everywhere | Single-column layouts, hamburger nav, gallery below bio, education logo on top, contact cards stack, courses → 2 columns, project grid → 1 column, survey explorer rows stack label-over-bar, the awards rail turns vertical, nav dock shortens to 0.36s, `--page-gutter` → 16 and `--paper-gutter` → 20, PDFs open in a new tab |
 | **≤520px** | Courses only | `.course-card-num` watermark drops out |
 | **≤480px** | About only | Further font/padding reductions |

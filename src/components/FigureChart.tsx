@@ -21,7 +21,15 @@ const GEO = {
     top: 18,
     // The end label is anchored to its right edge on mobile (see Paper.css) and
     // runs back over the plot, so it needs clearance, not a gutter.
-    right: 28,
+    //
+    // 32, up from 28, for the LAST X-TICK rather than the end label: "2024" is
+    // centred on the final data point, which sits on the plot's right edge, so
+    // half of it hangs into this gutter. Under Google Sans Flex — a wider face
+    // than Inter — that half grew past the svg's own box by 0.8px on all four
+    // charts. It opened no page scroll, but "nothing paints outside its svg" is
+    // the standard the mobile geometry is held to. 4 units is ~2px rendered at
+    // 375, which clears it with margin; the plot pays 0.6% of its width.
+    right: 32,
     // 90: the rotated y-title reaches x 27 at 23 units, the widest tick ("325")
     // is 41 units, and the tick sits 10 off the axis. 27 + 41 + 10 plus air.
     left: 90,

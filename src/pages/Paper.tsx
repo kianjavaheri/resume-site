@@ -1,16 +1,22 @@
-import React, { useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import Footer from '../components/Footer'
 import ScrollButton from '../components/Scroll'
 import ArrowOut from '../components/ArrowOut'
 import ArrowBack from '../components/ArrowBack'
+import SearchIcon from '../components/SearchIcon'
+import HeadingAnchor from '../components/HeadingAnchor'
+import NotFound from './NotFound'
+import { openPalette, shortcutLabel } from '../components/openPalette'
 import { hasAppHistory, useScrollRestore } from '../components/useScrollRestore'
+import { useReadingProgress } from '../components/useReadingProgress'
 import { useTheme } from '../components/useTheme'
 import SurveyExplorer from '../components/SurveyExplorer'
 import FigureCarousel from '../components/FigureCarousel'
 import FigureChart from '../components/FigureChart'
-import { figureCarousels, papers, surveyExplorers } from '../content/papers'
+import { figureCarousels, papers } from '../content/papers'
 import type { Block, PaperTable } from '../content/papers'
+import { linkableIds, renderedSections } from '../content/paper-view'
 import { paperTables } from '../content/tables'
 import { paperCharts } from '../content/charts'
 import { paperIntros } from '../content/intros'
@@ -82,22 +88,29 @@ function PaperTableBlock({ table }: { table: PaperTable }) {
 // figure in the same section still renders as a figure.
 function groupFigures(blocks: Block[], labels: Record<string, string>): Block[] {
   const out: Block[] = []
+  // Only the carousels this pass built may be appended to. A `carousel` block
+  // written by hand arrives from the content module itself, and pushing a
+  // figure into its array would mutate that module in place — which now
+  // persists, because renderedSections() memoises what it returns.
+  const made = new Set<Block>()
   for (const b of blocks) {
     const last = out[out.length - 1]
     if (b.type === 'figure' && last) {
-      if (last.type === 'carousel') {
+      if (last.type === 'carousel' && made.has(last)) {
         last.figures.push({ ...b, label: labels[b.src] })
         continue
       }
       if (last.type === 'figure') {
         out.pop()
-        out.push({
+        const carousel: Block = {
           type: 'carousel',
           figures: [
             { ...last, label: labels[last.src] },
             { ...b, label: labels[b.src] },
           ],
-        })
+        }
+        made.add(carousel)
+        out.push(carousel)
         continue
       }
     }
@@ -166,7 +179,15 @@ function renderBlock(b: Block, i: number) {
     )
   }
   if (b.type === 'h3') {
-    return <h3 key={i} className="paper-subheading">{b.text}</h3>
+    // `id` is injected by renderedSections(), so a subheading can be linked to
+    // and appear in the search index. A hand-written page that hasn't been
+    // through that layer simply renders without one.
+    return (
+      <h3 key={i} id={b.id} className="paper-subheading">
+        {b.text}
+        {b.id ? <HeadingAnchor id={b.id} /> : null}
+      </h3>
+    )
   }
   if (b.type === 'quote') {
     return <blockquote key={i} className="paper-quote">{b.text}</blockquote>
@@ -174,19 +195,42 @@ function renderBlock(b: Block, i: number) {
   return <p key={i} className="paper-para">{b.text}</p>
 }
 
+function decodeHash(hash: string): string {
+  const raw = hash ? hash.slice(1) : ''
+  try {
+    return decodeURIComponent(raw)
+  } catch {
+    return raw
+  }
+}
+
 function Paper() {
   const { slug } = useParams()
   const paper = slug ? papers[slug] : undefined
   const { theme, switchTheme, isChecked } = useTheme()
   const navigate = useNavigate()
+  const location = useLocation()
   useScrollRestore()
+  const progressRef = useReadingProgress()
   const [activeId, setActiveId] = useState('')
-  const explorer = slug ? surveyExplorers[slug] : undefined
+  // The survey cut, the tables' absorbed paragraphs and the subheading ids all
+  // live in paper-view.ts now, because the search index has to see exactly what
+  // this page renders — see the note at the top of that file.
+  const sections = slug ? renderedSections(slug) : []
   // Carousels on a GENERATED paper, folded together at render time. A
   // hand-written page writes a `carousel` block instead and isn't listed here.
   const carousels = slug ? figureCarousels[slug] : undefined
   const carouselSections = new Set(carousels?.sections ?? [])
   const figureLabels = carousels?.labels ?? {}
+
+  // A deep link from the command palette, or a heading link someone was sent.
+  // decodeURIComponent throws on a stray `%` — a mistyped or truncated pasted
+  // link is enough — and an exception here would blank the whole page.
+  //
+  // It has to be one of OUR ids, not just any fragment: an unrecognised one is
+  // not the reader asking for a section, so it must not open a gated paper.
+  const rawHash = decodeHash(location.hash)
+  const targetHash = slug && rawHash && linkableIds(slug).has(rawHash) ? rawHash : ''
 
   // An intro is either an ABSTRACT, which stands in for the document and puts
   // the rest of the page behind a button, or an OVERVIEW, which is just a lede
@@ -196,14 +240,37 @@ function Paper() {
   // The gate is one-way on purpose: once you've asked for the paper, collapsing
   // it back out from under you is not something a reader wants.
   const intro = slug ? paperIntros[slug] : undefined
-  const [expanded, setExpanded] = useState(false)
+  // Arriving AT a section opens the gate. Someone following a link to
+  // "Results" asked for the paper by asking for a part of it, and a button
+  // standing between them and a section they can already name would be
+  // ceremony. The initialiser matters as much as the effect: the sections have
+  // to be in the DOM in the first commit, or the layout effect below has
+  // nothing to scroll to.
+  const [expanded, setExpanded] = useState(() => !!targetHash)
   const showFull = !intro?.gated || expanded
 
   // Scrolling on navigation belongs to useScrollRestore — this only resets the
   // gate, so a second paper doesn't open already expanded.
   useEffect(() => {
-    setExpanded(false)
-  }, [slug])
+    setExpanded(!!targetHash)
+  }, [slug, targetHash])
+
+  // Land on the linked heading. A layout effect, declared after
+  // useScrollRestore, for the reason that hook documents: it scrolls a new
+  // history entry to the top in a layout effect of its own, and effects run in
+  // the order their hooks were called. Both happen before paint, so the top is
+  // never shown on the way past.
+  useLayoutEffect(() => {
+    if (!targetHash) return
+    const jump = () => document.getElementById(targetHash)?.scrollIntoView()
+    jump()
+    // Re-applied once the web font lands, which changes line counts and so the
+    // target's position — the same trap useScrollRestore documents.
+    let cancelled = false
+    const fonts = (document as Document & { fonts?: FontFaceSet }).fonts
+    fonts?.ready.then(() => { if (!cancelled) jump() })
+    return () => { cancelled = true }
+  }, [location.key, targetHash, showFull])
 
   useEffect(() => {
     if (!paper) return
@@ -227,7 +294,7 @@ function Paper() {
     if (!paper) return
     const ids = [
       ...(intro ? ['intro'] : []),
-      ...(showFull ? paper.sections.map((s) => s.id) : []),
+      ...(showFull ? sections.map((s) => s.id) : []),
       ...(showFull && paper.references?.length ? ['references'] : []),
     ]
     const update = () => {
@@ -263,13 +330,14 @@ function Paper() {
   }
 
   if (!paper) {
+    // The same page the catch-all route renders, so a bad slug and a bad
+    // address are the same dead end with the same way out of it.
     return (
-      <div className="paper" data-theme={theme}>
-        <div className="paper-inner paper-missing">
-          <p className="paper-missing-text">That paper doesn't exist.</p>
-          <Link to="/" className="paper-back">Back to the site</Link>
-        </div>
-      </div>
+      <NotFound
+        eyebrow="404"
+        title="That paper doesn't exist"
+        message="There's no reading page at this address. It may have been renamed, or the link may be out of date."
+      />
     )
   }
 
@@ -291,9 +359,24 @@ function Paper() {
           </button>
           <Link to="/" className="paper-back">Kian Javaheri</Link>
         </div>
-        <span className="paper-theme-toggle" onClick={switchTheme}>
-          {isChecked() ? 'Light' : 'Dark'}
-        </span>
+        <div className="paper-topbar-right">
+          <button
+            type="button"
+            className="paper-search-btn"
+            onClick={openPalette}
+            aria-label="Search"
+            title={`Search (${shortcutLabel()})`}
+          >
+            <SearchIcon />
+          </button>
+          <span className="paper-theme-toggle" onClick={switchTheme}>
+            {isChecked() ? 'Light' : 'Dark'}
+          </span>
+        </div>
+        {/* How far down the page the reader is. Pinned to the bar's bottom
+            edge and inset to the gutter, so it starts where the text does —
+            the same call the footer's hairline makes. */}
+        <div className="paper-progress" ref={progressRef} aria-hidden="true" />
       </div>
 
       <div className="paper-inner">
@@ -341,7 +424,7 @@ function Paper() {
                 {intro.title}
               </a>
             ) : null}
-            {showFull && paper.sections.map((s) => (
+            {showFull && sections.map((s) => (
               <a
                 key={s.id}
                 href={`#${s.id}`}
@@ -365,7 +448,10 @@ function Paper() {
           <article className="paper-article">
             {intro ? (
               <section className="paper-section">
-                <h2 id="intro" className="paper-section-title">{intro.title}</h2>
+                <h2 id="intro" className="paper-section-title">
+                  {intro.title}
+                  <HeadingAnchor id="intro" />
+                </h2>
                 {intro.paragraphs.map((text, i) => (
                   <p key={i} className="paper-para">{text}</p>
                 ))}
@@ -394,57 +480,36 @@ function Paper() {
               </div>
             ) : null}
 
-            {showFull && paper.sections.map((s) => {
-              // A section can end in a run of survey charts that renders as the
-              // explorer rather than as a stack of pictures. The marker heading
-              // stays put and labels it; everything after it is superseded by
-              // the explorer's own data and drops out of the flow.
-              const cut =
-                explorer && s.id === explorer.sectionId
-                  ? s.blocks.findIndex(
-                      (b) => b.type === 'h3' && b.text === explorer.afterHeading
-                    )
-                  : -1
-              const stacked = cut === -1 ? s.blocks : s.blocks.slice(0, cut + 1)
-
-              // Text the section's rebuilt tables now draw themselves. The
-              // crops cut several tables off early and the remainder was
-              // extracted as loose paragraphs, so without this the page prints
-              // those rows twice — once in the table, once as running text.
-              const absorbed = new Set(
-                stacked.flatMap((b) =>
-                  b.type === 'figure' ? paperTables[b.src]?.absorbs ?? [] : []
-                )
-              )
-              const visible = absorbed.size
-                ? stacked.filter((b) => !(b.type === 'p' && absorbed.has(b.text.trim())))
-                : stacked
-
-              return (
-                // The thesis's references came out of the PDF as an ordinary
-                // section — it groups them under h3 subheadings, which the flat
-                // `references: string[]` field can't express — so they'd render
-                // as body copy. The class hands them the reference treatment
-                // (see .paper-section-references in Paper.css).
-                <section
-                  key={s.id}
-                  className={`paper-section${s.id === 'references' ? ' paper-section-references' : ''}`}
-                >
-                  <h2 id={s.id} className="paper-section-title">{s.title}</h2>
-                  {(carouselSections.has(s.id)
-                    ? groupFigures(visible, figureLabels)
-                    : visible
-                  ).map(renderBlock)}
-                  {cut !== -1 && explorer ? (
-                    <SurveyExplorer heading={explorer.afterHeading} />
-                  ) : null}
-                </section>
-              )
-            })}
+            {showFull && sections.map((s) => (
+              // The thesis's references came out of the PDF as an ordinary
+              // section — it groups them under h3 subheadings, which the flat
+              // `references: string[]` field can't express — so they'd render
+              // as body copy. The class hands them the reference treatment
+              // (see .paper-section-references in Paper.css).
+              <section
+                key={s.id}
+                className={`paper-section${s.id === 'references' ? ' paper-section-references' : ''}`}
+              >
+                <h2 id={s.id} className="paper-section-title">
+                  {s.title}
+                  <HeadingAnchor id={s.id} />
+                </h2>
+                {(carouselSections.has(s.id)
+                  ? groupFigures(s.blocks, figureLabels)
+                  : s.blocks
+                ).map(renderBlock)}
+                {/* Set when this section's trailing charts were replaced by the
+                    explorer, which draws the same results from their counts. */}
+                {s.explorerHeading ? <SurveyExplorer heading={s.explorerHeading} /> : null}
+              </section>
+            ))}
 
             {showFull && paper.references?.length ? (
               <section className="paper-section">
-                <h2 id="references" className="paper-section-title">References</h2>
+                <h2 id="references" className="paper-section-title">
+                  References
+                  <HeadingAnchor id="references" />
+                </h2>
                 <ul className="paper-references">
                   {paper.references.map((r, i) => (
                     <li key={i}>{r}</li>

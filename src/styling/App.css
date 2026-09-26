@@ -2,6 +2,7 @@
    `*` reset below are the only two places — nothing else names a font.
    Kian is trying faces out. Previously used, same weight set, kept here so a
    swap back is a one-line change:
+     family=Inter:wght@300;400;500;600;700;800
      family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800
      family=Roboto:wght@300;400;500;600;700;800
    Metrics differ between faces, and several layout constants on this site are
@@ -9,8 +10,26 @@
    Experience meta column against "Laboratories", the Projects tag chips fitting
    two rows. Re-measure those after any swap. Apparent weight is not portable
    either: Roboto's 700 read much heavier than Plus Jakarta Sans's, and the two
-   display headings had to drop a step for it. */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+   display headings had to drop a step for it.
+
+   Google Sans Flex is the first VARIABLE font here, so the weight is a range
+   rather than a list — one file covering 300-800 instead of six static cuts.
+   The range is kept at 300..800 to match what the static imports above
+   declared, although only 400/500/600/700 are actually used in this file.
+
+   `opsz` is its optical-size axis. It is requested, and left to the browser's
+   default `font-optical-sizing: auto`, which picks an instance by font-size:
+   the 0.6rem micro-labels get a cut drawn for small sizes and the 2.5rem page
+   titles one drawn for display. That is what an opsz axis is for, and no other
+   face here has had one.
+
+   Glyph coverage was checked against every non-ASCII codepoint in src/ before
+   the swap. The latin subset carries U+2212 (the cards' minus), U+2191/U+2193
+   (the palette's arrow hints), the dashes, the curly quotes and U+00B7; the
+   `math` subset carries Greek and the relational operators; `symbols` carries
+   the remaining arrows. Nothing falls through to a system fallback. There is
+   no `greek` subset — Greek comes in via `math`. */
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,300..800&display=swap');
 
 [data-theme='light'] {
     --bgcolor: #ffffff;
@@ -142,7 +161,7 @@
     list-style: none;
     text-decoration: none;
     border-radius: 0 !important;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Google Sans Flex', sans-serif;
 }
 
 *:focus,
@@ -584,4 +603,20 @@ html {
     width: 1em;
     height: 1em;
     flex-shrink: 0;
+}
+
+/* ── Visually hidden ─────────────────────────── */
+/* Reaches a screen reader without taking any space. NOT `display: none`, which
+   removes it from the accessibility tree along with the layout. Used by the
+   command palette's result count and the heading anchors' copy confirmation.
+   `.paper-survey-sr` in Paper.css is the same rule, predating this one. */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
 }
