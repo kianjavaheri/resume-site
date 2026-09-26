@@ -310,6 +310,61 @@
     list-style: circle;
 }
 
+/* Steps whose order is the point. The marker has to be set on the <li> for the
+   same reason the bullets do — the global reset lands there, not on the list. */
+.paper-list-ordered li {
+    list-style: decimal;
+}
+
+/* Term/detail pairs, for a two-column table that would rather be a <dl>. A
+   real table here would hit .paper-table-scroll on a phone, and eight rows of
+   sentence-length text is the wrong thing to scroll sideways; stacked, each
+   detail simply wraps under its term. */
+.paper-deflist {
+    margin: 0 0 20px;
+}
+
+.paper-deflist dt {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-top: 18px;
+}
+
+.paper-deflist dt:first-child {
+    margin-top: 0;
+}
+
+/* The term links out to that page's documentation. It keeps the dt's own size
+   and weight rather than taking .paper-link, which is the header's uppercase
+   micro-label — these terms are sentences, and sentences read wrong in caps
+   (the same reason the tech tags aren't uppercased). */
+.paper-deflist dt a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    color: var(--textcolor);
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 1px;
+    transition: opacity 0.15s;
+}
+
+.paper-deflist dt a:hover {
+    opacity: 0.55;
+}
+
+.paper-deflist dt a:focus-visible {
+    outline: 2px solid var(--textcolor);
+    outline-offset: 3px;
+}
+
+.paper-deflist dd {
+    margin: 4px 0 0;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--muted);
+    overflow-wrap: break-word;
+}
+
 .paper-subheading {
     font-size: 0.95rem;
     font-weight: 600;
@@ -339,6 +394,12 @@
     margin-top: 10px;
 }
 
+/* Same opt-out for a lone figure — see .paper-carousel-plain. */
+.paper-figure-plain img {
+    background: none;
+    padding: 0;
+}
+
 /* The one figure lifted out of the document to sit with the intro — the
    capstone's screenshot of the finished tool. Not lazy-loaded: it is above the
    fold on arrival. */
@@ -363,9 +424,10 @@
 .paper-carousel-frame {
     position: relative;
     box-sizing: content-box;
+    --plate: 12px;
     background: #ffffff;
     border-radius: 10px !important;
-    padding: 12px;
+    padding: var(--plate);
     overflow: hidden;
 }
 
@@ -374,10 +436,10 @@
    given explicitly and `contain` fits the slide inside it. */
 .paper-carousel-img {
     position: absolute;
-    top: 12px;
-    left: 12px;
-    width: calc(100% - 24px);
-    height: calc(100% - 24px);
+    top: var(--plate);
+    left: var(--plate);
+    width: calc(100% - 2 * var(--plate));
+    height: calc(100% - 2 * var(--plate));
     object-fit: contain;
     opacity: 0;
     transition: opacity 0.25s ease;
@@ -385,6 +447,15 @@
 
 .paper-carousel-img-on {
     opacity: 1;
+}
+
+/* Slides that bring their own background. The plate is there for the papers'
+   cropped charts, which are white and would show as a bright slab on a dark
+   page; a DARK image wants the opposite, and the plate draws a white ring
+   around it. One variable moves the padding and the slides' inset together. */
+.paper-carousel-plain .paper-carousel-frame {
+    --plate: 0px;
+    background: none;
 }
 
 .paper-carousel-bar {

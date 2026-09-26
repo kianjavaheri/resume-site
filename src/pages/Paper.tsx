@@ -9,7 +9,7 @@ import { useTheme } from '../components/useTheme'
 import SurveyExplorer from '../components/SurveyExplorer'
 import FigureCarousel from '../components/FigureCarousel'
 import FigureChart from '../components/FigureChart'
-import { paperEdits, papers, surveyExplorers } from '../content/papers'
+import { figureCarousels, papers, surveyExplorers } from '../content/papers'
 import type { Block, PaperTable } from '../content/papers'
 import { paperTables } from '../content/tables'
 import { paperCharts } from '../content/charts'
@@ -76,13 +76,12 @@ function PaperTableBlock({ table }: { table: PaperTable }) {
   )
 }
 
-// A run of consecutive figures in a carousel section becomes one block. Only a
-// run of two or more is worth the controls; a lone figure renders as a figure.
-type FigureBlock = Extract<Block, { type: 'figure' }>
-type Carousel = { type: 'carousel'; figures: (FigureBlock & { label?: string })[] }
-
-function groupFigures(blocks: Block[], labels: Record<string, string>): (Block | Carousel)[] {
-  const out: (Block | Carousel)[] = []
+// A run of consecutive figures in a carousel section becomes one `carousel`
+// block — the same block a hand-written page writes inline, so both paths land
+// in one renderer. Only a run of two or more is worth the controls; a lone
+// figure in the same section still renders as a figure.
+function groupFigures(blocks: Block[], labels: Record<string, string>): Block[] {
+  const out: Block[] = []
   for (const b of blocks) {
     const last = out[out.length - 1]
     if (b.type === 'figure' && last) {
@@ -119,10 +118,10 @@ function renderBlock(b: Block, i: number) {
     if (chart) return <FigureChart key={i} chart={chart} caption={b.caption} />
 
     return (
-      <figure key={i} className="paper-figure">
+      <figure key={i} className={`paper-figure${b.plain ? ' paper-figure-plain' : ''}`}>
         <img
           src={b.src}
-          alt={b.caption || ''}
+          alt={b.alt ?? b.caption ?? ''}
           width={b.width}
           height={b.height}
           loading="lazy"
@@ -131,13 +130,39 @@ function renderBlock(b: Block, i: number) {
       </figure>
     )
   }
+  if (b.type === 'carousel') {
+    return <FigureCarousel key={i} figures={b.figures} plain={b.plain} />
+  }
   if (b.type === 'list') {
+    const items = b.items.map((item, j) => <li key={j}>{item}</li>)
+    // An <ol> for steps whose order is the point. The global reset clears
+    // list-style, so .paper-list restates it for both element types.
+    return b.ordered ? (
+      <ol key={i} className="paper-list paper-list-ordered">{items}</ol>
+    ) : (
+      <ul key={i} className={`paper-list${b.nested ? ' paper-list-nested' : ''}`}>{items}</ul>
+    )
+  }
+  if (b.type === 'deflist') {
     return (
-      <ul key={i} className={`paper-list${b.nested ? ' paper-list-nested' : ''}`}>
+      <dl key={i} className="paper-deflist">
         {b.items.map((item, j) => (
-          <li key={j}>{item}</li>
+          <React.Fragment key={j}>
+            <dt>
+              {item.href ? (
+                // NOT .paper-link: that is the header's 0.7rem uppercase
+                // micro-label, and these terms are sentences.
+                <a href={item.href} target="_blank" rel="noopener noreferrer" className="paper-deflist-link">
+                  {item.term}<ArrowOut />
+                </a>
+              ) : (
+                item.term
+              )}
+            </dt>
+            <dd>{item.detail}</dd>
+          </React.Fragment>
         ))}
-      </ul>
+      </dl>
     )
   }
   if (b.type === 'h3') {
@@ -157,11 +182,11 @@ function Paper() {
   useScrollRestore()
   const [activeId, setActiveId] = useState('')
   const explorer = slug ? surveyExplorers[slug] : undefined
-  // Render-time half of the paper edits declared in content/papers.ts; the
-  // drops are already applied to `paper` by the time it reaches the registry.
-  const edit = slug ? paperEdits[slug] : undefined
-  const carouselSections = new Set(edit?.carouselSections ?? [])
-  const figureLabels = edit?.figureLabels ?? {}
+  // Carousels on a GENERATED paper, folded together at render time. A
+  // hand-written page writes a `carousel` block instead and isn't listed here.
+  const carousels = slug ? figureCarousels[slug] : undefined
+  const carouselSections = new Set(carousels?.sections ?? [])
+  const figureLabels = carousels?.labels ?? {}
 
   // An intro is either an ABSTRACT, which stands in for the document and puts
   // the rest of the page behind a button, or an OVERVIEW, which is just a lede
@@ -409,13 +434,7 @@ function Paper() {
                   {(carouselSections.has(s.id)
                     ? groupFigures(visible, figureLabels)
                     : visible
-                  ).map((b, i) =>
-                    b.type === 'carousel' ? (
-                      <FigureCarousel key={i} figures={b.figures} />
-                    ) : (
-                      renderBlock(b, i)
-                    )
-                  )}
+                  ).map(renderBlock)}
                   {cut !== -1 && explorer ? (
                     <SurveyExplorer heading={explorer.afterHeading} />
                   ) : null}

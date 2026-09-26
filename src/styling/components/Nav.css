@@ -6,7 +6,9 @@
        Blur stays at 24px. Pushing it to 40 averages whatever is behind into a
        single flat tone, which loses the light/dark structure that tells you
        there is something back there at all. */
-    background: var(--nav-glass);
+    /* background-COLOR, not the shorthand: the dock animates this to an opaque
+       fill, and a shorthand can't be transitioned. */
+    background-color: var(--nav-glass);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     backdrop-filter: blur(24px) saturate(180%);
     box-shadow: var(--nav-rim), var(--nav-shadow);
@@ -33,75 +35,84 @@
     /* Clips the full name and the links as the pill closes over them. */
     overflow: hidden;
 
-    /* Two sampled damped oscillations of 1 − e^(−ct)·cos(ωt), ω = 2.5π.
-       They exist as a PAIR because one amplitude cannot serve both:
-
-       --ease-settle (c = 14, ~1.2% overshoot) drives the pill width. The
-       overshoot here is a percentage of the TRAVEL, and the travel is ~1184px
-       against a 60px destination — so even a 6% overshoot would drive the
-       width below zero and the pill would visibly collapse to nothing and pop
-       back. 1.2% is ~14px, which reads as a settle.
-
-       --ease-spring (c = 6, ~12% overshoot) drives the monogram's scale, where
-       overshoot costs nothing geometrically. That is where the oscillation is
-       actually legible: two decaying lobes. */
-    --ease-settle: linear(
-        0 0%, .541 5%, .826 10%, .953 15%, 1 20%, 1.012 25%, 1.011 30%,
-        1.007 35%, 1.004 40%, 1.002 45%, 1.001 50%, 1 60%, 1 100%
-    );
-    --ease-spring: linear(
-        0 0%, .316 5%, .612 10%, .844 15%, 1 20%, 1.085 25%, 1.117 30%,
-        1.113 35%, 1.091 40%, 1.062 45%, 1.035 50%, 1.014 55%, 1 60%,
-        .992 65%, .989 70%, .990 75%, .992 80%, .994 85%, .997 90%, .999 95%, 1 100%
-    );
+    /* One curve, and deliberately NO overshoot. The old collapse used a pair of
+       sampled damped oscillations, because its travel was ~1148px down to a
+       60px pill and the interesting question was how to settle that without
+       crossing zero. The dock's travel is 72px of growth to exactly 100% width
+       — where an overshoot doesn't read as a spring, it reads as a 1px
+       horizontal scrollbar. This is a decisive ease-out instead. */
+    --ease-dock: cubic-bezier(0.32, 0.72, 0, 1);
 
     transition:
-        width 0.55s var(--ease-settle),
-        padding 0.55s var(--ease-settle);
+        top 0.45s var(--ease-dock),
+        left 0.45s var(--ease-dock),
+        width 0.45s var(--ease-dock),
+        padding 0.45s var(--ease-dock),
+        border-radius 0.45s var(--ease-dock),
+        background-color 0.45s ease,
+        box-shadow 0.45s ease,
+        -webkit-backdrop-filter 0.45s ease,
+        backdrop-filter 0.45s ease;
 }
 
-/* Collapsed to the monogram. "KJ" measures 15.3px at 0.9rem/600, so 22px of
-   padding either side lands it centred in a 60px pill (22 + 15.3 + 22 ≈ 60).
-   Retune the width alongside the padding if the mark's type ever changes. */
-.nav-collapsed {
-    width: 60px;
-    padding: 0 22px;
+/* The rule that draws itself out from the centre as the bar docks. It is a
+   ::after inside the bar rather than a border, so it can be scaled from the
+   middle; `.nav`'s own `overflow: hidden` keeps the scale from ever painting
+   past the bar. --card-border is the internal-divider token, which is exactly
+   what this is — the same call the footer's hairline makes. */
+.nav::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--card-border);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.45s var(--ease-dock);
+}
+
+/* Attached to the top of the screen past the halfway mark, and no longer
+   glass. Three things happen together and the order is the point: the bar
+   grows to the viewport's edges, the material goes flat and opaque, and only
+   then does the line draw out from the middle to meet the new edges.
+
+   The blur goes to 0 rather than `none` so it can be animated; the rim and the
+   float go to their zero-alpha twins for the same reason (see App.css).
+
+   PADDING IS THE TRICK: the bar's chrome expands to the screen but its
+   CONTENTS do not move. Floating, the name starts at 36 (inset) + 26 (padding)
+   = 62px; docked, at 0 + 62. The right edge works the same, 36 + 14 = 50.
+   Change `.cards-wrapper`'s gutter or the pill's padding and both halves of
+   that sum move with it. */
+.nav-docked {
+    top: 0;
+    left: 0;
+    width: 100%;
+    border-radius: 0 !important;
+    padding: 0 50px 0 62px;
+    background-color: var(--nav-solid);
+    -webkit-backdrop-filter: blur(0px) saturate(100%);
+    backdrop-filter: blur(0px) saturate(100%);
+    box-shadow: var(--nav-rim-off), var(--nav-shadow-off);
+}
+
+/* Drawn only once the bar has started moving — the line is the arrival, not
+   the journey. Undocking uses the base rule's delay (none), so it retracts
+   first and the bar lifts away behind it. */
+.nav-docked::after {
+    transform: scaleX(1);
+    transition-delay: 0.12s;
 }
 
 .nav .name {
-    position: relative;
     font-size: 0.9rem;
     font-weight: 600;
     letter-spacing: 0;
     white-space: nowrap;
-    /* Never squeezed: the pill clips it instead, so the crossfade happens at a
-       fixed type size rather than the name reflowing on the way down. */
+    /* Never squeezed — the bar's padding is what moves, not the type. */
     flex-shrink: 0;
-}
-
-.name-full {
-    transition: opacity 0.2s ease;
-}
-
-/* Out of flow so it doesn't widen .name, and pinned to the same left edge the
-   full name starts at — so the monogram lands where the "K" already was. */
-.name-mark {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform-origin: left center;
-    transform: translateY(-50%) scale(0.62);
-    opacity: 0;
-    transition: opacity 0.2s ease, transform 0.55s var(--ease-spring);
-}
-
-.nav-collapsed .name-full {
-    opacity: 0;
-}
-
-.nav-collapsed .name-mark {
-    opacity: 1;
-    transform: translateY(-50%) scale(1);
 }
 
 .nav-links {
@@ -109,14 +120,6 @@
     align-items: center;
     gap: 2px;
     transition: opacity 0.2s ease;
-}
-
-/* Still in the layout (and clipped) while collapsed, so they must be made
-   unclickable explicitly. */
-.nav-collapsed .nav-links,
-.nav-collapsed .hamburger {
-    opacity: 0;
-    pointer-events: none;
 }
 
 .nav-links a {
@@ -131,6 +134,73 @@
 
 .nav-links a:hover {
     background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
+}
+
+/* ---- Projects dropdown ------------------------------------------------- */
+/* A pointer affordance hanging under the "Projects" link. It is a SIBLING of
+   the pill, not a child of the link, and it has to be: `.nav` carries
+   `overflow: hidden` to clip the name and links as it collapses, and its own
+   `backdrop-filter` makes it the containing block for `position: fixed`
+   descendants too — so nothing inside the bar can hang below it.
+
+   `left` is set inline from the link's measured position; the rest is here. */
+.nav-dropdown {
+    position: fixed;
+    /* The bar's own bottom edge: top 12px + height 56px. The gap below it is
+       this element's transparent padding, which is what the pointer crosses on
+       its way to the panel — an actual gap would drop the menu mid-travel. */
+    top: 68px;
+    padding-top: 10px;
+    z-index: 99;
+}
+
+.nav-dropdown-panel {
+    display: flex;
+    flex-direction: column;
+    /* The pill's material exactly — same fill, blur, saturation and rim — so
+       the panel reads as part of the bar rather than as a second surface. No
+       border: a solid line on glass reads as drawn rather than lit. */
+    background-color: var(--nav-glass);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    box-shadow: var(--nav-rim), var(--nav-shadow);
+    border-radius: 20px !important;
+    padding: 8px;
+    /* Wide enough for `Shipment Quoting Microservice` on one line, capped so a
+       future long label wraps instead of stretching the panel across the bar.
+       See `navLabel` in content/projects.ts. */
+    min-width: 232px;
+    max-width: 288px;
+}
+
+.nav-dropdown-panel a {
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--textcolor);
+    padding: 9px 14px;
+    border-radius: 12px !important;
+    transition: background-image 0.15s;
+}
+
+/* The nav links' own hover, at the nav links' own tint. */
+.nav-dropdown-panel a:hover {
+    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
+}
+
+/* The panel takes the bar's material in BOTH states, so it drops the glass when
+   the bar does. A GENERAL SIBLING selector is the only way to reach it: the
+   panel is a sibling of <nav>, not a child (see above for why it has to be).
+
+   It keeps `--nav-shadow` where the docked bar gives its up — the bar is
+   pinned to the screen's edge and isn't floating over anything any more, but
+   the panel still is, and a solid menu with no shadow would read as a hole
+   punched in the page. */
+.nav-docked ~ .nav-dropdown .nav-dropdown-panel {
+    background-color: var(--nav-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: var(--nav-rim-off), var(--nav-shadow);
 }
 
 .theme-toggle {
@@ -182,35 +252,54 @@
         padding: 0 8px 0 18px;
     }
 
-    /* Must be restated inside the query: it has the same specificity as the
-       .nav rule above, so without this the mobile width would win on source
-       order and the pill would never collapse on a phone. */
-    .nav-collapsed {
-        width: 60px;
-        padding: 0 22px;
+    /* Must be restated inside the query, all of it: these declarations have the
+       same specificity as the `.nav` rule above and lose to it on source order,
+       so without this the mobile inset would win and the bar would never reach
+       the screen's edges on a phone.
+       34 = 16 (inset) + 18 (padding), 24 = 16 + 8 — the same "contents don't
+       move" sum as on desktop, at the mobile gutter. */
+    .nav-docked {
+        top: 0;
+        left: 0;
+        width: 100%;
+        padding: 0 24px 0 34px;
     }
 
-    /* Shorter on mobile, purely for cost. `width` is a layout property, and
-       this pill carries a backdrop-filter — so every frame of the collapse
-       re-rasterises a 24px blur over a changing area, which is the expensive
-       part on a phone. Fewer frames is the one lever that doesn't change how
-       the glass looks. (It is not a new class of work: a fixed blurred element
-       over scrolling content already re-blurs on every scroll frame.)
-       The monogram's spring is a `transform`, so it stays composited and free
-       either way — the character of the animation survives the shorter time. */
+    /* Shorter on mobile, purely for cost. `width` is a layout property and the
+       bar carries a backdrop-filter, so every frame re-rasterises a blur over a
+       changing area — the expensive part on a phone. Fewer frames is the one
+       lever that doesn't change how the bar looks. The blur is also on its way
+       to 0 here, which makes the back half of the dock progressively cheaper
+       than the old collapse ever was. */
     .nav {
         transition:
-            width 0.42s var(--ease-settle),
-            padding 0.42s var(--ease-settle);
+            top 0.36s var(--ease-dock),
+            left 0.36s var(--ease-dock),
+            width 0.36s var(--ease-dock),
+            padding 0.36s var(--ease-dock),
+            border-radius 0.36s var(--ease-dock),
+            background-color 0.36s ease,
+            box-shadow 0.36s ease,
+            -webkit-backdrop-filter 0.36s ease,
+            backdrop-filter 0.36s ease;
     }
 
-    /* Matched to the pill so the two don't desync — otherwise the bar lands
-       and the monogram is still oscillating for another 130ms. */
-    .name-mark {
-        transition: opacity 0.2s ease, transform 0.42s var(--ease-spring);
+    /* Matched to the bar so the two don't desync. */
+    .nav::after {
+        transition: transform 0.36s var(--ease-dock);
+    }
+
+    .nav-docked::after {
+        transition-delay: 0.1s;
     }
 
     .nav-links {
+        display: none;
+    }
+
+    /* There is no pointer to hover with, and the hamburger menu already
+       carries a plain Projects link. */
+    .nav-dropdown {
         display: none;
     }
 
@@ -268,15 +357,32 @@
     }
 }
 
-/* The spring overshoot is the part worth suppressing here. The pill still
-   collapses so the state change stays legible, just without the oscillation. */
+/* The bar still docks, and the line still draws — the state change has to stay
+   legible either way. What goes is the travel: a short cross-fade of the
+   properties rather than 450ms of a bar sliding across the screen. */
 @media (prefers-reduced-motion: reduce) {
     .nav {
-        transition: width 0.2s ease, padding 0.2s ease;
+        transition:
+            top 0.15s ease,
+            left 0.15s ease,
+            width 0.15s ease,
+            padding 0.15s ease,
+            border-radius 0.15s ease,
+            background-color 0.15s ease,
+            box-shadow 0.15s ease,
+            -webkit-backdrop-filter 0.15s ease,
+            backdrop-filter 0.15s ease;
     }
 
-    .name-mark {
-        transition: opacity 0.2s ease;
-        transform: translateY(-50%) scale(1);
+    .nav::after,
+    .nav-docked::after {
+        transition: opacity 0.15s ease;
+        transition-delay: 0s;
+        transform: scaleX(1);
+        opacity: 0;
+    }
+
+    .nav-docked::after {
+        opacity: 1;
     }
 }

@@ -9,6 +9,7 @@ import Experience from '../components/Experience';
 import Contact from '../components/Contact';
 import Navbar from '../components/Navbar';
 import Proficiency from '../components/Proficiency';
+import Awards from '../components/Awards';
 import ScrollButton from '../components/Scroll';
 import Projects from '../components/Projects';
 import Footer from '../components/Footer';
@@ -27,6 +28,8 @@ function Home() {
         <Experience />
         <Projects />
         <Proficiency />
+        {/* Last card in the stack, below Skills. Not in the nav yet. */}
+        <Awards />
         <Contact />
       </div>
       <Footer />

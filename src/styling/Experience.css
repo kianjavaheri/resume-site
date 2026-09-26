@@ -208,24 +208,9 @@
     border-top: none !important;
 }
 
-.exp-ta-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 16px;
-}
-
 .exp-ta-course {
     font-size: 0.8rem;
     font-weight: 600;
-}
-
-.exp-ta-date {
-    font-size: 0.7rem;
-    font-weight: 400;
-    color: var(--muted);
-    white-space: nowrap;
-    font-variant-numeric: tabular-nums;
 }
 
 .exp-ta-prof {
@@ -246,14 +231,5 @@
     .experience-item {
         grid-template-columns: 1fr;
         row-gap: 12px;
-    }
-
-    .exp-ta-meta {
-        flex-direction: column;
-        gap: 2px;
-    }
-
-    .exp-ta-date {
-        white-space: normal;
     }
 }

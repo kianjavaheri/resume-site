@@ -1,0 +1,125 @@
+/* One sub-card for all three honors, with the ASU seal on the left and a
+   horizontal timeline beside it. */
+.award-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* `.exp-logo` exactly — 60px tile, 6px inset, radius scaling with the tile at
+   0.25, `--well-bg` so neither the Sandia glyph's black nor the ASU seal's
+   white elements drop out in either theme. Keep 60/15 in step, and keep this
+   rule in step with Experience's. */
+.award-logo {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 15px !important;
+    background: var(--well-bg);
+    box-shadow: var(--well-shadow);
+}
+
+.award-org-logo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+/* LinkedIn's entry rail, turned on its side: a dot per honor with a rule
+   running between them. Equal columns rather than `space-between`, so the dots
+   sit on a predictable grid and the connector is the same length every time.
+   No column gap — each column's right edge IS the next dot's left edge, which
+   is what lets the rule reach from one dot to the next with no arithmetic. */
+.award-track {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    flex: 1;
+    min-width: 0;
+}
+
+.award-step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    /* Clears the dot, which is absolutely positioned at the top-left. */
+    padding: 22px 16px 0 0;
+}
+
+.award-dot {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 9px;
+    height: 9px;
+    border-radius: 999px !important;
+    background: var(--muted);
+}
+
+/* The rule from this dot to the next one. Not on the last step — there is
+   nothing to its right to connect to, and a rule running off the end reads as
+   a cut-off list. `--card-border` is the internal-divider token, which is what
+   this is. */
+.award-step:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 15px;
+    right: 0;
+    height: 1px;
+    background: var(--card-border);
+}
+
+.award-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--textcolor);
+}
+
+.award-detail {
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--muted);
+    margin-top: 2px;
+}
+
+/* Three columns in a 335px card leaves ~100px each, which wraps "Barrett, The
+   Honors College" to four lines. Stacked, the rail turns back upright and is
+   simply LinkedIn's again — dot left, rule running down between them. */
+@media (max-width: 768px) {
+    .award-card {
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .award-track {
+        grid-template-columns: 1fr;
+    }
+
+    .award-step {
+        padding: 0 0 14px 20px;
+    }
+
+    .award-step:last-child {
+        padding-bottom: 0;
+    }
+
+    .award-dot {
+        top: 5px;
+    }
+
+    /* Vertical now: down the left, from this dot to the next. */
+    .award-step:not(:last-child)::before {
+        top: 14px;
+        bottom: 0;
+        left: 4px;
+        right: auto;
+        width: 1px;
+        height: auto;
+    }
+}

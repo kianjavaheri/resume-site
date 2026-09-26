@@ -9,17 +9,28 @@
     margin-bottom: 12px;
 }
 
+/* The card's two-column geometry, as tokens. TWO rows use it — the content
+   row and the contact band under it, which has to line its icons up with the
+   text column rather than with the card. Literals in both places would drift
+   the moment the ratio or the gutter changed. */
+.about-section {
+    --about-text-col: 3;
+    --about-gallery-col: 2;
+    --about-col-gap: 32px;
+    --about-gutter: 28px;
+}
+
 /* About content: title + bio left, gallery right, both top-aligned. The top
    padding is what the old hero row carried at each breakpoint. */
 .about-content-area {
     display: flex;
-    gap: 32px;
-    padding: 28px 28px 28px;
+    gap: var(--about-col-gap);
+    padding: 28px var(--about-gutter) 28px;
     align-items: flex-start;
 }
 
 .about-text {
-    flex: 3;
+    flex: var(--about-text-col);
     min-width: 0;
     display: flex;
     flex-direction: column;
@@ -56,9 +67,95 @@
     opacity: 0.5;
 }
 
+/* The three contact links at the foot of the card, centred on the TEXT column
+   rather than on the card — they read as a sign-off under the bio, and the
+   card's own centre lands them under the gap between the two columns.
+   
+   The band re-creates the content row's columns from the same tokens: an inner
+   div standing in for the text column, and an empty ::after standing in for the
+   gallery. Sharing the tokens is what keeps the two rows in step — this is the
+   same trap `.cards-wrapper`'s gutters and the nav bar have, where two rules
+   have to agree or the alignment silently drifts.
+   
+   The row stays OUTSIDE .about-content-area on purpose. Putting it inside the
+   text column would centre it for free, but on mobile that column stacks above
+   the gallery, so the icons would land in the middle of the card instead of at
+   its foot. */
+.about-social {
+    display: flex;
+    gap: var(--about-col-gap);
+    padding: 0 var(--about-gutter) 28px;
+}
+
+.about-social-inner {
+    flex: var(--about-text-col);
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+    /* `.project-links`' gap, so the row reads as the same component there. */
+    gap: 8px;
+}
+
+/* Stands in for the gallery column. */
+.about-social::after {
+    content: '';
+    flex: var(--about-gallery-col);
+}
+
+/* The Projects cards' icon buttons, exactly — 40px, 8px radius, a recessed
+   `--well-bg` chip with the well's inset shadow. Kian asked for the two to
+   match, so this rule is a copy of `.project-icon-link` and should be kept in
+   step with it; if that one is retuned, retune this.
+
+   They shipped as 46px outlined circles for one round, on the reasoning that a
+   well reads as a dent when it sits alone on a flat card rather than inset into
+   a sub-card. Two icon treatments on one page was the worse problem. */
+.about-social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 8px !important;
+    background-color: var(--well-bg);
+    color: var(--textcolor);
+    box-shadow: var(--well-shadow);
+    cursor: pointer;
+    transition: background-image 0.15s ease;
+}
+
+/* Stated for :visited too, for the reason `.project-icon-link` documents: a
+   visited <a> is styled by `a:visited` at 0-1-1, which outranks this class on
+   its own. These are outbound links, so they WILL be visited. */
+a.about-social-link,
+a.about-social-link:visited {
+    color: var(--textcolor);
+}
+
+/* --well-hover-tint, not --hover-tint: the latter is calibrated against the
+   page and is effectively invisible on --well-bg. */
+.about-social-link:hover {
+    background-image:
+        linear-gradient(var(--well-hover-tint), var(--well-hover-tint));
+}
+
+/* The global reset clears `outline`, so focus has to be restated. */
+.about-social-link:focus-visible {
+    outline: 2px solid var(--textcolor);
+    outline-offset: 2px;
+}
+
+/* LinkIcon draws at 20px; scaled to suit the tile, as on the project cards. */
+.about-social-link svg {
+    display: block;
+    width: 19px;
+    height: 19px;
+}
+
 /* Gallery */
 .about-gallery {
-    flex: 2;
+    flex: var(--about-gallery-col);
     min-width: 0;
 }
 
@@ -177,23 +274,44 @@
 
 /* ── Tablet ──────────────────────────────────── */
 @media (max-width: 1024px) {
+    .about-section {
+        --about-col-gap: 36px;
+    }
+
     .about-content-area {
-        gap: 36px;
-        padding: 40px 28px 36px;
+        padding: 40px var(--about-gutter) 36px;
+    }
+
+    .about-social {
+        padding: 0 var(--about-gutter) 36px;
     }
 }
 
 /* ── Mobile: stack gallery below bio ─────────── */
 @media (max-width: 768px) {
+    .about-section {
+        --about-col-gap: 32px;
+        --about-gutter: 20px;
+    }
+
     .about-content-area {
         flex-direction: column;
-        gap: 32px;
-        padding: 28px 20px 28px;
+        padding: 28px var(--about-gutter) 28px;
     }
 
     .about-gallery {
         flex: none;
         width: 100%;
+    }
+
+    .about-social {
+        padding: 0 var(--about-gutter) 28px;
+    }
+
+    /* One column down here, so there is no gallery to balance against and the
+       band's own centre is the text's centre. */
+    .about-social::after {
+        display: none;
     }
 }
 

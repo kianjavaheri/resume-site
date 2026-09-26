@@ -87,7 +87,7 @@ function Experience() {
               company="Arizona State University"
               date="May 2025 – May 2026"
               logo="/svgs/asu.svg"
-              role="Junior Researcher"
+              role="Junior Researcher @ Hanemann Lab"
               tags={['Python', 'Selenium', 'OCR', 'Web Scraping']}
             >
               <p className="exp-desc">
@@ -105,17 +105,17 @@ function Experience() {
               company="Arizona State University"
               date="Aug 2023 – May 2024"
               logo="/svgs/asu.svg"
-              role="Undergraduate Teaching Assistant"
+              role="Teaching Assistant"
               tags={['Data Structures', 'Algorithms', 'Teaching']}
             >
               {/* CSE 310 leads, not chronological: it's the role that matters
                   most to employers, and the first row is the collapsed preview. */}
               <div className="exp-ta-rows">
                 <div className="exp-ta-row">
-                  <div className="exp-ta-meta">
-                    <span className="exp-ta-course">CSE 310 — Data Structures & Algorithms</span>
-                    <span className="exp-ta-date">Jan – May 2024</span>
-                  </div>
+                  {/* No per-course dates: the card's own chip already says
+                      Aug 2023 – May 2024, and the two terms inside that span
+                      told a reader nothing they needed. */}
+                  <span className="exp-ta-course">CSE 310 — Data Structures & Algorithms</span>
                   <p className="exp-ta-prof">Prof. Xuerong Feng</p>
                   <ul className="exp-bullets">
                     <li>Led exam review sessions on red-black trees, dynamic programming, and minimum spanning tree algorithms (Kruskal's and Prim's).</li>
@@ -123,10 +123,7 @@ function Experience() {
                   </ul>
                 </div>
                 <div className="exp-ta-row">
-                  <div className="exp-ta-meta">
-                    <span className="exp-ta-course">FSE 150 — Intro to Grand Challenges</span>
-                    <span className="exp-ta-date">Aug – Dec 2023</span>
-                  </div>
+                  <span className="exp-ta-course">FSE 150 — Intro to Grand Challenges</span>
                   <p className="exp-ta-prof">Prof. Amy Trowbridge</p>
                   <ul className="exp-bullets">
                     <li>Facilitated weekly engineering discussions for a class of ~30, reinforcing interdisciplinary thinking within an engineering context.</li>

@@ -1,19 +1,11 @@
 import React, { useState } from 'react'
+import type { CarouselFigure } from '../content/papers'
 
-// A run of figures shown one at a time instead of stacked down the page.
-//
-// Opt-in per section, declared in content/papers.ts (`carouselSections`) rather
-// than in the generated paper modules. The capstone's three design diagrams
-// stacked ran 1,210px — a third of the page — for three pictures that are read
-// one after another anyway.
-export interface CarouselFigure {
-  src: string
-  width?: number
-  height?: number
-  // Short name for the slide. Without one there is nothing to tell a reader
-  // what they are flipping between; "2 / 3" is not a description.
-  label?: string
-}
+// Figures shown one at a time instead of stacked down the page. A hand-written
+// page writes a `carousel` block; a generated one declares `figureCarousels` in
+// content/papers.ts and Paper.tsx folds its consecutive figures into the same
+// block. The capstone's three design diagrams stacked ran 1,210px — a third of
+// the page — for three pictures that are read one after another anyway.
 
 function Chevron({ dir }: { dir: 'prev' | 'next' }) {
   // The same glyphs the About gallery uses, so the site has one arrow pair.
@@ -30,15 +22,18 @@ function Chevron({ dir }: { dir: 'prev' | 'next' }) {
   )
 }
 
-function FigureCarousel({ figures }: { figures: CarouselFigure[] }) {
+function FigureCarousel({ figures, plain }: { figures: CarouselFigure[]; plain?: boolean }) {
   const [idx, setIdx] = useState(0)
   const n = figures.length
   const go = (d: number) => setIdx((i) => (i + d + n) % n)
 
   // EVERY slide stays mounted, which is what keeps the arrows honest: the
-  // browser has all three in flight from first paint, so a click never has to
-  // wait on a fetch and there is no preload flag to get stuck (the trap the
-  // About gallery documents at length). Three diagrams, ~200KB.
+  // browser fetches the whole set as the carousel comes into range, so a click
+  // never has to wait and there is no preload flag to get stuck (the trap the
+  // About gallery documents at length). They are `lazy` because the set can be
+  // heavy — Material Boxes' seven screenshots are 561KB — and every carousel so
+  // far starts below the fold; the frame reserves its height either way, so
+  // nothing shifts as they land.
   //
   // The frame is sized to the TALLEST slide's ratio and the others letterbox
   // into it. Unreserved, changing slides moved everything below by up to 106px
@@ -50,7 +45,11 @@ function FigureCarousel({ figures }: { figures: CarouselFigure[] }) {
   const current = figures[idx]
 
   return (
-    <div className="paper-carousel" role="group" aria-roledescription="carousel">
+    <div
+      className={`paper-carousel${plain ? ' paper-carousel-plain' : ''}`}
+      role="group"
+      aria-roledescription="carousel"
+    >
       <div className="paper-carousel-frame" style={{ aspectRatio: String(1 / ratio) }}>
         {figures.map((f, i) => (
           <img
@@ -60,6 +59,7 @@ function FigureCarousel({ figures }: { figures: CarouselFigure[] }) {
             aria-hidden={i !== idx}
             width={f.width}
             height={f.height}
+            loading="lazy"
             className={`paper-carousel-img${i === idx ? ' paper-carousel-img-on' : ''}`}
           />
         ))}

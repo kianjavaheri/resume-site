@@ -2,19 +2,54 @@
 // the source PDFs. Paragraph breaks come from the PDF's own first-line indents
 // (see CLAUDE.md, "Paper pages"), not from guessing at line lengths.
 
+// One slide of a carousel. The label is what the reader flips between — it is
+// drawn under the frame and is also the active slide's alt text.
+export interface CarouselFigure {
+  src: string
+  width?: number
+  height?: number
+  label?: string
+}
+
 export type Block =
   | { type: 'p'; text: string }
   | { type: 'quote'; text: string }
   // Subheading inside a section (the thesis has two heading levels).
   | { type: 'h3'; text: string }
   // Bulleted list. The capstone poster is written as bullets, not prose;
-  // `nested` marks the poster's second-level (➢) items.
-  | { type: 'list'; items: string[]; nested?: boolean }
+  // `nested` marks the poster's second-level (➢) items. `ordered` draws an
+  // <ol> instead, for steps whose order is the point.
+  | { type: 'list'; items: string[]; nested?: boolean; ordered?: boolean }
+  // Term/detail pairs — a two-column table that would rather be a <dl>. The
+  // Material Boxes page's documentation index is eight rows of "page name" and
+  // "what it covers", which a real table would send into a sideways scroll on
+  // a phone, and whose first column wants to be a link.
+  | { type: 'deflist'; items: { term: string; href?: string; detail: string }[] }
+  // Figures shown one at a time instead of stacked. Written inline on a
+  // hand-written page; on a GENERATED one the module can't be hand-edited, so
+  // Paper.tsx folds a run of consecutive figures into this same shape from
+  // `figureCarousels` below.
+  // `plain` drops the white plate the figures normally sit on. That plate is
+  // there for the papers' cropped charts, which carry their own white
+  // background and would show as a bright slab on a dark page. An image that is
+  // ITSELF dark wants the opposite — the plate draws a white ring around it.
+  | { type: 'carousel'; figures: CarouselFigure[]; plain?: boolean }
   // Cropped from the source PDF at the rectangle the image occupies there.
   // width/height are the PNG's real pixel size. They must be rendered on the
   // <img>, or lazy-loaded images have no reserved space: the page grows as you
   // scroll past them and a jump to a later section lands short.
-  | { type: 'figure'; src: string; caption: string; width?: number; height?: number }
+  // `alt` overrides the caption as the image's alt text, for a picture whose
+  // visible caption should stay short but whose content needs describing.
+  // `plain` drops the white plate — see `plain` on CarouselFigure's block below.
+  | {
+      type: 'figure'
+      src: string
+      caption: string
+      alt?: string
+      plain?: boolean
+      width?: number
+      height?: number
+    }
 
 // A table rebuilt as markup rather than shown as a cropped image. The data
 // lives in `tables.ts`, keyed by the image it replaces.
@@ -96,13 +131,6 @@ export interface PaperEdit {
   // Figures dropped from the flow, by src. A figure that MOVED rather than
   // went away is dropped here and re-declared wherever it now renders.
   dropFigures?: string[]
-  // Sections whose runs of consecutive figures are drawn as one carousel
-  // instead of stacked down the page. Read at render time by Paper.tsx.
-  carouselSections?: string[]
-  // Names for the carousel's slides, by figure src. The poster carries no
-  // captions, so these are written for the page — a carousel whose only label
-  // is "2 / 3" tells the reader nothing about what they are flipping between.
-  figureLabels?: Record<string, string>
 }
 
 export const paperEdits: Record<string, PaperEdit> = {
@@ -116,9 +144,26 @@ export const paperEdits: Record<string, PaperEdit> = {
     // the last thing in Results, at the very bottom of the page.
     // Declared as the intro's `figure` in content/intros.ts.
     dropFigures: ['/pdfs/cs-capstone/figure4.png'],
-    // Three architecture diagrams stacked ran 1,210px of a 3,862px page.
-    carouselSections: ['design'],
-    figureLabels: {
+  },
+}
+
+// Sections of a GENERATED paper whose runs of consecutive figures draw as one
+// carousel. A hand-written page writes a `carousel` block instead and needs no
+// entry here — this exists because the three generated modules are rebuilt from
+// their PDFs and can't carry one.
+//
+// `labels` names the slides, by figure src. The capstone poster carries no
+// captions of its own, so these are written for the page: a carousel whose only
+// caption is "2 / 3" tells the reader nothing about what they're flipping
+// between.
+export const figureCarousels: Record<
+  string,
+  { sections: string[]; labels?: Record<string, string> }
+> = {
+  // Three architecture diagrams stacked ran 1,210px of a 3,862px page.
+  'cs-capstone': {
+    sections: ['design'],
+    labels: {
       '/pdfs/cs-capstone/figure1.png': 'The capstone API in place of EasyPost',
       '/pdfs/cs-capstone/figure2.png': 'Rate request sequence',
       '/pdfs/cs-capstone/figure3.png': 'Cache hit and miss flow',

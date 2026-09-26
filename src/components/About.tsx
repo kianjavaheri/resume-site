@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import PdfModal, { withViewerParams } from './PdfModal'
+import LinkIcon from './LinkIcon'
+import { contactLinks, isMailto } from '../content/contact-links'
 import ArrowOut from './ArrowOut'
 import './../styling/components/About.css'
 
@@ -181,6 +183,33 @@ function About() {
             </button>
           </div>
           <Gallery />
+        </div>
+
+        {/* The same three links the Contact section carries, at the foot of the
+            card — the shape a reader looks for at the end of an intro. One list
+            in content/contact-links.ts, so the two can't drift apart.
+
+            The outer band re-creates `.about-content-area`'s two columns so the
+            icons centre on the TEXT column rather than on the whole card; the
+            inner div is the text column's stand-in. See About.css.
+
+            Icon-only, so `aria-label` is the link's ONLY name and doubles as
+            the tooltip, exactly as on the Projects cards' icon links. */}
+        <div className="about-social">
+          <div className="about-social-inner">
+            {contactLinks.map((l) => (
+              <a
+                key={l.label}
+                href={l.href}
+                {...(isMailto(l.href) ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
+                className="about-social-link"
+                aria-label={l.label}
+                title={l.label}
+              >
+                <LinkIcon kind={l.icon} />
+              </a>
+            ))}
+          </div>
         </div>
       </section>
 
