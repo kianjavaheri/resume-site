@@ -18,6 +18,14 @@ export function useTheme() {
   }, [])
 
   const theme = preference === 'system' ? systemTheme : preference
+
+  // Mirrored onto <html> so the theme tokens resolve at the root as well as on
+  // the page div. The scrollbar needs that: it is painted by the root element,
+  // so a custom property it reads must be defined there. index.html's pre-paint
+  // script sets the same attribute before React mounts; this keeps it current.
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+  }, [theme])
   const switchTheme = () => setPreference(theme === 'light' ? 'dark' : 'light')
   const isChecked = () => theme === 'dark'
 

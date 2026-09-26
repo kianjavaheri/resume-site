@@ -30,6 +30,8 @@ A fifth, related: **programmatic `window.scrollTo` doesn't reliably fire a `scro
 
 Screenshots also come back blank while the pane is hidden, so verify structurally (`read_page`, computed styles, geometry) instead.
 
+**The transition row has bitten twice now, and the second time looked exactly like a CSS bug.** While checking the nav's dock, `classList` said `nav-docked` and the CSSOM showed the rule present, correct and later in the file — yet every computed value was the FLOATING one: `top: 12px`, the glass fill, the old padding. Nothing about that reads as "frozen clock"; it reads as a specificity problem, and chasing it that way wastes real time. `getAnimations()` returned `[]`, which is not the reassurance it looks like. **The test that settles it is the one in the table**: inject `transition: none`, re-read, and you get the true end state. It was correct all along.
+
 ## Tech stack
 
 - **React 18** with TypeScript
@@ -149,9 +151,19 @@ The general rule: **an inset shadow needs enough headroom below the fill to fall
 
 Section card titles are 0.95rem / 500. Normal casing everywhere — no `text-transform: uppercase` on nav links or section headers. Small uppercase letterspaced labels are used only for micro-labels (project tags, skill names, link buttons).
 
+### The page is capped, and that is what makes images scale on zoom-out
+
+`--page-max` (**1500px**) and `--page-gutter` (36px, 16px at ≤768px) are declared on `.home` in `Home.css`. **Three rules read them and all three centre the same way** — `.cards-wrapper`, `.nav` and `.home footer`. One number, so they cannot drift.
+
+**The cap exists for a reason that isn't obvious.** Uncapped, the layout was fluid all the way out, so the About gallery photo and the project thumbnails kept their apparent size on screen as the viewport grew — zoom out and the type shrank while the pictures didn't, because their containers widened in step with the zoom. Capped, the whole page scales together, which is what zooming out is supposed to do.
+
+- **`.nav` is now centred, not pinned.** `left: 0; right: 0; margin: 0 auto` plus `width: calc(100% - gutter*2)` and `max-width: calc(var(--page-max) - gutter*2)`. With the old bare `left: 36px`, a binding `max-width` truncates the RIGHT edge instead of centring, and the bar would sit left of the cards on a wide screen. Verified flush to **0.0px on both edges** against the About card at 375, 1280 and 1900.
+- **The docked bar's padding is a `max()`, and that is what keeps "the contents don't move" true above the cap.** Docked it is full-bleed, but floating its contents sit inside a *centred* box — so 62px from the screen's edge is only right below the cap. `max(62px, calc(50% - var(--page-max) / 2 + 62px))` is the cap's own left edge plus the same 62. **`50%`, not `100vw`**: a fixed element's percentage resolves against the initial containing block, which excludes the scrollbar, and `100vw` does not — that would misalign by the scrollbar's width. Below the cap the calc goes negative and `max()` returns the flat number, which is the old behaviour exactly. Measured: the name sits at x 62 / 62 at 1280 and x 260 / 260 at 1900, floating and docked.
+- `max-width` joins `width` in the dock transition, so the bar grows smoothly past the cap rather than snapping.
+
 ### Card layout system
 
-Sections live in `.cards-wrapper` in `Home.tsx`: vertical flex, `gap: 12px`, `padding: 0 36px 44px` (no top padding — content sits directly under the floating nav).
+Sections live in `.cards-wrapper` in `Home.tsx`: vertical flex, `gap: 12px`, `padding: 0 var(--page-gutter) 44px` (no top padding — content sits directly under the floating nav), capped at `--page-max` and centred.
 
 - **`.section-card`** — outer card: `border-radius: 20px !important`, `background: var(--card-bg)`, `box-shadow: var(--card-shadow)`, **no border**, `overflow: hidden`.
 - **`.card-header`** — flex row, `.card-title` left + non-clickable `.card-toggle-icon` (`+`/`−`) right. `padding: 18px 28px`. Entire row toggles.
@@ -216,7 +228,8 @@ src/
     intros.ts          # Intro block by slug (abstract or overview), the gate flag and the
                        #   capstone's lead figure. Hand-written
     project-pages.ts   # Reading pages for the 3 projects with no source document. Hand-written.
-                       #   material-boxes has grown past its stub; the other two haven't
+                       #   material-boxes and wage-effects have grown past their stubs;
+                       #   rental-prices hasn't
   App.tsx              # <Routes>: "/" → Home, "/papers/:slug" → Paper
   index.tsx            # createRoot + <BrowserRouter>
   react-app-env.d.ts   # vite/client types + the *.svg module shim
@@ -225,7 +238,7 @@ src/
     App.css            # Reset, tokens, card system, expandable cards + tags, PDF modal, scrollbar
     Education.css      # .edu-main 3-col grid + nested coursework rows
     Experience.css     # .experience-item 200px/1fr grid; .exp-meta logo-left row; TA sub-rows
-    pages/Home.css
+    pages/Home.css   # .home + the --page-max / --page-gutter tokens the cap reads
     pages/Paper.css    # Reading page, abstract gate, survey explorer, charts, tables
     components/
       About.css        # Hero, contact row, gallery (4/3, border-radius 24px, two-way slide)
@@ -244,6 +257,7 @@ public/
                        #   img_dep*.jpg (4) are unreferenced
     projects/          # One .webp thumbnail per project — see Projects
     material-boxes/    # 8 content-hashed .webp for that project's reading page
+    wage-effects/      # 7 content-hashed .webp — cover + 6 figures padded to one ratio
   svgs/                # 27 files: asu, sandia + 25 skill icons (see Skills)
   pdfs/                # resume.pdf + a folder per paper: cs-capstone/, basic-income/, thesis/
 ```
@@ -279,9 +293,11 @@ There is **no top-level Courses section** — it lives inside Education (see bel
 
 **Floating glass bar**: `position: fixed; top: 12px; left: 36px`, `width: calc(100% - 72px)`, height 56px, `border-radius: 20px !important`, **no border**, `overflow: hidden`.
 
-**It is flush with the section cards, and rounded to the same 20px.** The left/right insets are `.cards-wrapper`'s own gutters — 36px desktop, 16px at ≤768px — so the bar and the About card beneath it share both edges exactly (measured at a 1024px viewport: both run 36 → 984). Change `.cards-wrapper`'s padding and these move with it, or the alignment silently drifts. The radius matches `.section-card`, so the bar reads as part of the same stack rather than as a separate pill floating over it; it was `999px` before. **It animates to 0 when the bar docks**, since a rounded corner against the screen's edge reads as a mistake. The mobile menu panel is aligned and rounded to match (`left`/`right: 16px`, 20px).
+**It is flush with the section cards, and rounded to the same 20px.** Both read `--page-gutter` and `--page-max` (see *The page is capped* above), so the bar and the About card beneath it share both edges exactly at every width — verified 0.0px at 375, 1280 and 1900. They can no longer drift, because there is nothing to keep in step by hand. The radius matches `.section-card`, so the bar reads as part of the same stack rather than as a separate pill floating over it; it was `999px` before. **It animates to 0 when the bar docks**, since a rounded corner against the screen's edge reads as a mistake. The mobile menu panel is aligned and rounded to match (`left`/`right: 16px`, 20px).
 
 `.home` has `padding-top: 80px` so content clears the pill by 12px, matching the section gap.
+
+**The bar's three hover chips are 4px, not pills.** The links, the theme toggle and the hamburger all carried `border-radius: 999px`, which on a 27.5px chip renders as a ~13.75px corner; Kian asked for 10px less, which lands at 4. **They move together** — they are the same control at the same size in the same row, and a pill beside a rounded square on hover reads as an oversight. (The dropdown's rows are 6px, a hair softer, because they sit inside a 10px panel rather than on the open bar.)
 
 Mobile (≤768px) swaps the links for a `Menu`/`Close` hamburger; the menu is a rounded glass panel directly under the bar, flush with its left and right edges and carrying the same 20px radius. It uses the **same material** — same fill, blur, saturation and rim — and carries no `border`, since a solid line on glass reads as drawn rather than lit. Its text stays legible because the 24px blur destroys whatever is underneath.
 
@@ -299,12 +315,14 @@ Hovering "Projects" drops a glass panel listing the six projects, each linking s
 - **Both coordinates are measured, not hard-coded.** `left` comes from the Projects link's rect and `top` from the nav's own `getBoundingClientRect().bottom`, because **the bar sits at two heights**: 68px floating (12 + 56) and 56px docked. A literal would be right in one state and 12px wrong in the other.
 - **It closes whenever the bar docks or undocks, and on resize.** The bar moves out from under it either way, and a resize would leave it pointing at a link that has moved.
 - **Hidden at ≤768px**, where there is no pointer to hover with and the hamburger menu already carries a plain Projects link.
-- **Same material as the bar in BOTH states.** Floating, it is the glass — fill, blur, saturation and rim, 20px radius. **Docked, it goes solid with the bar**, via `.nav-docked ~ .nav-dropdown .nav-dropdown-panel`; a general sibling selector is the only way to reach it, since the panel is a sibling of `<nav>` rather than a child. It keeps `--nav-shadow` where the docked bar gives its up: the bar is pinned to the screen's edge and isn't floating over anything any more, but the panel still is, and a solid menu with no shadow reads as a hole punched in the page. The items take the nav links' own type and `--hover-tint` throughout.
+- **Same material as the bar in BOTH states.** Floating, it is the glass — fill, blur, saturation and rim. **Docked, it goes solid with the bar**, via `.nav-docked ~ .nav-dropdown .nav-dropdown-panel`; a general sibling selector is the only way to reach it, since the panel is a sibling of `<nav>` rather than a child. It keeps `--nav-shadow` where the docked bar gives its up: the bar is pinned to the screen's edge and isn't floating over anything any more, but the panel still is, and a solid menu with no shadow reads as a hole punched in the page. The items take the nav links' own type and `--hover-tint` throughout.
   - The panel's fill is declared as `background-color`, not the `background` shorthand, for the same reason the bar's is — a shorthand can't be transitioned, and both are animating between two materials.
 
 **`works` moved to `src/content/projects.ts`** when this was added, because the grid and the nav both need it and a second list would drift. `navLabel` is an optional SHORT name for the menu row: the card titles run to 71 characters and would wrap to three lines in a 242px panel. Four of the six carry one, and it falls back to `title`. That makes three lengths the same project is written at — the page's full title, the card's shortened one, and this — which is a real maintenance cost and the reason `navLabel` is optional rather than required.
 
-Measured at 1280: the panel is 242px wide under a link at x 943, six rows of 34px, and every label fits on one line.
+**The panel's corner is 10px, NOT the bar's 20px**, and its rows are 400 where the bar's links are 500. Both are deliberate steps away from the pill it hangs from: at 20px on a 239px box the panel read as a second pill floating off the bar rather than as a menu, and a menu of six destinations is a list you scan, not six more things that look as clickable as the nav itself. The rows' own radius came down to 6px with the panel — an inner corner rounder than its container's reads as a mistake.
+
+Measured at 1280: the panel is 239px wide under a link at x 943, six rows of 34px, and every label fits on one line.
 
 ### The glass is four things at once
 
@@ -509,7 +527,7 @@ The same three links the Contact section carries — LinkedIn, GitHub, Email —
   - At ≤768px the `::after` is `display: none` — one column, so the band's own centre *is* the text's centre.
 - **They ARE the Projects cards' icon buttons.** `.about-social-link` is a copy of `.project-icon-link` — 40px, `border-radius: 8px`, a recessed `--well-bg` chip carrying `--well-shadow`, `--textcolor` mark at 19px, `--well-hover-tint` on hover, 8px apart. **Keep the two in step**: if one is retuned, retune the other. Verified with `getComputedStyle`: every property identical in both themes.
   - It carries the **`a.about-social-link:visited` restatement** for the reason `.project-icon-link` documents — `a:visited` is 0-1-1 and outranks a bare class, and these are outbound links, so they *will* be visited.
-- **Two earlier treatments were tried and dropped**, which is worth knowing before a third: 46px outlined **circles** (Kian's original reference), then 46px outlined rounded squares at `.scroll-top`'s 14px radius. The reasoning against the well was that it reads as a dent when it sits alone on a flat card rather than inset into a sub-card — true, but **two icon-button treatments on one page was the worse problem**, and Kian's call was to match. Note also that nothing else on the site is a circle: 20px section cards, 14px sub-cards, 6px tags, and only `.exp-date` and the nav links' hover are round.
+- **Two earlier treatments were tried and dropped**, which is worth knowing before a third: 46px outlined **circles** (Kian's original reference), then 46px outlined rounded squares at `.scroll-top`'s 14px radius. The reasoning against the well was that it reads as a dent when it sits alone on a flat card rather than inset into a sub-card — true, but **two icon-button treatments on one page was the worse problem**, and Kian's call was to match. Note also that nothing else on the site is a circle: 20px section cards, 14px sub-cards, 6px tags, and **`.exp-date` is now the only round thing left** — the nav's hover chips came off their pill too.
 - Icon-only, so **`aria-label` is the link's only name** and doubles as the tooltip — the same contract the Projects cards' icon links use. `:focus-visible` is restated because the global reset clears `outline`.
 - `.about-content-area`'s own bottom padding is what spaces the row from the bio above it.
 
@@ -672,6 +690,9 @@ Two badge types sit **inline at the end of the project title**, so on a wrapping
 
 Full-text reading pages for the written work, at **`/papers/:slug`** (`src/pages/Paper.tsx`, `src/styling/pages/Paper.css`). Modelled on OpenAI's incident-report page: title block, sticky contents list on the left, ~700px article column on the right. Three: `basic-income`, `thesis` and `cs-capstone`. The first two open on their abstract with the text behind a button — see *The abstract is the landing view* below.
 
+- **The page's box is `--paper-max` (1320px) and `--paper-gutter` (36px, 20px at ≤768px)**, declared on `.paper` and read by both `.paper-topbar` and `.paper-inner` so the bar and the article beneath it cannot drift apart. It was a flat 1180 in both rules. The layout inside uses about 1050 (210 contents + 60 gap + 780 article), so the old box left the whole page floating mid-screen with the back control stranded 80px in from the edge; at 1280 the content now starts at x 36 rather than 86, and the back button at 30 rather than 80.
+- **`.paper-article` is 780px, up from 700.** At 1rem/1.85 that is about 95 characters — the top of a comfortable measure, and roughly where a line starts getting hard to track back from. Past this, widen the gutter instead.
+- **The top bar is `position: sticky`**, so the back control stays reachable however far down the reader is. It needs an opaque fill or the article scrolls through it, and the fill is `--page-base` — this is chrome, not a surface, the same call the home page's nav makes when it docks. **Two things have to clear its 76px** (68 on mobile): `.paper-toc`'s sticky `top` (92) and the headings' `scroll-margin-top` (104, 92 on mobile). Measured: a contents jump lands its heading 28px below the bar.
 - **Routing.** `App.tsx` has `/` and `/papers/:slug`. A slug with no entry renders a short "doesn't exist" block with a link home, rather than crashing. **`vercel.json` carries an SPA rewrite** (`/(.*)` → `/index.html`); without it a direct hit on `/papers/basic-income` 404s on Vercel, since only `index.html` exists on disk. Vercel checks the filesystem before rewrites, so assets still serve normally.
 - **Theme.** `useTheme` (`src/components/useTheme.ts`) is shared by `Home` and `Paper`, so both follow `theme-pref` identically. Home was refactored onto it; don't duplicate that logic in a new page.
 - **No navbar.** The nav's links scroll to sections that only exist on the home page. A paper page's top bar has a back button and a "Kian Javaheri" link on the left, and its own theme toggle on the right.
@@ -801,14 +822,33 @@ Three additions to `Block`, all driven by the Material Boxes documentation. They
 
 ### The Material Boxes page
 
-The first of the three hand-written project pages to grow past its stub blurb, and the template for the other two. It is **Overview** (two paragraphs of the mod's own documentation, the CurseForge screenshot, the seven-shot carousel), **Quick start** and **Features**, all converted from the mod's README-style docs.
+The first of the three hand-written project pages to grow past its stub blurb, and the template the wage-effects page followed. It is **Overview** (two paragraphs of the mod's own documentation, the CurseForge screenshot, the seven-shot carousel), **Quick start** and **Features**, all converted from the mod's README-style docs.
 
 - **Its images live in `public/images/material-boxes/`, not `public/pdfs/<slug>/`.** That layout is for papers converted from a PDF, and holds the figures cropped out of one. This page has no source document.
 - They carry the **content hash** the project thumbnails use (`<name>.<first 8 of md5>.webp`), for the reason documented under *Filenames carry a content hash*: `public/` is copied verbatim, so a stable name is a permanently stable URL and a replaced screenshot never reaches anyone who already loaded the page.
 - **The seven screenshots are lossless WebP**, like `material-boxes.webp` in the projects grid and for the same reason — Minecraft's pixel text and flat colour are exactly what lossy WebP smears. Lossless roughly halved them against the source PNGs (1.27MB → 561KB). Don't "optimise" them to `-q 85` to match the paper figures.
 - **The CurseForge screenshot is left exactly as supplied** (2000x1269, already WebP at 126KB). Re-encoding a lossy screenshot of a web page to hit a width target only softens its type.
 - **The eight `Features` links point at the repo's real `docs/` files** — `github.com/kianjavaheri/material-boxes/blob/main/docs/<name>.md`. All eight were checked for a 200 before shipping; a docs index of dead links is worse than no links. A **View Documentation** action was added to the page header alongside CurseForge and GitHub.
-- **The card blurb is NOT on this page.** It shipped alongside the mod's own documentation for one round and the two said the same thing in two voices, 400px apart; Kian cut the blurb. So Overview opens in documentation voice, and the resume-voice sentence survives only on the project card, which is the one place it belongs. **The other two project pages are still the blurb alone** — when they grow, this is the pattern.
+- **The card blurb is NOT on this page.** It shipped alongside the mod's own documentation for one round and the two said the same thing in two voices, 400px apart; Kian cut the blurb. So Overview opens in documentation voice, and the resume-voice sentence survives only on the project card, which is the one place it belongs. **`wage-effects` has since grown the same way** (see below); `rental-prices` is still the blurb alone.
+
+### The wage-effects page
+
+The second hand-written project page to grow past its stub. Built from the repo's README (`github.com/kianjavaheri/welfare-model`) but **deliberately not a copy of it**: Installation, Usage, Data setup and Project structure are all dropped, because a portfolio page describes a project rather than telling a reader how to run it. What survives is the design, the method, a **Results** section, the three validity threats, and the pivot that produced the current specification.
+
+- **The meta AND the project card's blurb were stale, and both are corrected.** Each described the abandoned CPS specification — the page's meta said `Data: CPS ASEC microdata`, and the card promised "an unconditional $6,000 a year", a policy simulation the current design cannot produce (the treatment is an arm assignment, not a dollar amount). Both now name the Baby's First Years RCT. **This is the trap a pivot leaves behind**: the page was rewritten at the time of the pivot but the two one-line summaries pointing *at* it weren't, and nothing in the build catches a description that has quietly become false. Grep for the old data source after any change of specification.
+- Numbers on the page come from the README's own reported output and are quoted exactly: +14.7% (LinearDML, 95% CI −0.5% to +32.3%), +14.9% (CausalForestDML, −4.5% to +38.1%), CATEs spanning 3.7% to 28.3% across n=160, employment −2.1pp. **Don't round them differently in one place than another** — the figures in the carousel print them too.
+- The **Results** section uses the `deflist` block, not prose: four estimates, each a term and its value. It is the second caller of that block after Material Boxes' documentation index.
+- **The project card's cover art opened this page for one round, and came out.** It is a dressed-up figure 6 — the same CATE histogram that ends the carousel — so the page led with the chart it closed on. The card still carries it; that is the one place it earns its keep, as the tile's picture. **So unlike Material Boxes, this page has no lone `figure` at all**, only the carousel.
+
+#### The six figures are padded to one ratio, and that is the whole trick
+
+The source figures run from **0.442 to 0.828** in height/width — `fig5_ate_comparison` is a wide forest plot, `fig4_employment_rate` a tall two-bar chart. The carousel sizes its frame to the **tallest** slide, so dropped in as-is the frame would have been 541px tall and the forest plot would have drawn at 289px of it: **250px of dead white**, on the one slide carrying the headline result.
+
+So each is padded to a single ratio (`919/1520 ≈ 0.6046`) before encoding, with `sips -p H W --padColor`. **Every one of the six has a uniform `#FCFCFB` on all four edges** — checked by sampling eight points per image, not assumed — so centred padding is seamless and no sampling-per-edge dance was needed (unlike the Projects thumbnails, where one image's bottom edge was mixed). Measured after: all six are 1400x847 and the carousel letterboxes **0px** on every slide.
+
+- **`-q 85`-style lossy, at q90 — NOT lossless.** That is the opposite call from Material Boxes' screenshots, and for a real reason: these are matplotlib output, antialiased vector text and thin strokes, which lossy WebP handles well; Minecraft's pixel text is what it smears. q90 is 39KB against lossless's 72KB on the largest figure. The whole set is 256KB.
+- **They keep the white plate** — no `plain` flag. These are exactly the case the plate exists for: charts carrying their own near-white background, which would otherwise show as a bright slab on a dark page. Material Boxes' dark screenshots are the inverse case.
+- **The cover is left exactly as supplied** (2000x1250 WebP, 72KB), the same call as Material Boxes' CurseForge shot: re-encoding a lossy WebP to hit a width target only softens it. It is the same artwork as the project card's thumbnail, at a different crop — Kian asked for it at the top of the page, under the overview, with the remaining six in the carousel below.
 
 ### Content is converted from the PDF, not retyped
 `src/content/papers.ts` holds the types and the registry; each paper is its own generated module (`basic-income.ts`, `thesis.ts`, `cs-capstone.ts`). Only the capstone's conversion script survives in the repo, as `scripts/extract-cs-capstone.py`; the other two were one-off scripts.
@@ -1017,6 +1057,16 @@ iOS Safari renders codepoints that carry an *emoji presentation* as color emoji 
 
 **Before adding any new symbol to visible copy**, check whether it is emoji-capable. If it is, draw it as inline SVG or append U+FE0E.
 
+## Scrollbar
+
+A floating pill, not a groove: no track, a 12px gutter with a 6px mark inside it. **The inset comes from a transparent border plus `background-clip: padding-box`**, which is the only way to pad a scrollbar thumb — it has no padding of its own. `border-radius` needs the usual `!important` to beat the global reset. Firefox gets `scrollbar-width: thin` + `scrollbar-color`, which is the whole API there.
+
+**`data-theme` is now mirrored onto `<html>`**, by `index.html`'s pre-paint script and again by `useTheme` on every change. That is what makes this work at all: the page scrollbar is painted by the ROOT element, so a custom property it reads has to be defined there, and the tokens live on `[data-theme='…']`, which until now only matched the `.home`/`.paper` div. A useful side effect is that **every** theme token now resolves at the root. `color-scheme` on the root still matters — it is what themes the scrollbar on engines that ignore these rules.
+
+`--scrollbar-thumb` is its own token rather than `--card-border`: that one is a hairline at `.1` alpha, which on a 6px pill is barely visible.
+
+**On macOS, scrollbars are overlay by default** and only appear while scrolling, unless *Always show scrollbars* is set — so this shows up far more on Windows and Linux than on Kian's own machine.
+
 ## Responsive breakpoints
 
 `768px` is the main one; the rest are local to a single grid that needed to break earlier or later than the others.
@@ -1026,7 +1076,7 @@ iOS Safari renders codepoints that carry an *emoji presentation* as color emoji 
 | **≤1100px** | Skills, Projects | Skill groups go from 2×2 back to stacked; project grid 3 columns → 2 |
 | **≤1024px** | Experience, Education, About, Courses | Reduced padding; `.edu-main` → `auto 170px 1fr`; courses → 3 columns; Experience's meta column → 170px. Projects left this breakpoint when it became a grid |
 | **≤900px** | Paper pages only | The contents list is hidden — no room beside the text |
-| **≤768px** | everywhere | Single-column layouts, hamburger nav, gallery below bio, education logo on top, contact cards stack, courses → 2 columns, project grid → 1 column, survey explorer rows stack label-over-bar, the awards rail turns vertical, nav dock shortens to 0.36s, PDFs open in a new tab |
+| **≤768px** | everywhere | Single-column layouts, hamburger nav, gallery below bio, education logo on top, contact cards stack, courses → 2 columns, project grid → 1 column, survey explorer rows stack label-over-bar, the awards rail turns vertical, nav dock shortens to 0.36s, `--page-gutter` → 16 and `--paper-gutter` → 20, PDFs open in a new tab |
 | **≤520px** | Courses only | `.course-card-num` watermark drops out |
 | **≤480px** | About only | Further font/padding reductions |
 

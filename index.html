@@ -18,6 +18,11 @@
           window.matchMedia('(prefers-color-scheme: dark)').matches);
         document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
         document.documentElement.style.background = dark ? '#0a0a0a' : '#ffffff';
+        // Also on <html>, so the theme tokens in App.css resolve at the ROOT.
+        // The page scrollbar is painted by the root element, and a var it
+        // looks up has to be defined there — not on the .home/.paper div.
+        // useTheme keeps this in step once React is running.
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
       })();
     </script>
   </head>

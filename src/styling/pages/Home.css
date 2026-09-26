@@ -4,4 +4,18 @@
     /* Clears the floating pill (12px top + 56px tall) by the section gap. */
     padding-top: 80px;
     min-height: 100vh;
+
+    /* The page's box, read by `.cards-wrapper`, `.nav` and `.home footer`.
+       See the note on .cards-wrapper in App.css for why there is a cap at all.
+       --page-gutter is the inset those three share; the nav's docked padding
+       is built from it too, so "the chrome expands, the contents don't move"
+       still holds above the cap. */
+    --page-max: 1500px;
+    --page-gutter: 36px;
+}
+
+@media (max-width: 768px) {
+    .home {
+        --page-gutter: 16px;
+    }
 }

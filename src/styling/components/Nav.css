@@ -23,13 +23,17 @@
     color: var(--textcolor);
     position: fixed;
     top: 12px;
-    /* Flush with `.cards-wrapper`'s 36px gutters, so the bar is exactly as wide
-       as the section cards beneath it. */
-    left: 36px;
-    /* Width rather than `right`, because the collapse animates it. Resolves
-       against the initial containing block, so this equals `right: 36px`
-       exactly. */
-    width: calc(100% - 72px);
+    /* Flush with `.cards-wrapper`, which is now CAPPED and centred — so the bar
+       is too, off the same two tokens. `left`/`right: 0` plus `margin: 0 auto`
+       is what centres a fixed element once `max-width` starts binding; with a
+       bare `left: 36px` the cap would truncate the right edge instead and the
+       bar would sit left of the cards on a wide screen.
+       Width rather than `right`, because the dock animates it. */
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    width: calc(100% - var(--page-gutter) * 2);
+    max-width: calc(var(--page-max) - var(--page-gutter) * 2);
     z-index: 100;
     height: 56px;
     /* Clips the full name and the links as the pill closes over them. */
@@ -45,8 +49,8 @@
 
     transition:
         top 0.45s var(--ease-dock),
-        left 0.45s var(--ease-dock),
         width 0.45s var(--ease-dock),
+        max-width 0.45s var(--ease-dock),
         padding 0.45s var(--ease-dock),
         border-radius 0.45s var(--ease-dock),
         background-color 0.45s ease,
@@ -88,10 +92,19 @@
    that sum move with it. */
 .nav-docked {
     top: 0;
-    left: 0;
     width: 100%;
+    max-width: 100%;
     border-radius: 0 !important;
-    padding: 0 50px 0 62px;
+    /* The docked bar is full-bleed, but its CONTENTS still have to land where
+       they were floating — and above the cap "where they were" is inside a
+       centred box, not 62px from the screen's edge. `50%` of a fixed element
+       resolves against the initial containing block (the viewport WITHOUT its
+       scrollbar, unlike 100vw), so this is the cap's own left edge plus the
+       same 62. Below the cap the calc goes negative and `max()` falls back to
+       the flat number, which is the old behaviour exactly.
+       62 = 36 (gutter) + 26 (the pill's own padding); 50 = 36 + 14. */
+    padding-left: max(62px, calc(50% - var(--page-max) / 2 + 62px));
+    padding-right: max(50px, calc(50% - var(--page-max) / 2 + 50px));
     background-color: var(--nav-solid);
     -webkit-backdrop-filter: blur(0px) saturate(100%);
     backdrop-filter: blur(0px) saturate(100%);
@@ -127,7 +140,12 @@
     font-weight: 500;
     letter-spacing: 0;
     padding: 6px 14px;
-    border-radius: 999px !important;
+    /* 4px, not a pill. `999px` on a 27.5px chip renders as a ~13.75px corner,
+       so "10px less" lands here. All three chips in the bar — the links, the
+       theme toggle and the hamburger — move together: they are the same
+       control at the same size in the same row, and a pill beside a rounded
+       square on hover reads as an oversight. */
+    border-radius: 4px !important;
     transition: background-image 0.15s;
     color: var(--textcolor);
 }
@@ -164,7 +182,11 @@
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     backdrop-filter: blur(24px) saturate(180%);
     box-shadow: var(--nav-rim), var(--nav-shadow);
-    border-radius: 20px !important;
+    /* 10px, NOT the bar's 20px. The panel deliberately stopped matching the
+       pill's corner here — at 20px on a 242px box it read as a pill of its own
+       hanging off the bar rather than as a menu. The items inside came down
+       with it, to keep the inner corner tighter than its container's. */
+    border-radius: 10px !important;
     padding: 8px;
     /* Wide enough for `Shipment Quoting Microservice` on one line, capped so a
        future long label wraps instead of stretching the panel across the bar.
@@ -173,13 +195,15 @@
     max-width: 288px;
 }
 
+/* 400, a step lighter than the nav links' own 500: a menu of six destinations
+   is a list to scan, and the bar's links are the things that look clickable. */
 .nav-dropdown-panel a {
     font-size: 0.82rem;
-    font-weight: 500;
+    font-weight: 400;
     letter-spacing: 0;
     color: var(--textcolor);
     padding: 9px 14px;
-    border-radius: 12px !important;
+    border-radius: 6px !important;
     transition: background-image 0.15s;
 }
 
@@ -210,7 +234,8 @@
     cursor: pointer;
     user-select: none;
     padding: 6px 14px;
-    border-radius: 999px !important;
+    /* With the nav links — see the note there. */
+    border-radius: 4px !important;
     transition: background-image 0.15s;
     color: var(--muted);
 }
@@ -229,7 +254,8 @@
     letter-spacing: 0;
     cursor: pointer;
     padding: 6px 12px;
-    border-radius: 999px !important;
+    /* With the nav links — see the note there. */
+    border-radius: 4px !important;
     transition: background-image 0.15s;
 }
 
@@ -245,10 +271,8 @@
 /* ── Mobile ─────────────────────────────────── */
 @media (max-width: 768px) {
     .nav {
-        left: 16px;
-        /* Width, not `right` — with `left` and `width` both set, `right` is
-           dropped as over-constrained and the pill ends up off-centre. */
-        width: calc(100% - 32px);
+        /* The gutter token already moved to 16px here; the cap never binds at
+           this width, so only the padding needs restating. */
         padding: 0 8px 0 18px;
     }
 
@@ -260,8 +284,9 @@
        move" sum as on desktop, at the mobile gutter. */
     .nav-docked {
         top: 0;
-        left: 0;
         width: 100%;
+        max-width: 100%;
+        /* 34 = 16 + 18, 24 = 16 + 8. No cap to clear at phone widths. */
         padding: 0 24px 0 34px;
     }
 
@@ -274,8 +299,8 @@
     .nav {
         transition:
             top 0.36s var(--ease-dock),
-            left 0.36s var(--ease-dock),
             width 0.36s var(--ease-dock),
+            max-width 0.36s var(--ease-dock),
             padding 0.36s var(--ease-dock),
             border-radius 0.36s var(--ease-dock),
             background-color 0.36s ease,
@@ -364,8 +389,8 @@
     .nav {
         transition:
             top 0.15s ease,
-            left 0.15s ease,
             width 0.15s ease,
+            max-width 0.15s ease,
             padding 0.15s ease,
             border-radius 0.15s ease,
             background-color 0.15s ease,

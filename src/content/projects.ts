@@ -99,7 +99,7 @@ export const works: Array<WorkProps> = [
     to: '/papers/wage-effects',
     links: [{ label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/welfare-model' }],
     image: { src: '/images/projects/wage-effects.120b1d50.webp', width: 1001, height: 563, alt: 'A histogram of per-mother wage-impact estimates from the causal forest, against the average treatment effect' },
-    blurb: 'Double Machine Learning over CPS ASEC microdata, estimating what an unconditional $6,000 a year does to future labor income.',
+    blurb: 'Double Machine Learning over the Baby\u2019s First Years cash-transfer RCT, estimating what $333 a month did to mothers\u2019 hourly wages a year later.',
     tags: ['Python', 'EconML', 'XGBoost', 'Causal Inference'],
   },
   {

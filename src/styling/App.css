@@ -52,6 +52,11 @@
     /* Two-part: a soft cast for float, a tight one to define the edge. */
     --nav-shadow: 0 6px 24px rgba(0, 0, 0, 0.10), 0 1px 3px rgba(0, 0, 0, 0.07);
 
+    /* The scrollbar's thumb. Its own token rather than `--card-border`: that
+       one is a hairline at .1 alpha, which on a 6px pill is barely there. */
+    --scrollbar-thumb: rgba(0, 0, 0, 0.22);
+    --scrollbar-thumb-hover: rgba(0, 0, 0, 0.38);
+
     /* The DOCKED bar's fill, once it has attached to the top of the screen and
        stopped being glass. Page-coloured, with the hairline under it carrying
        the separation — the classic docked header, and the honest one: a bar
@@ -115,6 +120,9 @@
     --nav-rim: inset 0 1px 0 rgba(255, 255, 255, 0.14),
                inset 0 0 0 1px rgba(255, 255, 255, 0.06);
     --nav-shadow: 0 6px 28px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.5);
+
+    --scrollbar-thumb: rgba(255, 255, 255, 0.20);
+    --scrollbar-thumb-hover: rgba(255, 255, 255, 0.36);
 
     --nav-solid: #000000;
     --nav-rim-off: inset 0 1px 0 rgba(255, 255, 255, 0),
@@ -236,11 +244,22 @@ a {
 /* Inset from the page edges, with each section a separate framed block rather
    than one continuous run. The gutters also let the colour field show, which
    is what the nav refracts. */
+/* The home page's own box. --page-max CAPS it, and that cap is the reason the
+   gallery photo and the project thumbnails now shrink when you zoom out: with
+   an uncapped fluid layout their containers keep widening as the viewport
+   does, so the pictures hold their apparent size on screen while the type
+   around them gets smaller. Capped, the whole page scales together.
+
+   `.nav` and `.home footer` read the SAME token and centre the same way — the
+   bar has to stay flush with the cards (see the Navbar notes in CLAUDE.md) and
+   the footer's text has to stay under them. Three rules, one number. */
 .cards-wrapper {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    padding: 0 36px 44px;
+    padding: 0 var(--page-gutter) 44px;
+    max-width: var(--page-max);
+    margin: 0 auto;
 }
 
 
@@ -448,7 +467,7 @@ a {
 @media (max-width: 768px) {
     .cards-wrapper {
         gap: 10px;
-        padding: 0 16px 32px;
+        padding: 0 var(--page-gutter) 32px;
     }
 
     .card-header {
@@ -507,16 +526,46 @@ a {
     }
 }
 
+/* ---- Scrollbar ---------------------------------------------------------- */
+/* A floating pill rather than a groove: no track, and the thumb is inset from
+   the edge by a TRANSPARENT border plus `background-clip: padding-box`, which
+   is the only way to pad a scrollbar thumb — it has no padding of its own. So
+   the gutter is 12px wide and the mark inside it is 6px.
+
+   These tokens resolve because `data-theme` is set on <html> as well as on the
+   page div (see index.html and useTheme.ts). The page scrollbar is painted by
+   the root element, and a custom property it reads has to be defined there.
+
+   `color-scheme` on the root still matters: it is what themes the scrollbar on
+   engines that don't take these rules at all. */
 ::-webkit-scrollbar {
-    width: 4px;
+    width: 12px;
+    height: 12px;
 }
 
-::-webkit-scrollbar-track {
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner {
     background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--card-border);
+    background: var(--scrollbar-thumb);
+    /* Beats the global `border-radius: 0 !important`, the same as everything
+       else on this site that needs a corner. */
+    border-radius: 999px !important;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+    background-clip: padding-box;
+}
+
+/* Firefox has no pseudo-elements for this, only the two-property API. */
+html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) transparent;
 }
 /* Outbound-link arrow (components/ArrowOut.tsx). Sized in em so it scales with
    the label it follows; `currentColor` lets each caller set the color. */

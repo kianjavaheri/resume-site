@@ -37,6 +37,15 @@ footer::before {
     background: var(--card-border);
 }
 
+/* The home page's footer sits in the same capped, centred box as the cards
+   above it — otherwise, past `--page-max`, the footer's name would keep
+   sliding out toward the screen's edge while the card stack stopped, and the
+   0.0px flush this file measures for would only hold below the cap. */
+.home footer {
+    max-width: var(--page-max);
+    margin: 0 auto;
+}
+
 /* Same 0.9rem/600 as .paper-back, the name at the head of a paper page. */
 .footer-name {
     font-size: 0.9rem;

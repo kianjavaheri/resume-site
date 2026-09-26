@@ -7,13 +7,36 @@
     min-height: 100vh;
 }
 
+/* The reading pages' own chrome. Two things about the box it sits in:
+
+   --paper-max is 1320, not the 1180 it was. The layout inside it uses about
+   1050 (210 contents + 60 gap + 780 article), so the old box left the whole
+   page floating in the middle of a wide screen with the back control stranded
+   80px in from the edge. The wider box pushes everything left toward the
+   margins — measured at 1280, content now starts at x 36 rather than 86.
+
+   It is declared once, here, and read by .paper-inner too, so the bar and the
+   article beneath it cannot drift apart at a breakpoint. */
+.paper {
+    --paper-max: 1320px;
+    --paper-gutter: 36px;
+}
+
+/* STICKY: the back control stays reachable however far down the reader is.
+   It needs an opaque fill or the article scrolls through it, and the fill is
+   the page's own — this is chrome, not a surface. The home page's nav makes
+   the same call when it docks. */
 .paper-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 22px 36px;
-    max-width: 1180px;
+    padding: 22px var(--paper-gutter);
+    max-width: var(--paper-max);
     margin: 0 auto;
+    background: var(--page-base);
 }
 
 /* Groups the back control with the name so the pair sits at the top-left and
@@ -35,6 +58,8 @@
     justify-content: center;
     width: 32px;
     height: 32px;
+    /* Pulls the glyph's box out to the gutter, so the ARROW lines up with the
+       text below it rather than the button's padding doing. */
     margin-left: -6px;
     border-radius: 8px !important;
     background: none;
@@ -87,9 +112,9 @@
 }
 
 .paper-inner {
-    max-width: 1180px;
+    max-width: var(--paper-max);
     margin: 0 auto;
-    padding: 0 36px 96px;
+    padding: 0 var(--paper-gutter) 96px;
 }
 
 .paper-head {
@@ -170,10 +195,13 @@
     margin-top: 44px;
 }
 
+/* 92 = the sticky bar's 76 (22 + a 32px control + 22) plus 16 of air. Both
+   this and the headings' scroll-margin below have to clear that bar, or the
+   contents list slides under it and a jump tucks its heading out of sight. */
 .paper-toc {
     position: sticky;
-    top: 32px;
-    max-height: calc(100vh - 64px);
+    top: 92px;
+    max-height: calc(100vh - 124px);
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -209,8 +237,12 @@
     border-left-color: var(--textcolor) !important;
 }
 
+/* The reading measure. 780 rather than 700 — Kian asked for a wider text
+   area, and at 1rem/1.85 this is about 95 characters, at the top of what is
+   comfortable but still inside it. Going much past this is where a line
+   becomes hard to track back from. */
 .paper-article {
-    max-width: 700px;
+    max-width: 780px;
 }
 
 .paper-section-title {
@@ -219,7 +251,8 @@
     letter-spacing: -0.01em;
     margin: 44px 0 18px;
     /* Clears the jump target from the top of the viewport. */
-    scroll-margin-top: 28px;
+    /* Clears the sticky top bar (76px) with room to breathe. */
+    scroll-margin-top: 104px;
 }
 
 .paper-section:first-child .paper-section-title {
@@ -1198,12 +1231,21 @@ circle.paper-chart-s2 {
 }
 
 @media (max-width: 768px) {
+    .paper {
+        --paper-gutter: 20px;
+    }
+
     .paper-topbar {
-        padding: 18px 20px;
+        padding: 18px var(--paper-gutter);
     }
 
     .paper-inner {
-        padding: 0 20px 72px;
+        padding: 0 var(--paper-gutter) 72px;
+    }
+
+    /* The bar is 68px here (18 + 32 + 18), and there is no contents list. */
+    .paper-section-title {
+        scroll-margin-top: 92px;
     }
 
     .paper-title {
