@@ -10,7 +10,16 @@
        --page-gutter is the inset those three share; the nav's docked padding
        is built from it too, so "the chrome expands, the contents don't move"
        still holds above the cap. */
-    --page-max: 1500px;
+    /* 1800, up from 1500. At 1500 a 2560px monitor left 530px of empty page
+       down each side, which read as the site sitting in a narrow strip. The
+       cap still exists and still does its job — see the note above: uncapped,
+       the gallery photo and the project thumbnails hold their apparent size
+       as you zoom out while the type shrinks. 1800 leaves 380px each side at
+       2560 and the layout still scales together.
+       Nothing else needs retuning: `.cards-wrapper`, `.nav` and `.home footer`
+       all read this token, and the docked bar's padding is a max() against it,
+       so the bar's contents stay put above the cap by construction. */
+    --page-max: 1800px;
     --page-gutter: 36px;
 }
 

@@ -585,6 +585,19 @@ a {
 html {
     scrollbar-width: thin;
     scrollbar-color: var(--scrollbar-thumb) transparent;
+
+    /* iOS Safari inflates text in blocks it judges wide relative to the
+       viewport, EVEN with a correct `width=device-width, initial-scale=1`
+       viewport meta — Chrome on Android disables the behaviour when that meta
+       is present, Safari does not. The symptom is a page that "comes in a
+       little zoomed in" on an iPhone and nowhere else, with rows of inline
+       type wider than they were authored to be.
+
+       100%, NOT `none`: `none` also disables the user's own pinch-zoom
+       scaling of text, which is a real accessibility setting. 100% only turns
+       off the automatic inflation. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 /* Outbound-link arrow (components/ArrowOut.tsx). Sized in em so it scales with
    the label it follows; `currentColor` lets each caller set the color. */

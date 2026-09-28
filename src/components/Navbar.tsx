@@ -7,16 +7,34 @@ import './../styling/components/Nav.css'
 
 function Navbar({ switchTheme, isChecked }: any) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [pastHalfway, setPastHalfway] = useState(false)
+  const [pastAbout, setPastAbout] = useState(false)
 
-  // Dock the pill to the top of the screen past the halfway mark. The scroll
-  // handler only reads scrollY (no layout); page height is remeasured on resize
-  // and whenever a section expands or collapses, which a resize won't catch.
+  // Dock the pill to the top of the screen once the About card has scrolled
+  // past — i.e. as soon as the reader leaves the intro and starts on the
+  // content. This replaces a "past 50% of the page" rule, which had two
+  // problems: the halfway point MOVED every time a section was expanded or
+  // collapsed, so the same scroll position docked or didn't depending on what
+  // was open; and on a long page it left the bar floating far past the point
+  // where it had stopped being a header.
+  //
+  // About is the right anchor because it is the one card that never collapses
+  // (`card-header-static`), so its own height is fixed and the threshold is
+  // stable no matter what the reader opens below it.
+  //
+  // The scroll handler still only reads scrollY — no layout. The threshold is
+  // measured on resize AND via a ResizeObserver on body, because expanding a
+  // section changes the document without firing a resize.
   useEffect(() => {
-    let scrollable = 0
-    const check = () => setPastHalfway(scrollable > 0 && window.scrollY > scrollable * 0.5)
+    let threshold = 0
+    const check = () => setPastAbout(threshold > 0 && window.scrollY > threshold)
     const measure = () => {
-      scrollable = document.documentElement.scrollHeight - window.innerHeight
+      const about = document.getElementById('about')
+      // The card's bottom edge, less the floating bar's own footprint
+      // (top 12 + height 56), so the bar docks exactly as the card goes under
+      // it rather than a bar's height later.
+      threshold = about
+        ? about.getBoundingClientRect().top + window.scrollY + about.offsetHeight - 68
+        : 0
       check()
     }
     measure()
@@ -33,7 +51,7 @@ function Navbar({ switchTheme, isChecked }: any) {
 
   // Never dock while the mobile menu is open: the menu panel hangs from the
   // bar's floating position, and docking would move the bar out from under it.
-  const docked = pastHalfway && !menuOpen
+  const docked = pastAbout && !menuOpen
 
   const close = () => setMenuOpen(false)
 

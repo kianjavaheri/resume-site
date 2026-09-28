@@ -63,7 +63,7 @@ const homeSections: { id: string; title: string; body?: string }[] = [
   { id: 'contact', title: 'Contact', body: 'LinkedIn GitHub Email' },
 ]
 
-const slugOf = (to: string) => to.replace('/papers/', '')
+const slugOf = (to: string) => to.replace('/projects/', '')
 
 // The card's short name, which is what a menu row wants — the papers' own titles
 // run to 71 characters. Same fallback the nav dropdown uses.
@@ -122,7 +122,7 @@ function build(): SearchEntry[] {
   for (const slug of Object.keys(papers)) {
     const paper = papers[slug]
     const short = shortTitles.get(slug) ?? paper.title
-    const path = `/papers/${slug}`
+    const path = `/projects/${slug}`
 
     // The intro sits above the contents list and always carries the id `intro`,
     // whether it says Abstract or Summary.

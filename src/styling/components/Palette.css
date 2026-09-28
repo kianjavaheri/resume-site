@@ -38,6 +38,19 @@
     overflow: hidden;
 }
 
+/* Flat and opaque, for a docked nav bar or a reading page — see the note in
+   CommandPalette.tsx. This is exactly what `.nav-docked ~ .nav-dropdown
+   .nav-dropdown-panel` does to the Projects menu, and for the same reasons:
+   the rim goes to its zero-alpha twin with the bar's, but `--nav-shadow`
+   STAYS, because unlike the docked bar this panel is still floating over the
+   page and a solid box with no shadow reads as a hole punched in it. */
+.palette-solid {
+    background-color: var(--nav-solid);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: var(--nav-rim-off), var(--nav-shadow);
+}
+
 /* ---- The field --------------------------------------------------------- */
 
 .palette-field {
@@ -156,12 +169,17 @@
 }
 
 /* --muted is keyed to the page, so on the inverted row it is close to the fill
-   and nearly gone. These take the inverted ink at reduced opacity instead,
-   which keeps the same hierarchy against the opposite background. */
+   and nearly gone. These take a dimmed version of the inverted ink instead,
+   which keeps the same hierarchy against the opposite background.
+
+   NOT `opacity`, which was the first attempt: opacity applies to the whole
+   subtree, so a <mark> inside the snippet could not come back to full strength
+   — and picking the match out by strength is the whole point below. The first
+   declaration is the fallback for anything without color-mix. */
 .palette-row-active .palette-row-sub,
 .palette-row-active .palette-row-snippet {
     color: var(--bgcolor);
-    opacity: 0.66;
+    color: color-mix(in srgb, var(--bgcolor) 62%, var(--textcolor));
 }
 
 .palette-row-kind {
@@ -178,13 +196,24 @@
     opacity: 0.6;
 }
 
-/* The global reset leaves <mark> with the UA's yellow. Weight carries the match
-   instead of a colour the site doesn't have — and on the inverted row a fill
-   would have to invert too. */
+/* The global reset leaves <mark> with the UA's yellow fill, which the site has
+   no colour for. The match is picked out by INK STRENGTH instead: full
+   `--textcolor` where the text around it is `--muted`.
+
+   It used to be `color: inherit` plus weight, and that was the bug — inside a
+   snippet the mark inherited `--muted`, so it was the same colour as its
+   surroundings and read as an arbitrary bold word rather than as the thing
+   that matched. Weight alone is not enough contrast to carry a highlight. */
 .palette-mark {
     background: none;
-    color: inherit;
+    color: var(--textcolor);
     font-weight: 700;
+}
+
+/* On the inverted row "full strength" is the inverted ink — the undimmed
+   version of the colour its surroundings were mixed down from above. */
+.palette-row-active .palette-mark {
+    color: var(--bgcolor);
 }
 
 .palette-empty {

@@ -4,9 +4,21 @@
     {
       "name": "resume-site",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["start"],
+      "runtimeArgs": [
+        "start"
+      ],
       "port": 3000,
-    "autoPort": true
+      "autoPort": true
+    },
+    {
+      "name": "resume-site-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "preview"
+      ],
+      "port": 4173,
+      "autoPort": true
     }
   ]
 }

@@ -10,8 +10,9 @@
   },
   "scripts": {
     "start": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "vite build && node scripts/prerender-meta.mjs",
+    "preview": "vite preview",
+    "og-images": "bash scripts/make-og-images.sh"
   },
   "devDependencies": {
     "@types/react": "^18.3.31",

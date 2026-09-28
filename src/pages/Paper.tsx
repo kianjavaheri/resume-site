@@ -143,6 +143,11 @@ function renderBlock(b: Block, i: number) {
       </figure>
     )
   }
+  // A hand-written page's table. The generated papers reach the same renderer
+  // by src lookup above; this is the direct route in.
+  if (b.type === 'table') {
+    return <PaperTableBlock key={i} table={b.table} />
+  }
   if (b.type === 'carousel') {
     return <FigureCarousel key={i} figures={b.figures} plain={b.plain} />
   }

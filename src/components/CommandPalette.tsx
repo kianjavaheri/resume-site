@@ -83,6 +83,19 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
   // Body scroll lock and Escape, shared with the PDF modal.
   useModalChrome(onClose)
 
+  // The panel wears the bar's material in BOTH of the bar's states, the same
+  // rule the Projects dropdown follows: glass while the bar is glass, flat and
+  // opaque once it has docked. A reading page has no nav bar at all and its
+  // top bar is already a flat `--page-base`, so the palette goes solid there
+  // too rather than being the one floating glass object on the page.
+  //
+  // Read ONCE, on open, and that is sound rather than lazy: `useModalChrome`
+  // locks the body's scrolling for as long as this is mounted, so the bar
+  // cannot dock or undock underneath it.
+  const [solid] = useState(
+    () => location.pathname !== '/' || !!document.querySelector('.nav-docked')
+  )
+
   const results = useMemo(() => search(query), [query])
 
   useEffect(() => setSel(0), [query])
@@ -108,7 +121,7 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
     // scrolling in a passive effect cleanup, which runs after this handler
     // returns. Scrolling before that fights a locked page.
     requestAnimationFrame(() => {
-      if (entry.path.startsWith('/papers/')) {
+      if (entry.path.startsWith('/projects/')) {
         navigate(entry.hash ? `${entry.path}#${entry.hash}` : entry.path)
         return
       }
@@ -147,7 +160,12 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="palette" role="dialog" aria-modal="true" aria-label="Search this site">
+      <div
+        className={`palette${solid ? ' palette-solid' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Search this site"
+      >
         <div className="palette-field">
           <SearchIcon />
           <input

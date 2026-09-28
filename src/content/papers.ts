@@ -55,6 +55,12 @@ export type Block =
       width?: number
       height?: number
     }
+  // A table written straight into a section. The GENERATED papers can't use
+  // this — their tables arrive as cropped images and are swapped out by src
+  // through `paperTables` — so this is the hand-written pages' way in, and it
+  // lands in the same <PaperTableBlock> renderer as theirs. `absorbs` means
+  // nothing here: there is no extracted prose to reclaim.
+  | { type: 'table'; table: PaperTable }
 
 // A table rebuilt as markup rather than shown as a cropped image. The data
 // lives in `tables.ts`, keyed by the image it replaces.
@@ -193,7 +199,7 @@ function withEdits(paper: Paper): Paper {
 }
 
 // Every project in the Projects grid has an entry here, because the cards link
-// to `/papers/:slug` and nothing else. A project added to `works` without a
+// to `/projects/:slug` and nothing else. A project added to `works` without a
 // page to point at is a dead card.
 export const papers: Record<string, Paper> = {
   [basicIncome.slug]: withoutWithheldPdfs(withEdits(basicIncome)),

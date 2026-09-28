@@ -65,10 +65,17 @@ footer::before {
    page context, not the component, decides where its text sits. Both rules
    live here rather than in Home.css/Paper.css so they stay in step.
 
-   Paper: the same 1180px box as .paper-topbar, so the name at the foot lands
-   directly under the name at the head. */
+   Paper: the same box as .paper-topbar and .paper-inner, so the name at the
+   foot lands on the same left edge as the name at the head.
+
+   It READS the token; it used to hard-code 1180. That was correct while
+   --paper-max was also 1180, and silently wrong the moment that token went to
+   1320 — this rule kept the old literal and the footer's text drifted 10px
+   right of the content at 1280 and 30px at 1500+, with its right edge 106px
+   inside the article's. Exactly the drift every other shared measurement on
+   this site is a variable to prevent. Don't put a number back here. */
 .paper footer {
-    max-width: 1180px;
+    max-width: var(--paper-max);
     margin: 0 auto;
 }
 

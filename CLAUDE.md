@@ -3,36 +3,45 @@
 ## Workflow rules
 - **Never push to GitHub.** Make commits locally only. The user pushes to remote themselves.
 
-## Outstanding work
-
-**Per-page link previews and a sitemap — NOT DONE, and Kian has asked to be reminded until it is.** Raise it at the end of any session that touches this repo, until this section says it shipped.
-
-The site is a single `index.html` with one `<title>Kian Javaheri</title>` and one description, and **no `og:` tags at all**. `Paper.tsx` sets `document.title` per paper, but that runs in JavaScript and the things that build link previews — LinkedIn's unfurler, Slack's, iMessage's, Discord's — fetch the raw HTML and read `<meta>` only. So all seven URLs unfurl identically, with no image. Pasting `/papers/thesis` into a recruiter DM shows a bare card. Search engines see seven URLs that look like one page, and `robots.txt` allows everything while pointing at nothing.
-
-The fix is a post-build Node script, not SSR and not a framework change:
-
-1. Read the `papers` and `works` registries, which already exist.
-2. For each of the seven routes, copy `dist/index.html` and swap in that route's `<title>`, `<meta name="description">`, `og:title` / `og:description` / `og:image` / `og:url` / `og:type`, `twitter:card=summary_large_image` and a canonical link.
-3. Write it to `dist/papers/<slug>/index.html`.
-4. Emit `dist/sitemap.xml` from the same registry, and add a `Sitemap:` line to `robots.txt`.
-
-Then `"build": "vite build && node scripts/prerender-meta.mjs"`.
-
-**Why that works here specifically:** `vercel.json`'s rewrite is `/(.*)` → `/index.html`, and Vercel checks the filesystem before rewrites (noted under *Paper pages* below). Once `dist/papers/thesis/index.html` exists, Vercel serves it directly and the rewrite never fires for that path; every other path still falls through to the SPA. A crawler gets real tags, a human gets the same file and React boots from it as before.
-
-The images are mostly done — the six project thumbnails are 700–1001px wide and content-hashed. OG wants ~1200x630 (1.91:1) against their 16/9 (1.78), so either accept the crop or pad them with the per-edge `sips` technique the wage-effects figures used. Two constraints that bite: `og:image` **must be an absolute URL**, and LinkedIn caches hard, which is the other reason the content hash in the filename earns its keep.
-
 Personal portfolio/resume website for Kian Javaheri, a May 2026 CS & Economics graduate from Barrett, The Honors College at ASU (Summa Cum Laude, 3.93 GPA). He holds **two degrees** — B.S. Computer Science and B.S. Economics — and the site is written to make that read as two credentials, not one. He is based in the Bay Area, CA and looking for full-time Software Engineering and Data Engineering roles.
 
 ## Running the project
 
 ```bash
 npm start        # dev server on localhost:3000
-npm run build    # production build
-npm run preview  # preview production build
+npm run build    # vite build, then scripts/prerender-meta.mjs
+npm run preview  # serve dist/ — the only way to test the prerendered output
+npm run og-images  # regenerate public/og/*.jpg. NOT part of the build
 ```
 
-Deployed on **Vercel** via git push to `master`. The build command is `vite build` (no `tsc` — esbuild handles TypeScript transpilation).
+Deployed on **Vercel** via git push to `master`. `vite build` runs without `tsc` — esbuild handles the TypeScript transpilation.
+
+### The build has a second half: per-route meta and a sitemap
+
+`scripts/prerender-meta.mjs` runs after `vite build` and writes seven HTML files — one per route — each carrying its own `<title>`, description, canonical link, Open Graph and Twitter card tags, plus `dist/sitemap.xml`.
+
+**Why it exists.** The site is one `index.html`. `Paper.tsx` sets `document.title` per project, but that runs in JavaScript, and the things that build link previews — LinkedIn's unfurler, Slack's, iMessage's, Discord's — fetch the raw HTML and read `<meta>` only. Without this every URL unfurled identically with no image, and search engines saw seven pages that looked like one.
+
+**Why it works without SSR.** A static host resolving a request checks the filesystem before it applies a rewrite. `vercel.json` rewrites `/(.*)` to `/index.html`, but once `dist/projects/thesis.html` exists on disk the filesystem check matches first and the rewrite never fires for that path. A crawler gets real tags; a human gets the same file and React boots from it exactly as before, because the file is the shell with a different head.
+
+**It reads the registries through Vite, not by parsing them.** `papers.ts` and `projects.ts` are TypeScript with extensionless imports, which plain Node cannot resolve. The script spins up a Vite server in middleware mode and calls `ssrLoadModule`, so it sees exactly what the app sees — the same invariant `paper-view.ts` holds for the search index. A registry change reaches the tags and the sitemap with no second list to maintain.
+
+Four decisions inside it that are not arbitrary:
+
+- **Every project page is written TWICE**, as `projects/<slug>.html` and `projects/<slug>/index.html`. A host resolving an extensionless request tries the path, then `.html` appended, then `/index.html` — and which of the last two it reaches first is the host's business. This is the one thing here that cannot be verified without deploying, so both forms exist and whichever is checked finds a real file. It costs about 2KB each. **It also caught a real bug**: `vite preview` falls through to the SPA on the extensionless path unless the sibling `.html` is there, which is how the gap was found in the first place.
+- **The tab title and the share title differ, deliberately.** `<title>` is the paper's full title, matching what `Paper.tsx` sets once React takes over — otherwise the tab visibly changes on hydration. `og:title` is the card's short `navLabel`, because an unfurler truncates around 60–90 characters and the thesis's full title is 100. That is the same split `navLabel` already existed for.
+- **`og:image` is absolute.** A relative one is simply dropped by most unfurlers.
+- **`og:image:alt` describes the PICTURE**, not the page — `works` already carries exactly that string for every thumbnail, so it is reused rather than rewritten.
+
+### The share images are JPEG, and that is not a preference
+
+`scripts/make-og-images.sh` regenerates `public/og/*.jpg`. Run it by hand after changing a thumbnail or the hero photo; it is **not** part of `npm run build`, because these are committed assets with content hashes in their names and a build that rewrote them every time would defeat the hash.
+
+- **JPEG, not WebP.** The whole point is the LinkedIn unfurler, and LinkedIn does not reliably render a WebP `og:image`. The source thumbnails *are* WebP, so each is decoded with `dwebp` first.
+- **1200x630** (1.905), the size every unfurler crops toward. The thumbnails are 16/9 (1.778), so they are **fitted by height and padded at the sides** rather than cropped — losing nothing, the same call the thumbnails themselves make.
+- **The pad colour is sampled from each image's own edge**, by reading the decoded PPM and taking the most common pixel down the left and right columns. That is not ceremony: the six sampled to `#FFFFFF`, `#FCFBFC`, `#F7F7F7`, `#F5F8F7`, **`#C7BA7E`** (the basic-income engraving's tan paper) and **`#151713`** (the Material Boxes Minecraft screenshot). Two of the six are nowhere near white, and a white bar on either would have been obvious.
+- **The home card is CROPPED, not padded**, because it is a photograph with a subject — bars either side read as a mistake on a photo where they read as deliberate on a UI screenshot. The crop is offset upward (60px of the 270 removed comes off the top) to keep headroom above the face; a centred crop leaves it 11px from the edge. Swap the source in the script to change it.
+- Both were checked by **rendering them and looking**, per the rule the project thumbnails already follow.
 
 ### Testing in a hidden preview pane
 
@@ -215,7 +224,7 @@ Section card titles are 0.95rem / 500. Normal casing everywhere — no `text-tra
 
 ### The page is capped, and that is what makes images scale on zoom-out
 
-`--page-max` (**1500px**) and `--page-gutter` (36px, 16px at ≤768px) are declared on `.home` in `Home.css`. **Three rules read them and all three centre the same way** — `.cards-wrapper`, `.nav` and `.home footer`. One number, so they cannot drift.
+`--page-max` (**1800px**) and `--page-gutter` (36px, 16px at ≤768px) are declared on `.home` in `Home.css`. It was 1500 until a 2560px monitor made the site read as a narrow strip with 530px of dead page down each side; at 1800 that is 416px, the cards go 1428px → 1728px wide, and the project tiles 372px → 545px. Nothing needed retuning with it — all three rules read the token, and the docked bar's padding is a `max()` against it, so the bar's contents stay put above the cap by construction (verified: the name sits at x 62/62 at 1280 and 442/442 at 2560, floating and docked). **Three rules read them and all three centre the same way** — `.cards-wrapper`, `.nav` and `.home footer`. One number, so they cannot drift. A **side effect worth knowing**: at the wider cap the seven-tile skill groups stop wrapping, because each column finally gets its full width.
 
 **The cap exists for a reason that isn't obvious.** Uncapped, the layout was fluid all the way out, so the About gallery photo and the project thumbnails kept their apparent size on screen as the viewport grew — zoom out and the type shrank while the pictures didn't, because their containers widened in step with the zoom. Capped, the whole page scales together, which is what zooming out is supposed to do.
 
@@ -252,7 +261,7 @@ src/
     Education.tsx      # Collapsible, default OPEN. ASU sub-card + course data + nested <Coursework> blocks
     Experience.tsx     # Collapsible, default OPEN. Three expandable role cards (Sandia, ASU RA, ASU TA) w/ tags
     Projects.tsx       # Collapsible, default OPEN. Six uniform tiles, each a <Link> to
-                       #   /papers/:slug. Entries live in content/projects.ts
+                       #   /projects/:slug. Entries live in content/projects.ts
     Proficiency.tsx    # Collapsible, default OPEN. 25 skills in 4 labelled groups of rounded icon tiles
     Awards.tsx         # Collapsible, default OPEN. 3 honors on a horizontal rail, ASU seal
     useClampedExpand.ts # Clamp-and-expand hook — Experience cards only (Projects tiles don't clamp)
@@ -270,8 +279,8 @@ src/
     LinkIcon.tsx       # Shared inline icon set — Projects links AND Contact cards
     Contact.tsx        # NOT a section-card; label above, 3 contact-card links w/ icons
     PdfModal.tsx       # Shared PDF modal (iframe); exports withViewerParams()
-    Navbar.tsx         # Floating glass bar, card-aligned; docks flat to the top past 50%
-                       #   scroll; Projects hover dropdown; hamburger ≤768px
+    Navbar.tsx         # Floating glass bar, card-aligned; docks flat to the top once
+                       #   the About card scrolls past; Projects dropdown; hamburger ≤768px
     Footer.tsx         # "Kian Javaheri" left, "© 2026" right; quiet, matches the paper top bar
     Scroll.tsx         # Back-to-top button; inverted fill, fades in past 400px
     ArrowOut.tsx       # Inline SVG ↗ for outbound links — replaces the emoji-prone U+2197
@@ -283,7 +292,7 @@ src/
     Resume.tsx         # DEAD — not imported anywhere
   pages/
     Home.tsx           # Root; .cards-wrapper; theme via useTheme
-    Paper.tsx          # /papers/:slug — abstract + "Read the full paper" gate, contents list, article
+    Paper.tsx          # /projects/:slug — abstract + "Read the full paper" gate, contents list, article
     NotFound.tsx       # The catch-all route AND the unknown-slug case. Paper chrome
   content/
     papers.ts          # Paper/Block types, slug registry, and the paperEdits layer
@@ -303,9 +312,9 @@ src/
     intros.ts          # Intro block by slug (abstract or overview), the gate flag and the
                        #   capstone's lead figure. Hand-written
     project-pages.ts   # Reading pages for the 3 projects with no source document. Hand-written.
-                       #   material-boxes and wage-effects have grown past their stubs;
-                       #   rental-prices hasn't
-  App.tsx              # <Routes>: "/" → Home, "/papers/:slug" → Paper, "*" → NotFound;
+                       #   All three have now grown past their stubs
+  App.tsx              # <Routes>: "/" → Home, "/projects/:slug" → Paper,
+                       #   "/papers/:slug" → legacy redirect, "*" → NotFound;
                        #   mounts <CommandPalette /> outside the routes
   index.tsx            # createRoot + <BrowserRouter>
   react-app-env.d.ts   # vite/client types + the *.svg module shim
@@ -329,14 +338,22 @@ src/
       Scroll.css       # Inverted fill, rounded square, fade in/out
 scripts/
   extract-cs-capstone.py  # Poster → src/content/cs-capstone.ts. Needs `pip install pymupdf`
+  prerender-meta.mjs      # RUNS ON EVERY BUILD. Per-route meta + sitemap.xml,
+                          #   reading the registries through Vite's ssrLoadModule
+  make-og-images.sh       # Regenerates public/og/. Manual — the outputs are
+                          #   committed and content-hashed
 public/
   images/              # img1–3.jpg used by the gallery (array in About.tsx);
                        #   img_dep*.jpg (4) are unreferenced
     projects/          # One .webp thumbnail per project — see Projects
     material-boxes/    # 8 content-hashed .webp for that project's reading page
     wage-effects/      # 7 content-hashed .webp — cover + 6 figures padded to one ratio
+  og/                  # 7 content-hashed 1200x630 JPEGs — the link-preview cards
   svgs/                # 27 files: asu, sandia + 25 skill icons (see Skills)
   pdfs/                # resume.pdf + a folder per paper: cs-capstone/, basic-income/, thesis/
+  robots.txt           # Allows everything, and points at /sitemap.xml
+README.md              # Short, for GitHub. CLAUDE.md is the long version
+vercel.json            # The /papers/:slug redirect, then the SPA rewrite
 ```
 
 ### Dead code and assets
@@ -355,7 +372,7 @@ Verified unreferenced — safe to delete, and worth knowing about before you go 
 | About | No | Always open | `card-header-static`. **Not hoverable** — see below |
 | Education | Yes | **Open** | ASU sub-card, collapsed; expanding it reveals the two coursework expandables |
 | Experience | Yes | **Open** | Three role cards, each collapsed to a 2-line preview |
-| Projects | Yes | **Open** | A 3-across grid of uniform tiles (2 at ≤1100px, 1 at ≤768px). Each tile is a link to `/papers/:slug`: edge-to-edge visual, flush-right title, short blurb, rule, tag chips and small icon links. No counter, no type label |
+| Projects | Yes | **Open** | A 3-across grid of uniform tiles (2 at ≤1100px, 1 at ≤768px). Each tile is a link to `/projects/:slug`: edge-to-edge visual, flush-right title, short blurb, rule, tag chips and small icon links. No counter, no type label |
 | Skills | Yes | **Open** | 25 icon tiles in 4 labelled groups |
 | Awards | Yes | **Open** | One sub-card: ASU seal + a horizontal timeline of 3 honors. **Not in the nav** |
 | Contact | No (not a card) | Always open | Title outside, 3 link cards |
@@ -380,7 +397,7 @@ Mobile (≤768px) swaps the links for a `Menu`/`Close` hamburger; the menu is a 
 
 ### The Projects dropdown
 
-Hovering "Projects" drops a glass panel listing the six projects, each linking straight to its `/papers/:slug` page. Clicking "Projects" itself still scrolls to the grid, as it always did.
+Hovering "Projects" drops a glass panel listing the six projects, each linking straight to its `/projects/:slug` page. Clicking "Projects" itself still scrolls to the grid, as it always did.
 
 **The panel is a SIBLING of `<nav>`, not a child of the link, and it has to be.** `.nav` carries `overflow: hidden` — it clips the drawn hairline to the bar — so anything inside that hangs below it is cut off. `position: fixed` does **not** escape that either: the pill's own `backdrop-filter` makes it the containing block for fixed descendants. There is no arrangement that keeps the panel inside the bar. `.mobile-menu` already worked this way, so the pattern was there.
 
@@ -413,9 +430,13 @@ Measured at 1280: the panel is 239px wide under a link at x 943, six rows of 34p
 
 Contrast holds over the photo: at `.50` over the darkest part of the gallery image the composite is ~`#808486`, ~4.9:1 against the near-black nav text.
 
-### Docks to the top of the screen past 50% scroll
+### Docks to the top of the screen once the About card has scrolled past
 
-`.nav-docked` attaches the bar to the top edge of the viewport, drops the glass for a flat opaque fill, and draws a hairline out from its middle to both edges of the screen. The scroll handler only reads `scrollY`; page height is remeasured on `resize` **and** via a `ResizeObserver` on `body`, because expanding a section changes document height without firing a resize. It never docks while the mobile menu is open — that panel hangs from the bar's floating position, and docking would move the bar out from under it.
+`.nav-docked` attaches the bar to the top edge of the viewport, drops the glass for a flat opaque fill, and draws a hairline out from its middle to both edges of the screen. The scroll handler only reads `scrollY`; the threshold is remeasured on `resize` **and** via a `ResizeObserver` on `body`, because expanding a section changes the document without firing a resize.
+
+**The trigger is the About card's bottom edge, less the bar's own 68px footprint (top 12 + height 56)**, so the bar docks exactly as the card goes under it. It was "past 50% of the page", which had two problems. The halfway point **moved every time a section was expanded or collapsed**, so the same scroll position docked or didn't depending on what the reader had open — a threshold that depends on unrelated state. And on a long page it left the bar floating well past the point where it had stopped being a header: measured at 1280, the old rule fired at y 1390 and the new one at y 553, 2.5x earlier.
+
+**About is the right anchor precisely because it never collapses** (`card-header-static`), so its height is fixed and the threshold is stable no matter what is opened below it. Measured: not docked at y 0 or 533, docked at 573 and beyond. It never docks while the mobile menu is open — that panel hangs from the bar's floating position, and docking would move the bar out from under it.
 
 **This replaces a collapse to a 60px "KJ" monogram.** That version shrank the pill toward the left edge and crossfaded the full name to a mark. `.name-mark`, `.name-full`, `.nav-collapsed`, the monogram's tuned 60px/22px pair and both `linear()` easing curves are **gone with it** — don't look for them, and don't reinstate the monogram without reading *Two easing curves* in the git history first, because its geometry was load-bearing.
 
@@ -465,6 +486,9 @@ It indexes 7 sections, 6 projects, 16 courses, 25 skills, every section heading 
 - **Results run in a `requestAnimationFrame` after the palette closes.** `useModalChrome` restores the body's scrolling in a *passive* effect cleanup, which runs after the click handler returns; scrolling before that fights a locked page.
 - **A jump to a section of the page you are already on does not push a history entry** — it scrolls. Cross-page, it navigates with the section id in `location.state`, which `Home` reads in a layout effect declared *after* `useScrollRestore` (that hook scrolls a new entry to the top in a layout effect of its own, and effects run in hook-call order). Re-applied on `document.fonts.ready`, the same trap `useScrollRestore` documents.
 - **`openPalette` and `shortcutLabel` live in `openPalette.ts`, not in the component.** A module exporting both a React component and plain functions can't be Fast Refreshed — Vite invalidates it on every edit and says so in the console. The trigger is an event rather than a context because there is one thing to say and no state to hold.
+- **The panel takes the bar's material in BOTH of the bar's states**, the same rule the Projects dropdown follows: glass while the bar is glass, flat `--nav-solid` once it has docked. A reading page and the 404 have no nav bar at all and their top bar is already a flat `--page-base`, so the palette goes solid there too rather than being the one floating glass object on the page. Like the dropdown it **keeps `--nav-shadow`** where the docked bar gives its up — it is still floating over the page, and a solid box with no shadow reads as a hole punched in it. The state is read **once, on open**, which is sound rather than lazy: `useModalChrome` locks the body's scrolling while the palette is mounted, so the bar cannot dock or undock underneath it.
+- **The `<mark>` on a match is picked out by INK STRENGTH, not by a fill** — full `--textcolor` where the text around it is `--muted`. It was `color: inherit` plus weight, and that was a bug: inside a snippet the mark inherited `--muted`, came out the same colour as its surroundings, and read as an arbitrary bold word rather than as the thing that matched. Weight alone will not carry a highlight.
+  - That is also why the inverted row's secondary text is a `color-mix` toward the fill and **not `opacity`**. Opacity applies to the whole subtree, so a `<mark>` inside a dimmed snippet could never come back to full strength. Measured 7.85:1 light and 6.2:1 dark for the dimmed text against the inverted fill.
 - **The nav chip is icon-only and hidden ≤900px.** See *Palette trigger* in `Nav.css` — the bar clips what it can't fit, and the measured fit is much tighter than it looks.
 
 **Two known limits, both deliberate.** A course result scrolls to Education without opening the coursework block — revealing it needs a channel through three components and isn't worth it for 16 entries, so the subtitle names the list instead. And **About's and Experience's prose isn't indexed**, because it lives in JSX rather than in `content/`; the Experience section entry carries the three employer names as a hand-written `body` so "Sandia" finds it, flagged in `search.ts` as something to delete when that data moves.
@@ -483,7 +507,13 @@ It indexes 7 sections, 6 projects, 16 courses, 25 skills, every section heading 
 
 **Tech tags** (`Tags.tsx`; `.tag-list` / `.tag` in `App.css`) sit **below** the clamp, so they stay visible while a card is collapsed. They're chips filled with `--well-bg` and set in `--textcolor`: recessed rather than raised, per *Nesting goes DOWN*, in the site's neutral palette. They're **boxy, not pills**: `border-radius: 6px` on a ~23px chip is the same proportion as `.project-wip`'s 4px on 15px, so the tags and the badge read as one shape at two sizes. Scale the radius with the height if either changes. They're deliberately **normal case**, not the uppercase micro-label, because names like `PostgreSQL` read wrong in caps. Tags are drawn only from what each entry's text states. Don't add a language the copy doesn't mention without checking with Kian.
 
-**Santa Cruz Rental Price Model is the one entry whose tags go past its copy**, and deliberately: `LightGBM` and `Ridge Regression` name the model actually trained and the baseline tried before it, neither of which the description mentions (it says only "gradient-boosted"). Kian supplied both. Its first draft carried `JavaScript` and `RentCast API` from the copy's own wording; those came off because **the tags credit what Kian built, not what the project contains** — the pipeline and the client-side app were largely Claude's, and the modelling was his. That distinction is worth keeping in mind for any future entry: the tag row is an attribution, not an inventory.
+**Santa Cruz Rental Price Model's tags used to go past its copy, and one of them was simply WRONG.** They read `LightGBM` and `Ridge Regression`, and this file defended that as deliberate — "the model actually trained and the baseline tried before it". Kian corrected it: **Ridge was an intermediate step that never reached the final model, and the baseline was medians, not Ridge.** The tag is now `Linear Regression`, and the page's meta line went from `LightGBM, with a Ridge baseline` to `LightGBM over a linear market trend`.
+
+**The real architecture is two models, and the page now says so**: a LightGBM model predicts how far above or below the market a given unit sits — its premium or discount as a percentage — and a **linear regression predicts where the market itself is**, which is what lets the app quote a year beyond its training data. That second half was missing from every description of this project.
+
+**This is the same trap the wage-effects page documents, and it bit harder here.** There the stale summaries at least pointed at a page that was right; here the error was in the page, the card's tags *and* in this file's own justification for them — so a future session checking "is that tag correct?" would have found a paragraph saying yes. **A confident note in CLAUDE.md is not evidence.** When a claim is about what a project actually does, the repo is not the source of truth; Kian is.
+
+Its first draft carried `JavaScript` and `RentCast API` from the copy's own wording; those came off because **the tags credit what Kian built, not what the project contains** — the pipeline and the client-side app were largely Claude's, and the modelling was his. That distinction is worth keeping in mind for any future entry: the tag row is an attribution, not an inventory.
 
 ### Experience
 Three cards: Sandia, ASU Junior Researcher and ASU Undergraduate Teaching Assistant.
@@ -541,7 +571,7 @@ The ASU sub-card starts **collapsed**, showing school, dates, degrees and honors
 - It carries `.expandable-card`, so it gets the same pointer and hover tint as the Experience cards.
 
 ### Nested coursework
-Course data (`cseCourses`, `ecnCourses`) lives in `Education.tsx`. A local `<Coursework>` component renders one collapsible block per degree, **both closed by default**, toggling independently. The header shows the degree name with a muted `Coursework · N courses` subtitle beneath.
+Course data (`cseCourses`, `ecnCourses`) lives in **`src/content/courses.ts`**, not in this component — the course grid and the command palette's index both read it, and two copies of sixteen course codes would drift. A local `<Coursework>` component renders one collapsible block per degree, **both closed by default**, toggling independently. The header shows the degree name with a muted `Coursework · N courses` subtitle beneath.
 
 Each block is a **rounded recessed well** inset within the education sub-card — `border-radius: 14px !important`, `--well-bg`, `--well-shadow` (which is `none` in dark; see *Nesting goes DOWN, not up* for why). The course cards inside keep `--sub-card-grad`, so they read as raised against the well.
 
@@ -564,7 +594,7 @@ Each `.course-card` is a flex row: a `.course-card-text` column (code above name
 
 ## Skills section
 
-25 skills in `Proficiency.tsx`, in **four labelled groups**: Languages (7), Frameworks & Libraries (7), Developer Tools (6), Data & Research (5). Each group is its own `.skill-group` — a `.skill-group-label` above a `.skills-grid` flex-wrap of `.skill-item`; each icon sits in a 72px `.skill-icon-wrap` (`border-radius: 16px !important`, sub-card gradient + shadow).
+25 skills in **`src/content/skills.ts`** (moved out of `Proficiency.tsx` for the reason the courses were — the grid and the search index both read the list), in **four labelled groups**: Languages (7), Frameworks & Libraries (7), Developer Tools (6), Data & Research (5). Each group is its own `.skill-group` — a `.skill-group-label` above a `.skills-grid` flex-wrap of `.skill-item`; each icon sits in a 72px `.skill-icon-wrap` (`border-radius: 16px !important`, sub-card gradient + shadow).
 
 **The groups have to be render structure, not just array order.** This was previously one flat array ordered languages → frameworks → tools with blank lines between the runs. `.skills-grid` is `flex-wrap`, so rows reflowed straight across those boundaries and the ordering was invisible — all the maintenance cost, none of the benefit.
 
@@ -583,7 +613,7 @@ Spacing has to keep a group break louder than a row wrap: `.skills-wrapper` row 
 - The **64px column gap** is what separates two groups sitting side by side. It has to stay well clear of `.skills-grid`'s **20px** tile gap, which was cut from 36px so seven Languages tiles fit on one row inside half the card.
 - **≤1100px** stacks the groups again, because the two top-row groups no longer fit side by side on one line each.
 
-**"Seven Languages tiles on one row" is true at ≥1500px, not at every width.** 1500 is `--page-max`, which is where it was measured. Below the cap the two columns share whatever the viewport gives them, and at 1101–1280 the seven-tile groups wrap to two rows — under Inter as well as under Google Sans Flex, verified by A/B. Don't treat that wrap as a regression; the thing to check after a font swap is the ≥1500px case.
+**"Seven Languages tiles on one row" is true from about 1500px of viewport up, not at every width.** Below that the two columns share whatever the viewport gives them, and at 1101–1280 the seven-tile groups wrap to two rows — under Inter as well as under Google Sans Flex, verified by A/B. Don't treat that wrap as a regression; the thing to check after a font swap is the wide case.
 
 - Icons are `<img src="/svgs/name.svg">` from `public/svgs/` — **not** Vite imports.
 - Most are **simple-icons** glyphs with the brand hex added as a `fill` attribute on the `<svg>` tag (matching how `react.svg` was already built).
@@ -677,7 +707,7 @@ A grid of **uniform tiles, each one a link to that project's page**. Modelled on
 **Two things the reference has that this deliberately doesn't:** a **year** under the tags (*Projects carry no dates* — see below), and a hairline **border** around each card instead of a shadow (*No card borders* is a site-wide rule; these carry `--card-shadow` like every other card).
 
 ### The whole tile is one `<Link>`
-`to` is what the card's old "Read" button pointed at. Every project has a page under `/papers/:slug`, so there is no outbound-link case to handle and `to` is a plain string.
+`to` is what the card's old "Read" button pointed at. Every project has a page under `/projects/:slug`, so there is no outbound-link case to handle and `to` is a plain string.
 
 - **There is nothing else inside the card to click** — no nested `<a>`, no buttons — because a link inside a link is invalid and unusable with a keyboard. That is why the **outbound links moved onto each project's page** as `actions` (GitHub, CurseForge, the live site, the PDFs). Nothing was lost: the three papers already carried theirs, and the three new pages were given them.
 - The card takes `cursor: pointer` **honestly** now. Under the old layout the tile was inert and only the buttons worked, which is why it took `.hover-card` (tint, no pointer) instead — see *Dead code* for what became of that class.
@@ -782,7 +812,7 @@ Three across, **two at ≤1100px**, one at ≤768px. 1100 rather than the site's
 
 **There is no project type on the card.** "CS Capstone", "Personal Project" and so on moved to the pages, where every one of them was *already* rendered as the `eyebrow` — it was duplicated, and the card had no room for a second label. Verified before removing: all six pages carry a matching eyebrow.
 
-**Every project needs a page.** The cards link to `/papers/:slug` and nothing else, so a project added to `works` without an entry in the `papers` registry is a dead card. There is a note to that effect on the registry itself.
+**Every project needs a page.** The cards link to `/projects/:slug` and nothing else, so a project added to `works` without an entry in the `papers` registry is a dead card. There is a note to that effect on the registry itself.
 
 Two badge types sit **inline at the end of the project title**, so on a wrapping title they follow the last word: a green `.project-release` (the shipped version, e.g. "Version 1.1.0") and then a red `.project-wip`. **Material Boxes is the only card carrying either** — it has both. They **share one rule** and differ only in fill — `#2e8b57` and `#e03e3e`, fixed colours rather than theme tokens, both at the same ~4.3:1 against white, so neither shouts over the other.
 
@@ -791,12 +821,16 @@ Two badge types sit **inline at the end of the project title**, so on a wrapping
 
 ## Paper pages
 
-Full-text reading pages for the written work, at **`/papers/:slug`** (`src/pages/Paper.tsx`, `src/styling/pages/Paper.css`). Modelled on OpenAI's incident-report page: title block, sticky contents list on the left, ~700px article column on the right. Three: `basic-income`, `thesis` and `cs-capstone`. The first two open on their abstract with the text behind a button — see *The abstract is the landing view* below.
+Full-text reading pages for the written work, at **`/projects/:slug`** (`src/pages/Paper.tsx`, `src/styling/pages/Paper.css`). Modelled on OpenAI's incident-report page: title block, sticky contents list on the left, a 780px article column on the right. **Six** — one per project: `basic-income`, `thesis` and `cs-capstone` are converted from source PDFs, and `wage-effects`, `rental-prices` and `material-boxes` are hand-written in `project-pages.ts`. The first two open on their abstract with the text behind a button — see *The abstract is the landing view* below.
 
 - **The page's box is `--paper-max` (1320px) and `--paper-gutter` (36px, 20px at ≤768px)**, declared on `.paper` and read by both `.paper-topbar` and `.paper-inner` so the bar and the article beneath it cannot drift apart. It was a flat 1180 in both rules. The layout inside uses about 1050 (210 contents + 60 gap + 780 article), so the old box left the whole page floating mid-screen with the back control stranded 80px in from the edge; at 1280 the content now starts at x 36 rather than 86, and the back button at 30 rather than 80.
 - **`.paper-article` is 780px, up from 700.** At 1rem/1.85 that is about 95 characters — the top of a comfortable measure, and roughly where a line starts getting hard to track back from. Past this, widen the gutter instead.
 - **The top bar is `position: sticky`**, so the back control stays reachable however far down the reader is. It needs an opaque fill or the article scrolls through it, and the fill is `--page-base` — this is chrome, not a surface, the same call the home page's nav makes when it docks. **Two things have to clear its 76px** (68 on mobile): `.paper-toc`'s sticky `top` (92) and the headings' `scroll-margin-top` (104, 92 on mobile). Measured: a contents jump lands its heading 28px below the bar.
-- **Routing.** `App.tsx` has `/`, `/papers/:slug` and a catch-all `*`. A slug with no entry and an address that matches nothing render the **same** `NotFound` page — paper chrome, the theme, a footer, and links to all six projects, because the reader was looking for something. Before the catch-all existed, anything outside the two routes matched nothing and React rendered an empty div: a blank white page with no theme and no way out. **`vercel.json` carries an SPA rewrite** (`/(.*)` → `/index.html`); without it a direct hit on `/papers/basic-income` 404s on Vercel, since only `index.html` exists on disk. Vercel checks the filesystem before rewrites, so assets still serve normally.
+- **Routing.** `App.tsx` has `/`, `/projects/:slug`, a legacy `/papers/:slug` and a catch-all `*`.
+
+  **The reading pages used to live at `/papers/:slug` and moved to `/projects/:slug`.** "Papers" was never quite right — half of the six are software, not writing — and the section, the nav dropdown and the card grid all say Projects. The INTERNAL vocabulary did not move with the URL: `Paper.tsx`, `papers.ts`, `paper-view.ts`, `paperTables`, `paperIntros` and every `.paper-*` class still say paper. That is deliberate — renaming them is several hundred mechanical edits across the CSS and this file for no reader-visible gain, and the risk is all downside. Read "paper" as "a reading page" throughout.
+
+  **Old links keep working, and it is done TWICE on purpose.** `vercel.json` carries a `permanent: true` (308) redirect from `/papers/:slug`, which is the one that matters in production: Vercel runs redirects *before* rewrites, so a crawler and the address bar both end up on the new URL instead of the app silently swapping it underneath. The `LegacyPaperRedirect` route in `App.tsx` is what makes the same link work under `npm start`, where there is no vercel.json at all. It uses `replace`, so the dead URL doesn't sit in history and bounce the back button through the redirect. A slug with no entry and an address that matches nothing render the **same** `NotFound` page — paper chrome, the theme, a footer, and links to all six projects, because the reader was looking for something. Before the catch-all existed, anything outside the two routes matched nothing and React rendered an empty div: a blank white page with no theme and no way out. **`vercel.json` carries an SPA rewrite** (`/(.*)` → `/index.html`); without it a direct hit on a route 404s on Vercel. Vercel checks the filesystem before rewrites, so assets still serve normally — **and that ordering is now load-bearing for more than assets**: the seven prerendered HTML files in `dist/` depend on it, since each one has to win against the rewrite for its own path. See *The build has a second half*.
 - **Theme.** `useTheme` (`src/components/useTheme.ts`) is shared by `Home` and `Paper`, so both follow `theme-pref` identically. Home was refactored onto it; don't duplicate that logic in a new page.
 - **No navbar.** The nav's links scroll to sections that only exist on the home page. A paper page's top bar has a back button and a "Kian Javaheri" link on the left, and its own theme toggle on the right.
 - **The back button is icon-only** (`ArrowBack.tsx`, stroked at 1.3 on a 14-unit viewBox to match `ArrowOut`, sized by `.arrow-back` in CSS rather than per caller — the same arrangement as `.arrow-out` and `.cal-icon`). It calls **`navigate(-1)`**, a real history POP, which is what lets scroll restoration put the reader back where they were; `navigate('/')` would be a PUSH and land at the top. **When there is no in-app history behind it** — someone deep-linked or opened the page in a new tab — it goes to `/` instead, because a back button inside the page should never throw the reader off the site. `hasAppHistory()` reads the running `idx` react-router keeps on the history entry; at 0 there is nothing of ours behind us.
@@ -954,13 +988,15 @@ Why bother at all: the capstone's three architecture diagrams stacked ran **1,21
 
 ### Block types added for hand-written pages
 
-Three additions to `Block`, all driven by the Material Boxes documentation. They are general, but only that page uses them so far:
+Four additions to `Block`. The first three came out of the Material Boxes documentation; `table` came out of the rent model. They are general, and the hand-written pages now share them:
 
 - **`list` takes `ordered`**, which draws an `<ol>`. Quick-start steps are numbered because their order is the point. The marker goes on the `li`, not the list — the global `*` reset lands `list-style: none` on the element itself, so setting it on the `<ol>` would only be inherited and lose.
 - **`deflist`** is `{ term, href?, detail }[]`, rendered as a `<dl>`. It replaces a two-column markdown table of eight documentation pages. **A real table was the wrong shape twice over:** `.paper-table-scroll` would have sent eight rows of sentence-length text into a sideways scroll on a phone, and table cells are plain strings, so the first column couldn't be a link. Stacked, each detail simply wraps under its term.
   - The term link is **not** `.paper-link` — that is the header's 0.7rem uppercase micro-label, and these terms are sentences. It keeps the `dt`'s own 0.95rem/600 and takes a `--card-border` underline plus `ArrowOut`, the same reason the tech tags aren't uppercased either.
 - **`figure` and `carousel` take `plain`**, which drops the white plate the images normally sit on. That plate is there for the papers' figures, which are charts cropped out of a PDF and carry their own white background — without it, a dark page shows a bright slab. A **dark** image wants the exact opposite: on Material Boxes' Minecraft screenshots the plate drew a visible white ring around every one of them. In the carousel the padding and the slides' inset both come off one `--plate` variable, so they can't drift apart.
 - **`figure` takes `alt`**, which overrides the caption as alt text. Before this a figure's caption was its alt, so a picture needing a real description had to print that description under itself. Material Boxes' CurseForge screenshot captions as "The mod's page on CurseForge" and describes itself properly to a screen reader.
+- **`table`** is `{ type: 'table'; table: PaperTable }` — a table written straight into a section, which **a hand-written page previously had no way to draw at all**. The thesis's six reach `PaperTableBlock` by a *src lookup*: `renderBlock` sees a `figure`, finds `paperTables[b.src]`, and swaps the rebuilt grid in for the cropped image. That route needs an image to key off, which a page with no source document doesn't have. The new block is the direct way into the same renderer, so both paths style identically and the alignment detection, the `.paper-table-scroll` and the `<caption>` all come for free. `absorbs` means nothing here — there is no extracted prose to reclaim.
+  - **A column goes right-aligned only if EVERY non-empty cell is a quantity**, and that is worth knowing before writing a "not applicable" cell. The rent model's accuracy table has no feature count for its median baseline; an em dash there fails `QUANTITY` and would drag the whole Features column ragged left while MAPE and MAE stayed right. The cell is left **empty** instead — `isQuantityColumn` filters blanks out before testing — which renders as nothing and keeps the column aligned. Same trap, one level down, as the `Year` column the `c > 0` exception exists for.
 
 ### The Material Boxes page
 
@@ -971,7 +1007,7 @@ The first of the three hand-written project pages to grow past its stub blurb, a
 - **The seven screenshots are lossless WebP**, like `material-boxes.webp` in the projects grid and for the same reason — Minecraft's pixel text and flat colour are exactly what lossy WebP smears. Lossless roughly halved them against the source PNGs (1.27MB → 561KB). Don't "optimise" them to `-q 85` to match the paper figures.
 - **The CurseForge screenshot is left exactly as supplied** (2000x1269, already WebP at 126KB). Re-encoding a lossy screenshot of a web page to hit a width target only softens its type.
 - **The eight `Features` links point at the repo's real `docs/` files** — `github.com/kianjavaheri/material-boxes/blob/main/docs/<name>.md`. All eight were checked for a 200 before shipping; a docs index of dead links is worse than no links. A **View Documentation** action was added to the page header alongside CurseForge and GitHub.
-- **The card blurb is NOT on this page.** It shipped alongside the mod's own documentation for one round and the two said the same thing in two voices, 400px apart; Kian cut the blurb. So Overview opens in documentation voice, and the resume-voice sentence survives only on the project card, which is the one place it belongs. **`wage-effects` has since grown the same way** (see below); `rental-prices` is still the blurb alone.
+- **The card blurb is NOT on this page.** It shipped alongside the mod's own documentation for one round and the two said the same thing in two voices, 400px apart; Kian cut the blurb. So Overview opens in documentation voice, and the resume-voice sentence survives only on the project card, which is the one place it belongs. **`wage-effects` and `rental-prices` have since grown the same way** (see below), and each dropped its card blurb on the way for this exact reason.
 
 ### The wage-effects page
 
@@ -991,6 +1027,20 @@ So each is padded to a single ratio (`919/1520 ≈ 0.6046`) before encoding, wit
 - **`-q 85`-style lossy, at q90 — NOT lossless.** That is the opposite call from Material Boxes' screenshots, and for a real reason: these are matplotlib output, antialiased vector text and thin strokes, which lossy WebP handles well; Minecraft's pixel text is what it smears. q90 is 39KB against lossless's 72KB on the largest figure. The whole set is 256KB.
 - **They keep the white plate** — no `plain` flag. These are exactly the case the plate exists for: charts carrying their own near-white background, which would otherwise show as a bright slab on a dark page. Material Boxes' dark screenshots are the inverse case.
 - **The cover is left exactly as supplied** (2000x1250 WebP, 72KB), the same call as Material Boxes' CurseForge shot: re-encoding a lossy WebP to hit a width target only softens it. It is the same artwork as the project card's thumbnail, at a different crop — Kian asked for it at the top of the page, under the overview, with the remaining six in the carousel below.
+
+### The Santa Cruz rent model page
+
+The third hand-written page to grow past its stub, and **the only one of the six whose page carries no picture** — no figure and no carousel. (It still has a card thumbnail; `image` is required on `WorkProps`.) What it has instead is three tables, which is why the `table` block exists (see *Block types added for hand-written pages*). Six sections: Overview, The data, How it works, Accuracy, What it cannot see, and Running it in the browser.
+
+- **It dropped its card blurb**, the same call Material Boxes and wage-effects both made. The two resume-voice paragraphs that were the whole page said what the new lede says, less precisely, and would have sat directly above it.
+- **The three tables are three different jobs**, and only one of them is a table in the source sense. The modelling-slice counts and the tech stack are both two-column and could have been `deflist`s; they are tables so the page has **one register** for anything tabular rather than two. The accuracy comparison genuinely needs four columns.
+  - The stack table's second column is prose-ish (`GeoPandas, Shapely, proj4 (EPSG:3310)`) and so goes left-aligned by the detection, which is correct — these are lists of names, not quantities.
+  - **The baseline's feature count is an empty cell, not an em dash.** See the `table` bullet above; a dash there loses the whole column's alignment.
+- **The date range moved into the prose above the counts table**, on purpose. `Feb 2020 – Sep 2026` in a `Count` column is not a count, and one non-quantity cell would have taken the column ragged left.
+- **The worst port difference is written out as `$0.00000000000045`, not as 4.5 × 10⁻¹³.** The superscript minus (U+207B) would be the first codepoint on the site outside the glyph audit's range (see *Typography*), and a missing glyph is exactly how a fallback face — or an emoji presentation — sneaks in. The run of zeros also makes the point more vividly than the exponent does.
+- **The British spellings are the source's and are kept** (`neighbourhood`, `licence`, `coarsened`), matching the rest of the site's copy.
+- Numbers come from the project's own reported output and are quoted exactly: 12.9% deployed / 12.6% analysis / 15.2% baseline MAPE, the 9–17% regional spread, k = 0.211, 81.2% coverage against an 80% target. **The 9–17% spread is stated twice**, once in Accuracy and once in the limits list, as the source write-up states it. Keep the two in step.
+- Measured at 1280: **4,793px**, six sections, three tables, none of which overflows its `.paper-table-scroll`. At 375px all three still fit the 335px column with no sideways scroll, so the scroller never engages on this page — it is there for the thesis's wider grids.
 
 ### Content is converted from the PDF, not retyped
 `src/content/papers.ts` holds the types and the registry; each paper is its own generated module (`basic-income.ts`, `thesis.ts`, `cs-capstone.ts`). Only the capstone's conversion script survives in the repo, as `scripts/extract-cs-capstone.py`; the other two were one-off scripts.
@@ -1165,10 +1215,11 @@ It used to be an **inverted full-bleed slab** (0.7rem/400 on both sides). `--foo
 
 **The footer renders on both pages, and each gutters differently — so the page context decides where its text sits, not the component.** Both rules live in `Footer.css`, not split across `Home.css` and `Paper.css`, so they stay in step:
 
-- **`.paper footer`** takes `max-width: 1180px; margin: 0 auto`, the same box as `.paper-topbar`, so the name at the foot lands directly under the name at the head.
+- **`.paper footer`** takes `max-width: var(--paper-max); margin: 0 auto`, the same box as `.paper-topbar` and `.paper-inner`, so the name at the foot sits on the same left edge as the content above it.
+  - **It hard-coded `1180px` until that was caught by a pass over this file.** The literal was correct while `--paper-max` was also 1180, and silently wrong the moment that token went to 1320: measured, the footer's name drifted **10px right of the content at 1280 and 30px at 1500+**, with its right edge 106px inside the article's, while this document still claimed the two were flush. It is the token now. **Don't put a number back** — this is exactly the drift every other shared measurement here is a variable to prevent.
 - **Gutters are 36px everywhere on desktop.** At ≤768px the base drops to 20px (matching `.paper-topbar`) and **`.home footer` overrides `--footer-gutter` to 16px**, because `.cards-wrapper` drops to 16px there and at 20px the footer's text sat 4px inside the card edge above it. Setting the variable moves the padding and the rule together.
 
-Measured flush to **0.0px** — footer name against the reference left edge, `©` against the right — on `/`, `/papers/thesis` and `/papers/cs-capstone` at 1280, 1024, 768 and 375px.
+Measured flush to **0.00px** — footer name against the content's left edge, `©` against its right — on a reading page at 375, 768, 1024, 1280, 1500 and 1900, and on `/` against the About card at 1280 and 1900.
 
 Note the scroll-to-top button is still `--textcolor`-filled and now floats over a page-coloured footer rather than an inverted one, which reads better, not worse: it kept its contrast either way, but it no longer briefly matches the slab behind it.
 
@@ -1234,3 +1285,5 @@ There are five **`prefers-reduced-motion: reduce`** blocks: `Nav.css` (cuts the 
 - **No toggle button** — collapsible headers have no `<button>`; the whole `.card-header` toggles.
 - **Inline SVG for icons** — the back-to-top arrow, gallery chevrons and outbound-link arrow are inline SVG. Unicode arrows render as emoji on some mobile browsers; FontAwesome was removed from the bundle (it cost ~67 kB for one arrow).
 - **No emoji-capable codepoints in copy** — see *No emoji glyphs in copy* above.
+- **`text-size-adjust: 100%` on `html`.** iOS Safari inflates text in blocks it judges wide relative to the viewport **even with a correct `width=device-width, initial-scale=1`** — Chrome on Android turns the behaviour off when that meta is present, Safari does not. The symptom is a page that "comes in a little zoomed in" on an iPhone and nowhere else, with rows of inline type wider than they were authored. `100%`, **not `none`**: `none` also disables the reader's own pinch-zoom text scaling, which is a real accessibility setting.
+- **`App.css` is imported FIRST in `App.tsx`**, before any component that ships its own stylesheet. Vite emits CSS in import order, so while that line sat last, every rule in App.css won each specificity *tie* against a component sheet — and which one applied depended on nothing a reader of either file could see. If a component's own colour or spacing is mysteriously not applying, check this before adding `!important`.

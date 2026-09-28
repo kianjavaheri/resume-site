@@ -36,7 +36,7 @@ export interface WorkLink {
 export interface WorkProps {
   image: WorkImage
   // Where the card goes. Always a route on this site — every project has a
-  // page under /papers/:slug, so there is no outbound-link case to handle.
+  // page under /projects/:slug, so there is no outbound-link case to handle.
   to: string
   wip?: boolean
   // Shipped version, e.g. 'Version 1.1.0'. Green badge, left of the WIP one.
@@ -54,7 +54,7 @@ export interface WorkProps {
   links?: WorkLink[]
 }
 
-// Every card links to a page under /papers/:slug, and that is the ONLY thing a
+// Every card links to a page under /projects/:slug, and that is the ONLY thing a
 // card does — the whole tile is one <Link>.
 //
 // `blurb` is a TEASER, not the project's description. Two or three lines, in
@@ -71,7 +71,7 @@ export const works: Array<WorkProps> = [
   {
     title: 'Revolution Parts Shipment Quoting Microservice',
     navLabel: 'Shipment Quoting Microservice',
-    to: '/papers/cs-capstone',
+    to: '/projects/cs-capstone',
     image: { src: '/images/projects/shipment-quoting.18712804.webp', width: 900, height: 534, alt: 'The quoting tool: shipment and package details on the left, live carrier rates and cache status on the right' },
     blurb: 'A Dockerized caching layer sitting in front of carrier quote APIs, in Flask and PostgreSQL. Cut quoting latency 64.4%, a 2.8x speedup over live calls.',
     tags: ['Python', 'Flask', 'PostgreSQL', 'Docker'],
@@ -79,7 +79,7 @@ export const works: Array<WorkProps> = [
   {
     title: 'Public Perception vs. Actual Economic Effects of U.S.–China Trade Policy',
     navLabel: 'Barrett Honors Thesis',
-    to: '/papers/thesis',
+    to: '/projects/thesis',
     links: [{ label: 'View in ASU Library', icon: 'library', href: 'https://keep.lib.asu.edu/items/203948' }],
     image: { src: '/images/projects/thesis-survey.bd86e9f6.webp', width: 900, height: 506, alt: 'The thesis survey as respondents saw it, asking whether the U.S. runs a trade deficit or a surplus' },
     blurb: 'Why the public read the 2018–2020 trade war so differently from the economy itself. A survey, and NLP over the open-ended answers. Barrett honors thesis.',
@@ -88,7 +88,7 @@ export const works: Array<WorkProps> = [
   {
     title: 'Universal Basic Income vs. Targeted Welfare',
     navLabel: 'Universal Basic Income',
-    to: '/papers/basic-income',
+    to: '/projects/basic-income',
     image: { src: '/images/projects/basic-income.9eabe994.webp', width: 700, height: 394, alt: 'An engraving of a hand holding banknotes, ringed by line drawings of the things a basic income pays for: housing, groceries, a car, healthcare' },
     blurb: 'Five recent studies on whether a basic income is affordable, across developing and developed economies, and what the choice of funding does to growth.',
     tags: ['Macroeconomics', 'Policy Analysis'],
@@ -96,7 +96,7 @@ export const works: Array<WorkProps> = [
   {
     title: 'Estimating the Wage Effects of a Universal Basic Income',
     navLabel: 'Wage Effects of a UBI',
-    to: '/papers/wage-effects',
+    to: '/projects/wage-effects',
     links: [{ label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/welfare-model' }],
     image: { src: '/images/projects/wage-effects.120b1d50.webp', width: 1001, height: 563, alt: 'A histogram of per-mother wage-impact estimates from the causal forest, against the average treatment effect' },
     blurb: 'Double Machine Learning over the Baby\u2019s First Years cash-transfer RCT, estimating what $333 a month did to mothers\u2019 hourly wages a year later.',
@@ -104,20 +104,20 @@ export const works: Array<WorkProps> = [
   },
   {
     title: 'Santa Cruz Rental Price Model',
-    to: '/papers/rental-prices',
+    to: '/projects/rental-prices',
     links: [
       { label: 'View Live Site', icon: 'site', href: 'https://rental-prices.vercel.app/' },
       { label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/rental-prices' },
     ],
     image: { src: '/images/projects/rental-prices.3ab58f9d.webp', width: 900, height: 506, alt: 'The rent model web app: a map of Santa Cruz with priced blocks, and an estimate panel showing a prediction interval' },
     blurb: 'A rent model for studios and one-bedrooms across Santa Cruz and Monterey counties. Type an address, get a price and an honest uncertainty range.',
-    tags: ['LightGBM', 'Ridge Regression', 'Gradient Boosting', 'Feature Engineering'],
+    tags: ['LightGBM', 'Linear Regression', 'Gradient Boosting', 'Feature Engineering'],
   },
   {
     wip: true,
     release: 'Version 1.1.0',
     title: 'Material Boxes',
-    to: '/papers/material-boxes',
+    to: '/projects/material-boxes',
     links: [
       { label: 'View CurseForge', icon: 'curseforge', href: 'https://www.curseforge.com/minecraft/mc-mods/material-boxes' },
       { label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/material-boxes' },

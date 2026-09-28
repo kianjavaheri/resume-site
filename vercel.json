@@ -1,3 +1,10 @@
 {
+  "redirects": [
+    {
+      "source": "/papers/:slug",
+      "destination": "/projects/:slug",
+      "permanent": true
+    }
+  ],
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

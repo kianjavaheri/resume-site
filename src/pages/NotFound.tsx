@@ -11,7 +11,7 @@ import './../styling/pages/Paper.css'
  * The catch-all route, and the unknown-slug case on a reading page.
  *
  * Both used to fall through to nothing: App.tsx matched only `/` and
- * `/papers/:slug`, so a typo or a stale link rendered an empty div — a blank
+ * `/projects/:slug`, so a typo or a stale link rendered an empty div — a blank
  * white page with no theme, no chrome and no way out.
  *
  * It wears the reading pages' chrome rather than the home page's, because the
