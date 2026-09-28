@@ -93,7 +93,7 @@
    simply LinkedIn's again — dot left, rule running down between them. */
 @media (max-width: 768px) {
     .award-card {
-        gap: 16px;
+        gap: 18px;
         align-items: flex-start;
     }
 
@@ -101,8 +101,16 @@
         grid-template-columns: 1fr;
     }
 
+    /* 26px between entries, up from 14. Stacked, the three honors sat closer
+       to each other than the two lines INSIDE Dean's List ("All eight
+       semesters" is 2px under its own name), so the card read as one squashed
+       block of six lines rather than as three entries. The gap between
+       entries now clearly beats the gap within one.
+
+       It also gives the connector rule something to be: at 14px the run from
+       one dot to the next was barely longer than the dot itself. */
     .award-step {
-        padding: 0 0 14px 20px;
+        padding: 0 0 26px 20px;
     }
 
     .award-step:last-child {

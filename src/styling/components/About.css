@@ -212,7 +212,11 @@ a.about-social-link:visited {
 .gallery-img-exit-right,
 .gallery-img-exit-left {
     animation-duration: 0.45s;
-    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    /* easeInOutCubic. Was Material's cubic-bezier(0.4, 0, 0.2, 1), which is
+       an "emphasised decelerate" — it leaves fast and coasts in, so the two
+       slides spent most of the animation nearly still. The symmetric curve
+       reads as one continuous push. Shared with FigureCarousel. */
+    animation-timing-function: var(--ease-in-out-cubic);
     animation-fill-mode: forwards;
 }
 

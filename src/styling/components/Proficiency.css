@@ -49,16 +49,31 @@
     gap: 24px 20px;
 }
 
+/* On mobile this element is a <button> rather than a <div> (see
+   Proficiency.tsx), so it restates what a button brings with it: the UA's own
+   font, background and border. The global `*` reset already zeroes the border
+   and the radius. */
 .skill-item {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
+    background: none;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    text-align: center;
 }
 
+/* 64px, down from 72. The grid carries twenty-six tiles now and the section
+   was the loudest block on the page; a step down quiets it without touching
+   the type scale. The glyph came down with it at the same ~0.53 ratio (38/72
+   -> 34/64), so the icons keep their proportion inside the tile rather than
+   growing relative to it. The 16px radius is unchanged: at 0.25 of the tile it
+   would be 16 at either size. */
 .skill-icon-wrap {
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
     border-radius: 16px !important;
     background-color: var(--sub-card-fill);
     background-image: var(--sub-card-grad);
@@ -69,8 +84,11 @@
 }
 
 .skill-icon {
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
+    /* `contain`, not `cover`, and it earns its keep: most of these glyphs are
+       square, but LightGBM's is the mark's real 630x1048 extent and letterboxes
+       into the tile rather than being stretched square. */
     object-fit: contain;
 }
 
@@ -111,12 +129,58 @@
     }
 
     .skill-icon-wrap {
-        width: 60px;
-        height: 60px;
+        width: 56px;
+        height: 56px;
     }
 
     .skill-icon {
-        width: 32px;
-        height: 32px;
+        width: 30px;
+        height: 30px;
+    }
+
+    /* THE NAMES ARE HIDDEN HERE, and revealed one at a time on tap.
+       Twenty-six tiles wrapping two or three to a row put twenty-six lines of
+       uppercase micro-type through the section, which read as noise around
+       the marks rather than as labels on them.
+
+       `display: none` rather than a visually-hidden clip, deliberately: the
+       tile's <img> already carries `alt={title}`, so the skill is still
+       announced, and leaving a hidden-but-present label would have it read
+       out twice. The tile becomes a real <button> at this width, so the
+       reveal is reachable by keyboard as well as by touch.
+
+       The revealed name is absolutely positioned, so showing it CANNOT change
+       the tile's height and reflow the grid under the finger that tapped it.
+       The row gap below (20px) is what it sits in. */
+    .skill-item {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .skill-name {
+        display: none;
+    }
+
+    .skill-item-revealed .skill-name {
+        display: block;
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 50%;
+        transform: translateX(-50%);
+        /* Wider than the 56px tile, so a long name like PostgreSQL stays on
+           one line instead of wrapping into its neighbour's column. */
+        width: max-content;
+        max-width: 92px;
+        color: var(--textcolor);
+        /* Above the neighbouring tiles it overhangs. */
+        z-index: 1;
+    }
+
+    /* The tap target keeps its own feedback, since the name appearing is the
+       only other signal and it lands outside the tile. */
+    .skill-item-revealed .skill-icon-wrap {
+        background-image:
+            linear-gradient(var(--hover-tint), var(--hover-tint)),
+            var(--sub-card-grad);
     }
 }

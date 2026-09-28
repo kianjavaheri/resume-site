@@ -93,15 +93,25 @@ export const works: Array<WorkProps> = [
     blurb: 'Five recent studies on whether a basic income is affordable, across developing and developed economies, and what the choice of funding does to growth.',
     tags: ['Macroeconomics', 'Policy Analysis'],
   },
-  {
-    title: 'Estimating the Wage Effects of a Universal Basic Income',
-    navLabel: 'Wage Effects of a UBI',
-    to: '/projects/wage-effects',
-    links: [{ label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/welfare-model' }],
-    image: { src: '/images/projects/wage-effects.120b1d50.webp', width: 1001, height: 563, alt: 'A histogram of per-mother wage-impact estimates from the causal forest, against the average treatment effect' },
-    blurb: 'Double Machine Learning over the Baby\u2019s First Years cash-transfer RCT, estimating what $333 a month did to mothers\u2019 hourly wages a year later.',
-    tags: ['Python', 'EconML', 'XGBoost', 'Causal Inference'],
-  },
+  // HIDDEN, not deleted — Kian's call, Sep 2026: he wants to understand the
+  // project better before it represents him. Everything it needs is still here:
+  // the page in project-pages.ts, its seven images under public/images/
+  // wage-effects/ and public/og/, and the thumbnail above.
+  //
+  // To bring it back, uncomment THIS and the matching line in the `papers`
+  // registry in papers.ts. Both, together — a work with no page fails the
+  // build (prerender-meta.mjs throws), and a page with no work would be a live
+  // URL with nothing linking to it. The card, the nav dropdown row, the search
+  // index, the sitemap and its prerendered HTML all follow from these two.
+  // {
+  //   title: 'Estimating the Wage Effects of a Universal Basic Income',
+  //   navLabel: 'Wage Effects of a UBI',
+  //   to: '/projects/wage-effects',
+  //   links: [{ label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/welfare-model' }],
+  //   image: { src: '/images/projects/wage-effects.120b1d50.webp', width: 1001, height: 563, alt: 'A histogram of per-mother wage-impact estimates from the causal forest, against the average treatment effect' },
+  //   blurb: 'Double Machine Learning over the Baby\u2019s First Years cash-transfer RCT, estimating what $333 a month did to mothers\u2019 hourly wages a year later.',
+  //   tags: ['Python', 'EconML', 'XGBoost', 'Causal Inference'],
+  // },
   {
     title: 'Santa Cruz Rental Price Model',
     to: '/projects/rental-prices',
@@ -110,7 +120,7 @@ export const works: Array<WorkProps> = [
       { label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/rental-prices' },
     ],
     image: { src: '/images/projects/rental-prices.3ab58f9d.webp', width: 900, height: 506, alt: 'The rent model web app: a map of Santa Cruz with priced blocks, and an estimate panel showing a prediction interval' },
-    blurb: 'A rent model for studios and one-bedrooms across Santa Cruz and Monterey counties. Type an address, get a price and an honest uncertainty range.',
+    blurb: 'A rent model for studios and one-bedrooms across Santa Cruz and Monterey counties. Type an address, get a price and the range it probably falls in.',
     tags: ['LightGBM', 'Linear Regression', 'Gradient Boosting', 'Feature Engineering'],
   },
   {

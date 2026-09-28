@@ -334,6 +334,7 @@ a.project-icon-link:visited {
 }
 
 @media (max-width: 768px) {
+
     /* Tracks `.sub-card`'s 22px 24px padding at this width. */
     .project-visual {
         margin-top: -22px;

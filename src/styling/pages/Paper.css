@@ -144,7 +144,17 @@
     font-weight: 500;
     letter-spacing: -0.02em;
     line-height: 1.15;
-    max-width: 20ch;
+    /* NO max-width. It was `20ch`, which on the thesis — a 100-character
+       title — held the head to a ~640px column and broke it over FOUR lines
+       while 600px of the page sat empty beside it. Kian's call: the head
+       block spans the page like the rule under it does.
+
+       20ch is the right cap for a paragraph and the wrong one for a display
+       heading. The measure argument is about tracking back to the start of
+       the NEXT line, and it scales with how many lines there are: two lines
+       of 40px type is not a reading task. The head's own box is still capped
+       — `.paper-inner` is --paper-max — so this is not unbounded, it just
+       uses what the page already gives it. */
 }
 
 .paper-meta {
@@ -476,6 +486,18 @@
 /* An absolutely positioned replaced element does NOT resolve `auto` width from
    its insets — it falls back to the image's intrinsic size — so the box is
    given explicitly and `contain` fits the slide inside it. */
+/* IT SLIDES NOW, it does not crossfade. This used to be an opacity swap, on
+   the reasoning that a set of diagrams is not a sequence in space and so has
+   no direction to honour. Two things changed that: the carousel advances by
+   ITSELF every six seconds, and the dots below it let a reader jump from
+   slide 1 to slide 5. Both of those are movement through an ordered set, and
+   a fade says nothing about which way you went. It is also the About
+   gallery's motion, and the site has one slider register, not two.
+
+   Every slide stays mounted and is parked off-frame at ±100%; only the class
+   moves. `visibility` rides along with the transform so a parked slide is not
+   in the accessibility tree or hit-testable — `opacity` alone would leave
+   them all clickable on top of each other. */
 .paper-carousel-img {
     position: absolute;
     top: var(--plate);
@@ -483,12 +505,47 @@
     width: calc(100% - 2 * var(--plate));
     height: calc(100% - 2 * var(--plate));
     object-fit: contain;
-    opacity: 0;
-    transition: opacity 0.25s ease;
+    /* Parked to the right by default, which is where a slide that has not
+       been reached yet should come from. */
+    transform: translateX(100%);
+    visibility: hidden;
+    transition:
+        transform 0.45s var(--ease-in-out-cubic),
+        visibility 0s linear 0.45s;
+}
+
+/* Already passed: parked to the LEFT, so going back brings it in from the
+   side it left toward. */
+.paper-carousel-img-before {
+    transform: translateX(-100%);
 }
 
 .paper-carousel-img-on {
-    opacity: 1;
+    transform: translateX(0);
+    visibility: visible;
+    transition:
+        transform 0.45s var(--ease-in-out-cubic),
+        visibility 0s linear 0s;
+}
+
+/* A full-frame slide is the motion this setting exists to suppress. The
+   pictures still change, so the controls keep their feedback. */
+@media (prefers-reduced-motion: reduce) {
+    .paper-carousel-img {
+        transition: visibility 0s linear 0.2s, opacity 0.2s ease;
+        transform: none;
+        opacity: 0;
+    }
+
+    .paper-carousel-img-before {
+        transform: none;
+    }
+
+    .paper-carousel-img-on {
+        transition: visibility 0s linear 0s, opacity 0.2s ease;
+        transform: none;
+        opacity: 1;
+    }
 }
 
 /* Slides that bring their own background. The plate is there for the papers'
@@ -1256,10 +1313,6 @@ circle.paper-chart-s2 {
     /* The bar is 68px here (18 + 32 + 18), and there is no contents list. */
     .paper-section-title {
         scroll-margin-top: 92px;
-    }
-
-    .paper-title {
-        max-width: none;
     }
 
     .paper-para,

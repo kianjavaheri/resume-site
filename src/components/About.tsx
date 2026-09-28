@@ -3,13 +3,26 @@ import PdfModal, { withViewerParams } from './PdfModal'
 import LinkIcon from './LinkIcon'
 import { contactLinks, isMailto } from '../content/contact-links'
 import ArrowOut from './ArrowOut'
+import CarouselDots, { CarouselCounter } from './CarouselDots'
+import { useCarouselAutoplay } from './useCarouselAutoplay'
 import './../styling/components/About.css'
 
+// The running order. Kian reordered the gallery and the FILES were renamed to
+// match rather than the array being shuffled, so img1..img4 on disk really are
+// the gallery's 1st..4th. (It was briefly img3, img1, img_dep2, img2.) Keep it
+// that way -- renaming beats a comment explaining why the numbers are out of
+// sequence.
+//
+// img4 is the one PORTRAIT source here (992x1119, against the others' ~1.3
+// landscape). The frame is 4/3 with `object-fit: cover` and
+// `object-position: center top`, so it keeps the top ~66% -- head to knees --
+// and takes the crop off the bottom, which is where the path is. Checked by
+// rendering it, per the rule the project thumbnails follow.
 const images = [
   '/images/img1.jpg',
   '/images/img2.jpg',
   '/images/img3.jpg',
-  // '/images/img4.jpg',
+  '/images/img4.jpg',
 ]
 
 // Resolves once the bitmap is actually ready to paint, so a slide never starts
@@ -78,11 +91,11 @@ function Gallery() {
     return () => { cancelled = true }
   }, [idx])
 
-  const go = (delta: number, dir: 'right' | 'left') => async (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (busy.current) return
-    const next = (idx + delta + images.length) % images.length
+  // The one path to a new slide, shared by the arrows and the dots. Both have
+  // to run the preload-and-await, or a jump to a photo the browser has not
+  // fetched slides an empty frame in — the exact bug documented below.
+  const slideTo = async (next: number, dir: 'right' | 'left') => {
+    if (busy.current || next === idx) return
     if (!ready.current.has(next)) {
       busy.current = true
       try {
@@ -100,13 +113,29 @@ function Gallery() {
     setIdx(next)
   }
 
+  // Cycles forward on its own until an arrow or a dot is used, then stops for
+  // good. It goes through `slideTo` like everything else, so an autoplay step
+  // onto a photo the browser has not fetched still awaits the decode rather
+  // than sliding an empty frame in.
+  const { rootRef, takeOver, pauseProps } = useCarouselAutoplay({
+    count: images.length,
+    advance: () => { void slideTo((idx + 1) % images.length, 'right') },
+  })
+
+  const go = (delta: number, dir: 'right' | 'left') => async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    takeOver()
+    await slideTo((idx + delta + images.length) % images.length, dir)
+  }
+
   // A track translated by -idx would be simpler, but wrapping from the last
   // image to the first would slide the whole strip backwards — the wrong way.
   // With only three photos you hit that wrap every third click.
   const sliding = outgoing !== null
 
   return (
-    <div className="about-gallery">
+    <div className="about-gallery" ref={rootRef} {...pauseProps}>
       <div className="gallery-frame">
         {sliding && (
           <img
@@ -127,6 +156,9 @@ function Gallery() {
           onLoad={() => ready.current.add(idx)}
           onAnimationEnd={() => setOutgoing(null)}
         />
+        {/* Inside the frame, so it rides above both slides and is clipped by
+            the frame's own `overflow: hidden` like they are. */}
+        <CarouselCounter index={idx} count={images.length} />
       </div>
       <div className="gallery-controls">
         <button type="button" className="gallery-arrow" onClick={go(-1, 'left')} aria-label="Previous">
@@ -134,7 +166,24 @@ function Gallery() {
             <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
-        <span className="gallery-count">{idx + 1} / {images.length}</span>
+        {/* Dots rather than a bare `n / N`, so a reader can go straight to a
+            photo instead of clicking through to it. `go` is the arrows' own
+            handler, which is what carries the preload-and-await and the
+            direction of travel -- jumping has to take the same path, or a
+            dot click would slide an empty frame in on a cold image. */}
+        <CarouselDots
+          count={images.length}
+          index={idx}
+          itemLabel="photo"
+          onSelect={(i) => {
+            // A dot picks a slide, not a direction, so the direction is
+            // derived: a jump forward enters from the right, back from the
+            // left. Getting it wrong is not subtle — the photo travels the
+            // wrong way across the frame.
+            takeOver()
+            void slideTo(i, i > idx ? 'right' : 'left')
+          }}
+        />
         <button type="button" className="gallery-arrow" onClick={go(1, 'right')} aria-label="Next">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <path d="M6 3L11 8L6 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

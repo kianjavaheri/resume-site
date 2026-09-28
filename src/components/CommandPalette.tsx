@@ -92,8 +92,19 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
   // Read ONCE, on open, and that is sound rather than lazy: `useModalChrome`
   // locks the body's scrolling for as long as this is mounted, so the bar
   // cannot dock or undock underneath it.
+  //
+  // It reads `data-past-about`, NOT the `.nav-docked` class, and that is a bug
+  // fix rather than a preference. On a phone the palette is opened from the
+  // mobile menu's Search row, which closes the menu and opens the palette in
+  // the same click -- and an open menu forces the bar UNDOCKED (its panel
+  // hangs from the floating position). Both state updates batch into one
+  // render, so this initialiser ran while `.nav-docked` was still absent: the
+  // palette took the glass and then sat over a bar that re-docked flat behind
+  // it. The attribute tracks the scroll position alone and ignores the menu.
   const [solid] = useState(
-    () => location.pathname !== '/' || !!document.querySelector('.nav-docked')
+    () =>
+      location.pathname !== '/' ||
+      document.querySelector('.nav')?.getAttribute('data-past-about') === 'true'
   )
 
   const results = useMemo(() => search(query), [query])

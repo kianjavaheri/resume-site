@@ -121,6 +121,9 @@ Defined on `[data-theme='light']` / `[data-theme='dark']`:
 | `--well-hover-tint` | `rgba(0,0,0,.045)` | `rgba(255,255,255,.05)` | Hover tint for surfaces on `--well-bg` |
 | `--hover-tint` | `rgba(0,0,0,.032)` | `rgba(255,255,255,.022)` | Hover tint for page-colored surfaces |
 | `--hover-tint-inverse` | `rgba(255,255,255,.16)` | `rgba(0,0,0,.14)` | Hover tint for `--textcolor`-filled surfaces |
+| `--nav-hover-tint` | `rgba(0,0,0,.06)` | `rgba(255,255,255,.10)` | Hover tint for the nav bar's chips, in BOTH of its states |
+| `--nav-drop-shadow` | `0 10px 24px rgba(0,0,0,.12)` | `0 10px 28px rgba(0,0,0,.65)` | The Projects panel's downward-only cast |
+| `--ease-in-out-cubic` | `cubic-bezier(.645,.045,.355,1)` | same | The carousels' slide curve (on `:root`, not per theme) |
 | `--card-shadow` | — | — | Outer card elevation |
 | `--sub-card-shadow` | — | — | Inner card elevation |
 | `--nav-glass` | `rgba(197,203,217,.50)` | `rgba(68,68,78,.50)` | Nav pill fill |
@@ -151,6 +154,7 @@ Why it matters:
   ```
 - On surfaces filled with `--textcolor` (the scroll-to-top button), use `--hover-tint-inverse` — the normal tint is keyed to the page and would be invisible.
 - On surfaces filled with `--well-bg` (the coursework headers), use `--well-hover-tint`. `--hover-tint` in dark is only `.022` alpha — deliberately held down for the pure-black page — and on a well it is imperceptible.
+- **On the nav bar's chips — the links, the theme toggle, the hamburger, the palette chip and the dropdown's rows — use `--nav-hover-tint`.** Same reasoning one step further: the bar is chrome, not a page-coloured surface. **This was a real bug in dark mode.** Once the bar docks its fill is `--nav-solid`, which is pure `#000` there, and `.022` white on pure black composites to `rgb(6,6,6)` — a 6-point step, invisible. The hover simply did not exist on the docked bar. At `.10` it lands on `rgb(26,26,26)`, a 26-point step. Measured across all four cases (docked/floating × light/dark) the old tint gave steps of 6, 5, 8 and 8; the new one gives 26, 22, 15 and 14.
 
 ### Nesting goes DOWN, not up
 
@@ -193,7 +197,7 @@ Broke, and fixed:
 
 Looked broken, wasn't:
 
-- **The Languages group wrapping to two rows at 1280.** It does — and it did under Inter too. The claim that seven tiles fit on one row holds at **≥1500px**, which is `--page-max` and where it was measured. Verified 1 row under both faces at 1500/1700/1900, 2 rows under both at 1101/1280.
+- **The Languages group wrapping to two rows at 1280.** It does — and it did under Inter too. The claim that seven tiles fit on one row holds at **≥1500px**, which is where it was measured. Verified 1 row under both faces at 1500/1700/1900, 2 rows under both at 1101/1280. (Re-measured after the tile came down to 64px and Frameworks grew to eight: **all three of the 7/8/7 groups** are 1 row at 1500/1800/1900 and 2 rows at 1101/1280. The shrink bought exactly enough for the wider group, so the ≥1500 rule is unchanged.)
 - **Desktop chart end labels painting outside the svg.** Pre-existing, and *better* now: under Inter two charts overhung (+7.3px, +1.9px), under Google Sans Flex one does (+9.1px). The wide geometry has always let the end label run into its gutter; it adds no page scroll.
 - **Two collision pairs per chart on desktop.** Already documented below as em-box leading, not ink. Unchanged.
 
@@ -224,7 +228,7 @@ Section card titles are 0.95rem / 500. Normal casing everywhere — no `text-tra
 
 ### The page is capped, and that is what makes images scale on zoom-out
 
-`--page-max` (**1800px**) and `--page-gutter` (36px, 16px at ≤768px) are declared on `.home` in `Home.css`. It was 1500 until a 2560px monitor made the site read as a narrow strip with 530px of dead page down each side; at 1800 that is 416px, the cards go 1428px → 1728px wide, and the project tiles 372px → 545px. Nothing needed retuning with it — all three rules read the token, and the docked bar's padding is a `max()` against it, so the bar's contents stay put above the cap by construction (verified: the name sits at x 62/62 at 1280 and 442/442 at 2560, floating and docked). **Three rules read them and all three centre the same way** — `.cards-wrapper`, `.nav` and `.home footer`. One number, so they cannot drift. A **side effect worth knowing**: at the wider cap the seven-tile skill groups stop wrapping, because each column finally gets its full width.
+`--page-max` (**1800px**) and `--page-gutter` (36px, 16px at ≤768px) are declared on `.home` in `Home.css`. It was 1500 until a 2560px monitor made the site read as a narrow strip with 530px of dead page down each side; at 1800 that is 416px, the cards go 1428px → 1728px wide, and the project tiles 372px → 545px. Nothing needed retuning with it — all three rules read the token, and the docked bar's padding is a `max()` against it, so the bar's contents stay put above the cap by construction (verified: the name sits at x 62/62 at 1280 and 442/442 at 2560, floating and docked). **Three rules read them and all three centre the same way** — `.cards-wrapper`, `.nav` and `.home footer`. One number, so they cannot drift. A **side effect worth knowing**: at the wider cap the skill groups stop wrapping, because each column finally gets its full width.
 
 **The cap exists for a reason that isn't obvious.** Uncapped, the layout was fluid all the way out, so the About gallery photo and the project thumbnails kept their apparent size on screen as the viewport grew — zoom out and the type shrank while the pictures didn't, because their containers widened in step with the zoom. Capped, the whole page scales together, which is what zooming out is supposed to do.
 
@@ -262,7 +266,8 @@ src/
     Experience.tsx     # Collapsible, default OPEN. Three expandable role cards (Sandia, ASU RA, ASU TA) w/ tags
     Projects.tsx       # Collapsible, default OPEN. Six uniform tiles, each a <Link> to
                        #   /projects/:slug. Entries live in content/projects.ts
-    Proficiency.tsx    # Collapsible, default OPEN. 25 skills in 4 labelled groups of rounded icon tiles
+    Proficiency.tsx    # Collapsible, default OPEN. 27 skills in 4 labelled groups of rounded icon
+                       #   tiles. On mobile the tiles are BUTTONS and the names are tap-to-reveal
     Awards.tsx         # Collapsible, default OPEN. 3 honors on a horizontal rail, ASU seal
     useClampedExpand.ts # Clamp-and-expand hook — Experience cards only (Projects tiles don't clamp)
     useTheme.ts        # Shared theme hook (theme-pref) — used by Home AND Paper
@@ -300,7 +305,7 @@ src/
                        #   Paper.tsx AND search.ts — see Paper pages
     search.ts          # The command palette's index, BUILT from the other modules
     courses.ts         # The 16 courses — read by Education.tsx AND search.ts
-    skills.ts          # The 25 skills in 4 groups — read by Proficiency.tsx AND search.ts
+    skills.ts          # The 27 skills in 4 groups — read by Proficiency.tsx AND search.ts
     projects.ts        # The Projects grid's entries + types — read by Projects.tsx AND Navbar
     contact-links.ts   # LinkedIn / GitHub / Email + isMailto() — read by Contact AND About
     basic-income.ts    # GENERATED from public/pdfs/basic-income/ — regenerate, don't hand-edit
@@ -330,10 +335,10 @@ src/
       Contact.css      # 3-col grid of .contact-card; icon + label left, arrow right
       Courses.css      # .courses-grid + .course-card + .course-card-num — imported by Education.tsx
       Footer.css       # Quiet in-flow bar + the two page-context gutter rules
-      Nav.css          # Floating pill, glass, .nav-docked + its drawn hairline, dropdown
+      Nav.css          # Floating pill, glass, .nav-docked, the Projects dropdown + its caret
       Palette.css      # The ⌘K panel: nav material, inverted selected row
       Awards.css       # .award-card — .exp-logo copy + .award-track dot rail
-      Proficiency.css  # .skill-group + label; .skills-grid flex-wrap; 72px .skill-icon-wrap; .skill-monogram
+      Proficiency.css  # .skill-group + label; .skills-grid flex-wrap; 64px .skill-icon-wrap; .skill-monogram
       Projects.css     # 3-across grid; .project-main link + sibling footer of chips and icons
       Scroll.css       # Inverted fill, rounded square, fade in/out
 scripts/
@@ -343,13 +348,15 @@ scripts/
   make-og-images.sh       # Regenerates public/og/. Manual — the outputs are
                           #   committed and content-hashed
 public/
-  images/              # img1–3.jpg used by the gallery (array in About.tsx);
+  images/              # img1–4.jpg used by the gallery, IN THAT ORDER (array in About.tsx);
                        #   img_dep*.jpg (4) are unreferenced
     projects/          # One .webp thumbnail per project — see Projects
     material-boxes/    # 8 content-hashed .webp for that project's reading page
     wage-effects/      # 7 content-hashed .webp — cover + 6 figures padded to one ratio
   og/                  # 7 content-hashed 1200x630 JPEGs — the link-preview cards
-  svgs/                # 27 files: asu, sandia + 25 skill icons (see Skills)
+  svgs/                # 31 files: asu, sandia + 27 skill icons, plus two with no caller —
+                       #   apachespark.svg (PySpark's) and matplotlib.svg (commented out),
+                       #   PySpark left behind when it came off the list (see Skills)
   pdfs/                # resume.pdf + a folder per paper: cs-capstone/, basic-income/, thesis/
   robots.txt           # Allows everything, and points at /sitemap.xml
 README.md              # Short, for GitHub. CLAUDE.md is the long version
@@ -361,7 +368,7 @@ Verified unreferenced — safe to delete, and worth knowing about before you go 
 
 - **`src/components/Resume.tsx`** — not imported anywhere; points at an old Google Doc.
 - **`src/util/svgs/`** — 8 SVGs (`asulogo`, `cpp`, `gcp`, `go`, `java`, `js`, `python`, `react`) from before the move to `public/svgs/`. Nothing imports them. This is the trap the *SVGs live in `public/svgs/`* rule exists to avoid: there are two svg directories and only one is live.
-- **`public/images/img_dep*.jpg`** — 4 files, not in the gallery array.
+- **`public/images/img_dep.jpg`, `img_dep1.jpg`, `img_dep3.jpg`** — 3 files, not in the gallery array. There was a fourth: `img_dep2.jpg` was promoted into the gallery and is now **`img4.jpg`** (see *About gallery*).
 - **`.card-toggle-btn`** in `App.css` (plus `--toggle-btn-bg` / `--toggle-btn-bg-hover`, which feed nothing else) — styles for a button that is never rendered; headers toggle on the whole `.card-header` row.
 - **`.hover-card`** in `App.css` — the hover tint without the pointer cursor. The Projects tiles took it while they were inert; they are links now and carry their own hover. The rule is annotated in place, because the distinction it encodes (never promise a click you can't honour) is worth keeping even while unused.
 
@@ -397,15 +404,27 @@ Mobile (≤768px) swaps the links for a `Menu`/`Close` hamburger; the menu is a 
 
 ### The Projects dropdown
 
-Hovering "Projects" drops a glass panel listing the six projects, each linking straight to its `/projects/:slug` page. Clicking "Projects" itself still scrolls to the grid, as it always did.
+Hovering "Projects" drops a panel listing the projects, each linking straight to its `/projects/:slug` page. Clicking "Projects" itself still scrolls to the grid, as it always did. **The link carries a caret** (`CaretDown.tsx`) marking it as the one that expands.
 
-**The panel is a SIBLING of `<nav>`, not a child of the link, and it has to be.** `.nav` carries `overflow: hidden` — it clips the drawn hairline to the bar — so anything inside that hangs below it is cut off. `position: fixed` does **not** escape that either: the pill's own `backdrop-filter` makes it the containing block for fixed descendants. There is no arrangement that keeps the panel inside the bar. `.mobile-menu` already worked this way, so the pattern was there.
+**The panel is the bar's surface CONTINUING DOWNWARD, not an island floating under it.** Kian's call, after OpenAI's nav. It used to hang 10px below the pill as its own rounded box with a full rim and a four-sided shadow, which read as a second, separate thing. Three changes carry the join, and none of them works alone:
+
+- **It is flush, and its top corners are SQUARE.** `padding-top` on `.nav-dropdown` went 10px → 0, so the panel starts exactly at the bar's bottom edge; measured, the gap is 0.00px in all four states. The bar's own corners are 20px, but the Projects link sits nowhere near one and a pill's bottom edge is straight everywhere in between, so a square-topped box hung off it merges into it. The bottom corners stay rounded at **8px**, because that edge really is an edge — and the old reason for that radius (look deliberately smaller than the 20px pill, so as not to read as a second pill) is gone, leaving only the rule that a container's corner stays looser than its contents' 6px rows.
+- **There is no rim.** `--nav-rim`'s bright `inset 0 1px 0` is a specular highlight along a *top edge*, and the panel no longer has one to light. Drawn anyway, it was a bright line straight across the seam.
+- **The shadow is `--nav-drop-shadow`, which casts only downward.** `--nav-shadow`'s second `0 1px 3px` component rings all four sides and the top of that ring landed on the join.
+
+**And `.nav-dropdown`'s `z-index` went 99 → 101, ABOVE the bar's 100.** This is the non-obvious one: the bar casts its shadow downward onto whatever is beneath it, so underneath it the panel's top edge was painted over and the two read as two surfaces with a dark seam between them. They do not overlap — the panel begins exactly where the bar ends — so nothing is hidden by raising it.
+
+Verified in all four states (floating/docked × light/dark): `gapToBar` 0.00px, panel fill identical to the bar's fill, top corners square, `z-index` 101 over 100.
+
+**The caret is driven by the panel's OWN state, not by `:hover`.** `.nav-menu-open .nav-caret` rotates 180° and comes up from `--muted` to `--textcolor`. It has to be state-driven because the pointer *leaves the link* the moment it moves down onto the panel — a `:hover` flip would snap the caret back down while the menu it describes was still open. It is inline SVG at 1em on the shared 14-unit/1.3-stroke geometry, and not a typed character, for the usual reason: the arrow codepoints carry an emoji presentation. Under `prefers-reduced-motion` the rotation is dropped and only the colour change remains — the direction still reads, because it is a flip and not a journey.
+
+**The panel is a SIBLING of `<nav>`, not a child of the link, and it has to be.** `.nav` carries `overflow: hidden` — it clips the name and links as the pill resizes — so anything inside it that hangs below it is cut off. `position: fixed` does **not** escape that either: the pill's own `backdrop-filter` makes it the containing block for fixed descendants. There is no arrangement that keeps the panel inside the bar. `.mobile-menu` already worked this way, so the pattern was there.
 
 `left` is set inline from the link's measured `getBoundingClientRect().left`; everything else is in `Nav.css`.
 
 **It is a pointer affordance, and deliberately not a menu widget.** Sitting outside the bar, the panel can't be reached by `:focus-within` and isn't in the link's tab order, so it carries **no `aria-haspopup` / `aria-expanded`** — announcing a popup a keyboard user can't open would be a lie. Building a real menu (roving focus, arrow keys, Escape) would be the alternative, and it isn't worth it here because **nothing is only reachable this way**: the Projects grid is six links to the same six pages, and the nav's own Projects link goes there. Same rule as the chart tooltip — it enhances and never gates.
 
-- **There is no dead gap to fall through.** `.nav-dropdown` is a transparent box starting at the bar's bottom edge with `padding-top: 10px`; the glass is on the inner `.nav-dropdown-panel`. The pointer crosses that padding, not empty page. A 120ms close delay covers the diagonal.
+- **There is no dead gap to fall through — and now there is no gap at all.** `.nav-dropdown` used to carry a `padding-top: 10px` as a transparent bridge across the space between bar and panel. The panel is flush now, so there is nothing to bridge: the pointer's only journey is across the bar's own bottom padding (~14px below the link), which the 120ms close delay covers.
 - **Both coordinates are measured, not hard-coded.** `left` comes from the Projects link's rect and `top` from the nav's own `getBoundingClientRect().bottom`, because **the bar sits at two heights**: 68px floating (12 + 56) and 56px docked. A literal would be right in one state and 12px wrong in the other.
 - **It closes whenever the bar docks or undocks, and on resize.** The bar moves out from under it either way, and a resize would leave it pointing at a link that has moved.
 - **Hidden at ≤768px**, where there is no pointer to hover with and the hamburger menu already carries a plain Projects link.
@@ -414,9 +433,9 @@ Hovering "Projects" drops a glass panel listing the six projects, each linking s
 
 **`works` moved to `src/content/projects.ts`** when this was added, because the grid and the nav both need it and a second list would drift. `navLabel` is an optional SHORT name for the menu row: the card titles run to 71 characters and would wrap to three lines in a 242px panel. Four of the six carry one, and it falls back to `title`. That makes three lengths the same project is written at — the page's full title, the card's shortened one, and this — which is a real maintenance cost and the reason `navLabel` is optional rather than required.
 
-**The panel's corner is 10px, NOT the bar's 20px**, and its rows are 400 where the bar's links are 500. Both are deliberate steps away from the pill it hangs from: at 20px on a 239px box the panel read as a second pill floating off the bar rather than as a menu, and a menu of six destinations is a list you scan, not six more things that look as clickable as the nav itself. The rows' own radius came down to 6px with the panel — an inner corner rounder than its container's reads as a mistake.
+**The panel's rows are 400 where the bar's links are 500** — a menu of destinations is a list you scan, not more things that look as clickable as the nav itself. Their 6px radius stays inside the panel's own 8px, since an inner corner rounder than its container's reads as a mistake.
 
-Measured at 1280: the panel is 239px wide under a link at x 943, six rows of 34px, and every label fits on one line.
+Measured at 1280: the panel is 244px wide, and every label fits on one line.
 
 ### The glass is four things at once
 
@@ -445,13 +464,13 @@ Contrast holds over the photo: at `.50` over the darkest part of the gallery ima
 - **`.nav` is still sized with `width`, not `right`** — the dock animates width from `calc(100% - 72px)` to `100%`, and `left` + `width` + `right` is over-constrained (`right` gets dropped and the bar sits off-centre). The mobile query must override `width` too, for the same reason.
 - **The mobile `.nav-docked` restates `top`, `left`, `width` and `padding`.** Same specificity as the `.nav` rule in that query, so on source order alone the mobile inset would win and the bar would never reach the screen's edges on a phone. (This is the same trap the old `.nav-collapsed` had, and the reason it is called out twice.)
 
-#### The line is a scaled ::after, not a border
+#### The docked bar has NO hairline, and the one it had is gone for good
 
-`.nav::after` is a 1px `--card-border` rule pinned to the bar's bottom edge at `transform: scaleX(0)`, going to `scaleX(1)` when docked. A `border-bottom` can't be drawn from the middle outward; a scaled pseudo-element can, and `transform` is composited so it costs nothing per frame. `.nav`'s own `overflow: hidden` guarantees it can never paint past the bar.
+There used to be a `.nav::after` here: a 1px `--card-border` rule pinned to the bar's bottom edge at `transform: scaleX(0)`, scaling to `scaleX(1)` as the bar docked, delayed 0.12s so it drew out from the centre *after* the bar had travelled — and retracting first on the way back, so the pair had a direction.
 
-`--card-border` is the internal-divider token, which is exactly what this is — the same call the footer's hairline makes.
+**Kian cut it.** On the solid docked bar it read as a stray grey line across the top of the page rather than as a divider: the bar already separates itself from the content by being opaque and flush to the screen's edge, so the rule was drawing a boundary that was there anyway.
 
-**The line is delayed 0.12s on the way in and not at all on the way out**, which is what gives the pair a direction: docking, the bar travels and *then* the line draws to meet the new edges; undocking, the line retracts first and the bar lifts away behind it. Measured through a dock at 1280: the line is still at 0 while the bar is at left 19.7, and reaches 0.78 by 160ms, by which time the bar is at left 1.4.
+Gone with it: `.nav-docked::after`, the mobile duration match (0.36s) and the reduced-motion fade. **Don't reinstate a line without reading this first** — the draw-out was tuned against the dock's own 0.45s curve, and the delay asymmetry was the whole point of it. A plain `border-bottom` is not the same thing and can't be drawn from the middle outward.
 
 #### One curve, and deliberately no overshoot
 
@@ -474,7 +493,7 @@ Duration is the only performance lever that doesn't change how the bar looks. `w
 
 **Nothing in the index is a second copy of any content.** It is BUILT from the modules the pages already render — `works`, `courseGroups`, `skillGroups`, the `papers` registry and `renderedSections()` — so a project, a course or a paragraph cannot be searchable and absent, or present and unsearchable. That invariant is the entire reason `content/paper-view.ts` exists; see *The render layer is shared with the search index* under Paper pages.
 
-It indexes 7 sections, 6 projects, 16 courses, 25 skills, every section heading and subheading, and the full prose of all six papers. Verified: **all 47 linkable hashes across all six papers resolve to a real element** on the rendered page.
+It indexes 7 sections, the projects, 16 courses, 27 skills, every section heading and subheading, and the full prose of every paper in the registry (see *One project is hidden* under Projects — the counts here are written for the full set). Verified: **all 47 linkable hashes across all six papers resolve to a real element** on the rendered page.
 
 - **Built LAZILY, on the first search, then held.** Walking ~120KB of paper text costs a couple of milliseconds — nothing on a keystroke, and worth not paying on first paint.
 - **Scoring is substring, not fuzzy subsequence.** On an index this size a subsequence matcher finds a path through almost every long paragraph and the results stop meaning anything. A hit at a word boundary beats one inside a word, an early hit beats a late one, and **every term must land somewhere** or a two-word query matches anything containing either half.
@@ -486,6 +505,8 @@ It indexes 7 sections, 6 projects, 16 courses, 25 skills, every section heading 
 - **Results run in a `requestAnimationFrame` after the palette closes.** `useModalChrome` restores the body's scrolling in a *passive* effect cleanup, which runs after the click handler returns; scrolling before that fights a locked page.
 - **A jump to a section of the page you are already on does not push a history entry** — it scrolls. Cross-page, it navigates with the section id in `location.state`, which `Home` reads in a layout effect declared *after* `useScrollRestore` (that hook scrolls a new entry to the top in a layout effect of its own, and effects run in hook-call order). Re-applied on `document.fonts.ready`, the same trap `useScrollRestore` documents.
 - **`openPalette` and `shortcutLabel` live in `openPalette.ts`, not in the component.** A module exporting both a React component and plain functions can't be Fast Refreshed — Vite invalidates it on every edit and says so in the console. The trigger is an event rather than a context because there is one thing to say and no state to hold.
+- **It reads `data-past-about` on `<nav>`, NOT the `.nav-docked` class, and that is a bug fix rather than a preference.** On a phone the palette is opened from the mobile menu's `Search` row, which calls `close()` and `openPalette()` in the same click — and an open menu forces the bar **undocked** (`docked = pastAbout && !menuOpen`, because the menu panel hangs from the bar's floating position). Both state updates batch into one render, so this initialiser ran while `.nav-docked` was still absent: **the palette took the glass and then sat over a bar that re-docked flat behind it.** That is exactly the symptom — "the search bar is in the liquid glass even when scrolled down on mobile". `data-past-about` tracks the scroll position alone and ignores the menu. Verified at 375px in both themes: scrolled, `nav-docked` is absent while the menu is open but the attribute stays `"true"`, and the palette opens solid over a re-docked bar; at the top it correctly takes the glass.
+- **`.palette-input` is `font-size: 16px` at ≤768px, and 16 is a threshold rather than a taste.** iOS Safari zooms the whole page in when a focused input's text is under 16px, and does not zoom back out on blur — which is the other half of "it comes slightly zoomed in". This is the site's only `<input>` and the palette focuses it the instant it opens, so every search left the page enlarged. **`text-size-adjust: 100%` does not cover this** (that governs Safari's inflation of wide text blocks, a different behaviour with a different trigger) and neither does the viewport meta, which is already correct. The fix is **not** `maximum-scale`, which would take away the reader's own pinch-zoom. 0.95rem is 15.2px, so this is a 0.8px step nobody will notice.
 - **The panel takes the bar's material in BOTH of the bar's states**, the same rule the Projects dropdown follows: glass while the bar is glass, flat `--nav-solid` once it has docked. A reading page and the 404 have no nav bar at all and their top bar is already a flat `--page-base`, so the palette goes solid there too rather than being the one floating glass object on the page. Like the dropdown it **keeps `--nav-shadow`** where the docked bar gives its up — it is still floating over the page, and a solid box with no shadow reads as a hole punched in it. The state is read **once, on open**, which is sound rather than lazy: `useModalChrome` locks the body's scrolling while the palette is mounted, so the bar cannot dock or undock underneath it.
 - **The `<mark>` on a match is picked out by INK STRENGTH, not by a fill** — full `--textcolor` where the text around it is `--muted`. It was `color: inherit` plus weight, and that was a bug: inside a snippet the mark inherited `--muted`, came out the same colour as its surroundings, and read as an arbitrary bold word rather than as the thing that matched. Weight alone will not carry a highlight.
   - That is also why the inverted row's secondary text is a `color-mix` toward the fill and **not `opacity`**. Opacity applies to the whole subtree, so a `<mark>` inside a dimmed snippet could never come back to full strength. Measured 7.85:1 light and 6.2:1 dark for the dimmed text against the inverted fill.
@@ -594,11 +615,13 @@ Each `.course-card` is a flex row: a `.course-card-text` column (code above name
 
 ## Skills section
 
-25 skills in **`src/content/skills.ts`** (moved out of `Proficiency.tsx` for the reason the courses were — the grid and the search index both read the list), in **four labelled groups**: Languages (7), Frameworks & Libraries (7), Developer Tools (6), Data & Research (5). Each group is its own `.skill-group` — a `.skill-group-label` above a `.skills-grid` flex-wrap of `.skill-item`; each icon sits in a 72px `.skill-icon-wrap` (`border-radius: 16px !important`, sub-card gradient + shadow).
+27 skills in **`src/content/skills.ts`** (moved out of `Proficiency.tsx` for the reason the courses were — the grid and the search index both read the list), in **four labelled groups**: Languages (7), Frameworks & Libraries (8), Developer Tools (7), Data & Research (5). Each group is its own `.skill-group` — a `.skill-group-label` above a `.skills-grid` flex-wrap of `.skill-item`; each icon sits in a **64px** `.skill-icon-wrap` (`border-radius: 16px !important`, sub-card gradient + shadow), with a 34px glyph inside it.
+
+**The tile went 72px → 64px (56px on mobile), and the glyph with it at the same ratio** — 38/72 and 34/64 are both ~0.53, so the icons keep their proportion inside the tile rather than growing relative to it. The 16px radius is unchanged and needs no note: at 0.25 of the tile it would be 16 at either size. The section carries twenty-seven tiles now and was the loudest block on the page; a step down quiets it without touching the type scale.
 
 **The groups have to be render structure, not just array order.** This was previously one flat array ordered languages → frameworks → tools with blank lines between the runs. `.skills-grid` is `flex-wrap`, so rows reflowed straight across those boundaries and the ordering was invisible — all the maintenance cost, none of the benefit.
 
-**Data & Research is deliberately not folded into Developer Tools.** Stata, QGIS, Qualtrics, MATLAB and JupyterHub are the tooling behind the econometrics and the thesis, and they are the clearest evidence in the site that the Economics degree is a second credential rather than a line item. Filing them under "Developer Tools" both mislabels them (Qualtrics is a survey platform) and buries the point. It also keeps the buckets even — 7/7/6/5 instead of 7/7/11.
+**Data & Research is deliberately not folded into Developer Tools.** Stata, QGIS, Qualtrics, MATLAB and JupyterHub are the tooling behind the econometrics and the thesis, and they are the clearest evidence in the site that the Economics degree is a second credential rather than a line item. Filing them under "Developer Tools" both mislabels them (Qualtrics is a survey platform) and buries the point. It also keeps the buckets from collapsing into one — 7/8/7/5 instead of 7/8/12.
 
 `skillGroups` is **explicitly annotated** `{ label: string; skills: Skill[] }[]`. Without the annotation each group's array gets its own narrow element type and `s.invertDark` errors in the groups that have no inverted icon.
 
@@ -610,7 +633,7 @@ Spacing has to keep a group break louder than a row wrap: `.skills-wrapper` row 
 ### 2×2 above 1100px
 `.skills-wrapper` is a grid, `auto auto`. Source order gives Languages | Frameworks & Libraries on top and Developer Tools | Data & Research below. Stacked, the section was twice as tall as it needed to be and left most of the card empty on the right.
 - Columns are **`auto`**, so each is only as wide as its longest row of tiles. `justify-content: start` keeps the pair left-aligned rather than spread across the card.
-- The **64px column gap** is what separates two groups sitting side by side. It has to stay well clear of `.skills-grid`'s **20px** tile gap, which was cut from 36px so seven Languages tiles fit on one row inside half the card.
+- The **64px column gap** is what separates two groups sitting side by side. It has to stay well clear of `.skills-grid`'s **20px** tile gap, which was cut from 36px so seven Languages tiles fit on one row inside half the card. The binding case is now the **eight**-tile Frameworks group, which fits on one row from 1500px up only because the tile came down to 64px.
 - **≤1100px** stacks the groups again, because the two top-row groups no longer fit side by side on one line each.
 
 **"Seven Languages tiles on one row" is true from about 1500px of viewport up, not at every width.** Below that the two columns share whatever the viewport gives them, and at 1101–1280 the seven-tile groups wrap to two rows — under Inter as well as under Google Sans Flex, verified by A/B. Don't treat that wrap as a regression; the thing to check after a font swap is the wide case.
@@ -618,10 +641,29 @@ Spacing has to keep a group break louder than a row wrap: `.skills-wrapper` row 
 - Icons are `<img src="/svgs/name.svg">` from `public/svgs/` — **not** Vite imports.
 - Most are **simple-icons** glyphs with the brand hex added as a `fill` attribute on the `<svg>` tag (matching how `react.svg` was already built).
 - **Skills without an SVG fall back to an `abbr` monogram.** Nothing uses it right now; the mechanism stays for the next skill that has no glyph. To promote one: drop the file in `public/svgs/` and swap `abbr` for `src`.
-- **MATLAB is the one non-simple-icons icon.** simple-icons still has no MATLAB glyph (it 404s), so `matlab.svg` is **devicon's** (MIT) — the real membrane mark, and the only multi-colour, gradient-carrying icon in the set. The gradients use `id`s, which is safe only because these are loaded through `<img src>`, where ids stay scoped to the file. Inline it and they'd collide.
-- **PySpark wears the Apache Spark mark** (`apachespark.svg`), since simple-icons has no PySpark glyph and it's the same project. PyTorch and PySpark are both filed under Frameworks & Libraries, not Data & Research — that group is specifically the econometrics/thesis tooling (see above), and these are Python libraries.
+- **Two icons in the live set are not simple-icons': MATLAB and LightGBM**, which has no glyph there (both 404). `matlab.svg` is **devicon's** (MIT) — the real membrane mark, and the only gradient-carrying icon in the set. Its gradients use `id`s, which is safe only because these load through `<img src>`, where ids stay scoped to the file. Inline it and they'd collide.
+- **Matplotlib is built and COMMENTED OUT.** `matplotlib.svg` is on disk (devicon's polar-histogram mark, square, taken exactly as supplied) and its entry sits commented in `skills.ts` — uncomment the one line to restore it. The file is the second unreferenced svg in `public/svgs/`, alongside the one PySpark left behind.
+- **scikit-learn is an ordinary simple-icons glyph** with the brand hex `#F7931E` added as a `fill`, like most of the set.
+- **PySpark is gone, LightGBM took its slot, and Selenium joined Developer Tools.** Kian's call. `apachespark.svg` is left in `public/svgs/` with nothing pointing at it.
+- **LightGBM is the second non-simple-icons icon**, after MATLAB, and it is built differently from every other file here. simple-icons has no LightGBM glyph, and the project's only official artwork is a **wordmark** — `microsoft/LightGBM`, `docs/logo/LightGBM_logo_black_text.svg`, 4645x1052, which in a square tile would draw the whole word at about 15px tall. So `lightgbm.svg` is the **mark lifted out of it**: the four coloured triangles (`#EF4927`, `#76B644`, `#1B9AD7`, `#FCB518`), with the grey text paths and the `fill:none` bounding rect dropped, on the mark's own tight `viewBox="0 0 630 1048"`.
+  - **That viewBox is portrait (0.60), and deliberately not padded to square.** It is the mark's real extent; `object-fit: contain` letterboxes it to 34x56 in a 64px tile. It reads noticeably narrower than the square brand glyphs beside it, which is the honest rendering of a portrait mark — **that is what `contain` is there for**, and the alternative is stretching a logo.
+  - Rebuild it from the source logo rather than by hand if it ever needs redoing, and **render it and look** before shipping: `qlmanage -t -s 300 -o /tmp icon.svg`. Cropping the wrong paths out of a wordmark is exactly the kind of error that is invisible in the markup.
+- **Selenium is an ordinary simple-icons glyph** with the brand hex `#43B02A` added as a `fill` on the `<svg>`, like most of the set.
+- PyTorch is filed under Frameworks & Libraries, not Data & Research — that group is specifically the econometrics/thesis tooling (see above), and PyTorch is a Python library.
 - `invertDark: true` applies `filter: invert(1) brightness(0.85)` in dark mode. Used by **Flask** and **GitHub** (GitHub's brand hex `#181717` is invisible on black).
 - C++ uses the lighter logo blue `#659AD2` rather than `#00599C` for dark-mode legibility.
+
+### On mobile the names are hidden, and the tiles become real buttons
+
+Below 768px `.skill-name` is `display: none` and one name at a time is revealed by tapping its tile. Twenty-seven tiles wrapping two or three to a row put twenty-seven lines of uppercase micro-type through the section, which read as noise around the marks rather than as labels on them.
+
+- **`Proficiency.tsx` branches in JS, not CSS**, via `useIsMobile()` — because what changes is not styling but *what the element is*. On mobile each tile renders as a `<button type="button">` with `aria-expanded`; on desktop it stays a `<div>`. **A button on desktop would be a control that does nothing**, since the name is already printed under every tile — the same rule that keeps `.hover-card` and `.expandable-card` apart.
+- **`display: none`, not a visually-hidden clip.** The tile's `<img>` already carries `alt={title}`, so the skill is still announced; a hidden-but-present label would have it read out twice.
+- **The revealed name is absolutely positioned**, so showing it cannot change the tile's height and reflow the grid under the finger that just tapped it. Measured: the grid is 208px tall with a name shown and 208px with none. It sits in the 20px row gap below, `width: max-content` capped at 92px so `PostgreSQL` (83px) stays on one line instead of wrapping into its neighbour's column.
+- The tile keeps a `--hover-tint` on its icon wrap while revealed, because the name appears *outside* the tile and the tap would otherwise have no feedback on the thing that was tapped.
+- `.skill-item` restates `background`, `padding`, `font`, `color` and `text-align`, since it is a `<button>` at that width and would otherwise inherit the UA's own.
+
+**`useIsMobile` (`src/components/useIsMobile.ts`) is shared with `FigureChart`**, which owned the logic first as `useCompactGeometry`'s body. Two components now change behaviour rather than styling at 768px, so the breakpoint lives in one place and cannot drift from `Nav.css`, `Paper.css` and `Proficiency.css`.
 
 ## Awards section
 
@@ -642,6 +684,8 @@ Spacing has to keep a group break louder than a row wrap: `.skills-wrapper` row 
 - `--card-border` for the rule, `--muted` for the dots — the internal-divider token and the secondary-text token, which is what each of them is.
 
 **At ≤768px the rail stands back up and is simply LinkedIn's again**: one column, dots down the left, the connector vertical (`left: 4px; top: 14px; bottom: 0`, `width: 1px`). Three columns in a 335px card leaves ~100px each, which wraps `Barrett, The Honors College` to four lines. Measured: 3 rows, dots aligned, no sideways scroll.
+
+**The step padding there is 26px, up from 14, and the card gap 18 from 16.** Kian's read was that the stacked card looked squished, and the measurement says why: at 14px the gap *between* two honors was barely larger than the 2px gap *inside* Dean's List (its "All eight semesters" second line), so six lines read as one block rather than as three entries. Now it is 26px between entries against 2px within one, and the connector rule finally has a run longer than the dot it starts from. The card goes 164px → 189px at 375.
 
 Measured: the card is 100px in a 186px section at 1280; 164px in a 256px section at 375.
 
@@ -666,7 +710,15 @@ The same three links the Contact section carries — LinkedIn, GitHub, Email —
 
 ## About gallery
 
-`<Gallery>` in `About.tsx`. Three photos from the `images` array, prev/next arrows and an `n / N` counter. The frame is `aspect-ratio: 4 / 3`, `border-radius: 24px !important`, `overflow: hidden`. The radius went 75px (a shape nothing else on the site used) to 14px (matching `.sub-card`) to **24px** — Kian asked for about 10px more than the sub-card radius. Softer than the panels around it without going back to a shape of its own.
+`<Gallery>` in `About.tsx`. **Four** photos from the `images` array, prev/next arrows with clickable dots between them, an `n / N` badge in the picture's own corner, and a six-second autoplay.
+
+**The filenames ARE the running order, because the files were renamed to match it.** Kian reordered the gallery (it was `img3`, `img1`, `img_dep2`, `img2`) and the four files on disk were then renamed so `img1`–`img4` really are the gallery's 1st–4th. **That is the right fix and the one to repeat**: renaming beats leaving an out-of-sequence array with a comment explaining itself. `img4` is the old `img_dep2`, promoted out of the dead pile.
+
+**`img4` is the one PORTRAIT source** — 992x1119 (0.887) against the others' ~1.3 landscape — so in the 4/3 frame `object-fit: cover` with `object-position: center top` keeps its top **66%**, which is Kian head-to-knees, and takes the crop off the bottom where the path is. Checked by rendering it, per the rule the project thumbnails follow. The other three lose 0–7%.
+
+It was **re-compressed from 1.5MB to 391KB** at its native size (`sips -s formatOptions 82`), because the gallery warms both neighbours on mount and four photos at that weight is most of a megabyte before anyone clicks. **Note `sips -Z 1400` UPSCALED it** to 1241x1400 on the first attempt — the same trap the project thumbnails document ("sources narrower than that are left alone rather than upscaled"). Re-compress at native size; don't pass a dimension. The original is in git history.
+
+The frame is `aspect-ratio: 4 / 3`, `border-radius: 24px !important`, `overflow: hidden`. The radius went 75px (a shape nothing else on the site used) to 14px (matching `.sub-card`) to **24px** — Kian asked for about 10px more than the sub-card radius. Softer than the panels around it without going back to a shape of its own.
 
 ### Both slides animate, not just the incoming one
 The transition keeps **two** images mounted: `idx` (incoming) and `outgoing`. They animate in step — the old one exits a full frame width while the new one enters — and the frame's `overflow: hidden` clips both. `outgoing` is cleared in `onAnimationEnd` on the incoming image.
@@ -677,6 +729,7 @@ Details that matter:
 - **`.gallery-img` is `position: absolute; inset: 0`** so the two slides stack. The frame keeps its height from `aspect-ratio`, so nothing collapses when both images leave the flow.
 - **No enter class on first paint** (`sliding` is false until the first click), or the opening photo slides in on every page load.
 - **No fade under the slide.** At a full 100% travel a cross-fade only muddies the midpoint.
+- **The curve is `--ease-in-out-cubic`** (`cubic-bezier(0.645, 0.045, 0.355, 1)`), at Kian's request and shared with `FigureCarousel` so the two sliders cannot drift. It was Material's `cubic-bezier(0.4, 0, 0.2, 1)`, an *emphasised decelerate*: that curve leaves fast and coasts in, so the two slides spent most of the 0.45s nearly still. A symmetric curve reads as one continuous push, which is what a slide where both layers travel together wants. The token is on `:root` in `App.css`, not per theme.
 - **`prefers-reduced-motion: reduce`** swaps the slide for a 0.2s fade — a full-width move is exactly the motion that setting exists to suppress. The enter still animates, so `onAnimationEnd` still fires and the cleanup path is unchanged.
 
 ### A slide never starts on an image that isn't there yet
@@ -695,6 +748,30 @@ This is a case where the hidden-pane rules at the top of this file describe a **
 **Why not a `translateX(-idx * 100%)` track?** Simpler CSS, but wrapping from the last photo back to the first slides the whole strip backwards — the wrong direction. With three images you hit that wrap every third click. The two-layer approach keeps the direction correct on wrap in both directions.
 
 Note when testing: an animation's clock does not advance while `document.visibilityState === 'hidden'`, so in a hidden preview pane the transforms jump straight to their `forwards` fill state and `animationend` never fires. Check `element.getAnimations()` rather than sampled transforms if playback looks broken.
+
+## The two carousels share their controls
+
+The About gallery and the paper pages' `FigureCarousel` are different components with different slide mechanics, but everything **around** the pictures is one implementation, because the site should have one slider register rather than two that drift. Both control rows are `[prev arrow] [dots] [next arrow]`, with the count in the picture's corner.
+
+- **`CarouselDots.tsx`** draws the dots, and owns the rule about when there are any: **ten or fewer** slides get dots you can click to jump; more falls back to no dots at all, with the corner badge carrying the position on its own. Eleven dots in a ~210px row sit ~10px apart, which is under any usable touch target and reads as a texture rather than a set of controls. Every current caller is well inside the limit (4 photos, 3 diagrams, 7 screenshots), so in practice everything on the site has dots today. Each dot is a real `<button>` with `aria-current`; the **mark is an inner span**, so the button stays a ~19x24 target while the dot it draws stays 7px.
+  - Not a `tablist`: that role promises roving focus and arrow-key navigation, which this does not implement. Same rule as the Projects dropdown declining `aria-haspopup`.
+- **`CarouselCounter`** (exported from the same file) is the `n / N` badge, **in the picture's top-right corner** rather than in the control row — Instagram's placement, at Kian's request, less rounded than Instagram's pill at 6px on a ~22px badge, which is `.tag`'s own proportion. It started in the control row beside the dots and came out: the dots were already saying the same thing 20px away. **Fixed `rgba(0,0,0,.55)` fill and white ink in BOTH themes**, which is the one place on the site that is right — it sits on a photograph or a screenshot, not on a themed surface, so no token describes what is behind it and the scrim *is* the contrast. `tabular-nums`, so it cannot jitter as the number changes. Its parent must be `position: relative`; both frames already are, since their slides are absolutely positioned.
+- **`useCarouselAutoplay.ts`** advances either carousel every **6 seconds** — long enough to read a figure's label, short enough that a four-photo gallery gets round itself. One value for both.
+
+  **Autoplay is content that moves without being asked, so it stops in five situations and every one matters:**
+
+  1. **`prefers-reduced-motion: reduce`** — off entirely.
+  2. **The reader took over.** One click on an arrow or a dot and the timer never runs again for that carousel. This is also the pause mechanism WCAG 2.2.2 asks for, without adding a control to the bar. Verified: after a dot click the slide does not move again across a 7s wait.
+  3. **Pointer or keyboard focus is inside it** (`onFocus`/`onBlur` on the root, so focus landing on a dot counts).
+  4. **It is off screen**, via an `IntersectionObserver` at `threshold: 0` — a higher threshold would never fire for a carousel taller than the viewport. Every paper carousel starts below the fold.
+  5. **The tab is hidden**, or the interval queues advances to fire in a burst on return.
+
+  A single slide never animates at all. `advance` is held in a ref so the interval keeps its phase instead of restarting on every slide change.
+
+  **Testing it in the hidden preview pane needs a workaround**, and the pane is doing the right thing: `document.visibilityState` is `'hidden'` there, so condition 5 correctly suspends the timer and nothing ever moves. Redefine `visibilityState` on the iframe's document and dispatch `visibilitychange` to let it run — and put the test iframe ON screen, since condition 4 is geometric and an off-screen iframe never intersects.
+
+**Both now SLIDE, with `--ease-in-out-cubic`.** The gallery always did. `FigureCarousel` used to crossfade, on the documented reasoning that a set of diagrams is not a sequence in space and so has no direction to honour — **that reasoning expired** when the carousel gained dots (jumping 1 → 5 is a direction) and autoplay (always forward). Its slides are parked off-frame and given **three** states, not two: `.paper-carousel-img-on` at 0, `.paper-carousel-img-before` at `-100%` for everything already passed, and the default `+100%` for everything still ahead. With a single "on" class every inactive slide would park on the same side and going back would look identical to going forward. `visibility` rides the transform with a `0s` delay on each side, so a parked slide is out of the accessibility tree and not hit-testable — `opacity` alone would leave seven slides stacked and clickable.
+
 
 ## Projects
 
@@ -797,6 +874,16 @@ Then update the `src` in `Projects.tsx`. If a picture ever looks stale again, ch
 ### Breakpoints
 Three across, **two at ≤1100px**, one at ≤768px. 1100 rather than the site's usual 1024, because a card here has to hold a picture *and* a title that wraps beneath it, so three stop working before the other grids do. It is the same breakpoint Skills uses, for a related reason. **`grid-auto-rows` reverts to `auto` at ≤768px** — one column means every row is its own card, and equalising would only pad the short ones.
 
+### One project is HIDDEN, not deleted
+
+**Estimating the Wage Effects of a UBI is commented out**, Sep 2026 — Kian's call: he wants to understand the project better before it represents him. Everything it needs is still in the repo: the page in `project-pages.ts`, its seven images under `public/images/wage-effects/`, its thumbnail, its `og/` card.
+
+**Two comment blocks bring it back, and they move as a PAIR**: the `works` entry in `content/projects.ts` and the matching line in the `papers` registry in `content/papers.ts` (plus the `wageEffects` import above it, also commented). Uncommenting one alone breaks: a work with no page **fails the build** (`prerender-meta.mjs` throws `project "…" has no page in the papers registry`), and a page with no work would be a live URL with nothing linking to it and a search index that disagrees with the grid. The card, the nav dropdown row, the search entries, the sitemap and its prerendered HTML all follow from those two lines.
+
+Verified while hidden: the build writes **6** routes and a 6-URL sitemap, `/projects/wage-effects` renders the ordinary `NotFound` page with full chrome in both themes, and the bundle drops ~10kB as the page's content tree-shakes out.
+
+**Counts elsewhere in this file are written for the full set of six.** Where you read "six projects" or "all six papers", the sixth is this one.
+
 ### Still true
 **Projects carry no dates.** They were removed deliberately. Don't reintroduce a `date` field without checking with Kian.
 
@@ -824,6 +911,7 @@ Two badge types sit **inline at the end of the project title**, so on a wrapping
 Full-text reading pages for the written work, at **`/projects/:slug`** (`src/pages/Paper.tsx`, `src/styling/pages/Paper.css`). Modelled on OpenAI's incident-report page: title block, sticky contents list on the left, a 780px article column on the right. **Six** — one per project: `basic-income`, `thesis` and `cs-capstone` are converted from source PDFs, and `wage-effects`, `rental-prices` and `material-boxes` are hand-written in `project-pages.ts`. The first two open on their abstract with the text behind a button — see *The abstract is the landing view* below.
 
 - **The page's box is `--paper-max` (1320px) and `--paper-gutter` (36px, 20px at ≤768px)**, declared on `.paper` and read by both `.paper-topbar` and `.paper-inner` so the bar and the article beneath it cannot drift apart. It was a flat 1180 in both rules. The layout inside uses about 1050 (210 contents + 60 gap + 780 article), so the old box left the whole page floating mid-screen with the back control stranded 80px in from the edge; at 1280 the content now starts at x 36 rather than 86, and the back button at 30 rather than 80.
+- **The title block spans the page.** `.paper-title` carried `max-width: 20ch`, which on the thesis — a 100-character title — held the head to a ~640px column and broke it over FOUR lines while 600px of the page sat empty beside it. Kian's call to remove it. **20ch is the right cap for a paragraph and the wrong one for a display heading**: the measure argument is about tracking back to the start of the *next* line, and two lines of 40px type is not a reading task. The head is still bounded by `.paper-inner`'s `--paper-max`, so this is not unbounded — it just uses what the page already gives it. Measured on the thesis: 4 lines → **2** at 1280, 1500 and 1900, with the title now exactly as wide as the rule under it. The mobile `max-width: none` override went with it, since there is nothing left to override.
 - **`.paper-article` is 780px, up from 700.** At 1rem/1.85 that is about 95 characters — the top of a comfortable measure, and roughly where a line starts getting hard to track back from. Past this, widen the gutter instead.
 - **The top bar is `position: sticky`**, so the back control stays reachable however far down the reader is. It needs an opaque fill or the article scrolls through it, and the fill is `--page-base` — this is chrome, not a surface, the same call the home page's nav makes when it docks. **Two things have to clear its 76px** (68 on mobile): `.paper-toc`'s sticky `top` (92) and the headings' `scroll-margin-top` (104, 92 on mobile). Measured: a contents jump lands its heading 28px below the bar.
 - **Routing.** `App.tsx` has `/`, `/projects/:slug`, a legacy `/papers/:slug` and a catch-all `*`.
@@ -898,7 +986,7 @@ The three expected divergences are all Table 3's **"Q10: Price Increase Awarenes
 
 A 2px line across the bottom edge of the sticky top bar, driven by `useReadingProgress`. The thesis page is 20,478px and gave no sense of position.
 
-- **It writes `transform` straight to the node**, not through React state: this updates on every scroll frame, and a `setState` there would re-render the whole paper. `scaleX` on a composited transform is the same call `.nav::after` makes for the docked hairline.
+- **It writes `transform` straight to the node**, not through React state: this updates on every scroll frame, and a `setState` there would re-render the whole paper. `scaleX` on a composited transform is cheap enough to run every frame — it is the same trick the nav's docked hairline used before that line was removed.
 - **It has no transition**, deliberately — it tracks the scroll exactly, and easing toward the reader's own scrolling would only lag behind it. That also makes it measurable in a hidden preview pane, where the transition clock is frozen.
 - **Inset to `--paper-gutter`, not run to the screen's edges.** The bar it hangs from is capped and centred, and a rule overshooting the content it belongs to is what the footer's `::before` exists to avoid. Measured flush with `.paper-title` to 0.00px.
 - The page's height is **observed as well as measured** — expanding the abstract gate puts a whole document on the page without firing a resize, the same reason the nav's dock watches `body`.
@@ -982,9 +1070,9 @@ Why bother at all: the capstone's three architecture diagrams stacked ran **1,21
   - The frame is `box-sizing: content-box`, against the global border-box reset, so that ratio applies to the content box rather than to the box plus its 12px white plate.
   - An absolutely positioned **replaced** element does not resolve `auto` width from its insets — it falls back to the image's intrinsic size — so the slides are given an explicit `calc(100% - 24px)` box.
 - **Slides are labelled, and the labels are written for the page** — neither the poster nor the Minecraft screenshots carry captions of their own. A carousel whose only caption is "2 / 7" tells the reader nothing about what they're flipping between; the label doubles as the active slide's `alt`, and the inactive slides are `aria-hidden` with an empty one.
-- **The arrows and counter are the About gallery's, exactly** — same chevron paths, same bare no-fill treatment, same 0.65rem uppercase counter — so the site has one slider register rather than two.
+- **The arrows are the About gallery's, exactly** — same chevron paths, same bare no-fill treatment — and the dots and corner badge between them are literally the same components. See *The two carousels share their controls*.
 - **At ≤768px the bar is `align-items: flex-start`.** The longest labels wrap to two lines there; centred, that pushed the arrows down as you clicked them. Measured at 375px on both pages: the label goes 15px → 29px and the controls stay at the same offset through every slide.
-- Crossfade, no slide: there is no direction to honour when the pictures aren't a sequence in space, and a fade is what `prefers-reduced-motion` would fall back to anyway, so there's no motion block to write.
+- **It slides now, and it used to crossfade.** The old note here said there was no direction to honour because the pictures aren't a sequence in space. Dots and autoplay made that false — see *The two carousels share their controls*. There IS a `prefers-reduced-motion` block now, falling back to the fade this used to be.
 
 ### Block types added for hand-written pages
 
@@ -1269,11 +1357,13 @@ A floating pill, not a groove: no track, a 12px gutter with a 6px mark inside it
 | **≤1100px** | Skills, Projects | Skill groups go from 2×2 back to stacked; project grid 3 columns → 2 |
 | **≤1024px** | Experience, Education, About, Courses | Reduced padding; `.edu-main` → `auto 210px 1fr` becomes `auto 170px 1fr`; courses → 3 columns; Experience's meta column → **185px** (was 170 until Google Sans Flex). Projects left this breakpoint when it became a grid |
 | **≤900px** | Paper pages, Navbar | The contents list is hidden — no room beside the text. The nav's palette chip goes too: the bar clips what it can't fit, and the fit there is tighter than it looks (see *Palette trigger* in `Nav.css`) |
-| **≤768px** | everywhere | Single-column layouts, hamburger nav, gallery below bio, education logo on top, contact cards stack, courses → 2 columns, project grid → 1 column, survey explorer rows stack label-over-bar, the awards rail turns vertical, nav dock shortens to 0.36s, `--page-gutter` → 16 and `--paper-gutter` → 20, PDFs open in a new tab |
+| **≤768px** | everywhere | Single-column layouts, hamburger nav, gallery below bio, education logo on top, contact cards stack, courses → 2 columns, project grid → 1 column, survey explorer rows stack label-over-bar, the awards rail turns vertical and its steps loosen to 26px, **skill names hide and become tap-to-reveal (and the tiles become `<button>`s)**, **the palette input goes to 16px**, nav dock shortens to 0.36s, `--page-gutter` → 16 and `--paper-gutter` → 20, PDFs open in a new tab |
 | **≤520px** | Courses only | `.course-card-num` watermark drops out |
 | **≤480px** | About only | Further font/padding reductions |
 
-There are five **`prefers-reduced-motion: reduce`** blocks: `Nav.css` (cuts the dock's travel to a 0.15s cross-fade and swaps the line's draw-out for a fade), `About.css` (swaps the gallery's full-width slide for a fade), `Projects.css` (drops the card's hover lift, keeping the tint), and two in `Paper.css` (the chart marker's `r` transition and the survey bar's `width` transition). The first three are at the end of their files so they win on source order; the `Paper.css` pair each sit directly beneath the rule they suppress, which is unambiguous because nothing later re-declares those transitions.
+There are **eight** `prefers-reduced-motion: reduce` blocks — `Nav.css` 2 (the dock; the Projects caret's rotation), `Paper.css` 3 (the chart marker's `r`; the survey bar's `width`; the figure carousel's slide), and one each in `About.css` (the gallery slide), `Projects.css` (the card's hover lift) and `App.css` (the carousel dots' transition). `Nav.css`'s dock block cuts the travel to a 0.15s cross-fade (it used to also fade the hairline out — that line is gone, see *The docked bar has NO hairline*). `About.css` swaps the gallery's full-width slide for a fade. `Projects.css` drops the card's hover lift and keeps the tint.
+
+Those three sit at the END of their files, so they win on source order. The `Paper.css` blocks and the caret's each sit directly beneath the rule they suppress, which is unambiguous because nothing later re-declares those transitions.
 
 ## Key technical decisions
 

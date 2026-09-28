@@ -110,7 +110,9 @@ import { basicIncome } from './basic-income'
 import { csCapstone } from './cs-capstone'
 import { thesis } from './thesis'
 // Hand-written, not converted from a document — see project-pages.ts.
-import { materialBoxes, rentalPrices, wageEffects } from './project-pages'
+// `wageEffects` is deliberately not imported — see the commented registry
+// line below and the matching entry in projects.ts.
+import { materialBoxes, rentalPrices } from './project-pages'
 
 // PDFs that are no longer offered for download. Kian withdrew the full-text
 // files for the thesis and the two capstones; the site links to the reading
@@ -205,7 +207,9 @@ export const papers: Record<string, Paper> = {
   [basicIncome.slug]: withoutWithheldPdfs(withEdits(basicIncome)),
   [csCapstone.slug]: withoutWithheldPdfs(withEdits(csCapstone)),
   [thesis.slug]: withoutWithheldPdfs(withEdits(thesis)),
-  [wageEffects.slug]: wageEffects,
+  // HIDDEN — uncomment together with its `works` entry in projects.ts, and
+  // restore the import above. See the note there for why both move as a pair.
+  // [wageEffects.slug]: wageEffects,
   [rentalPrices.slug]: rentalPrices,
   [materialBoxes.slug]: materialBoxes,
 }

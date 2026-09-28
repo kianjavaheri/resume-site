@@ -251,4 +251,22 @@
     .palette-key {
         display: none;
     }
+
+    /* 16px EXACTLY, and it is a threshold rather than a taste: iOS Safari
+       zooms the whole page in when a focused input's text is smaller than
+       16px, and it does not zoom back out on blur. This is the site's only
+       <input>, and the palette focuses it the instant it opens -- so on a
+       phone the page came back visibly enlarged after every search.
+
+       `text-size-adjust: 100%` on <html> does NOT cover this. That governs
+       Safari's inflation of wide text blocks; the focus zoom is a separate
+       behaviour with its own trigger, and the only thing that turns it off is
+       the font size itself. The viewport meta is already correct and does not
+       help either -- and the fix is NOT to pin `maximum-scale`, which would
+       take away the reader's own pinch-zoom.
+
+       15.2px (0.95rem) to 16px is a 0.8px step nobody will notice. */
+    .palette-input {
+        font-size: 16px;
+    }
 }

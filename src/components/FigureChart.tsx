@@ -1,4 +1,5 @@
 import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useIsMobile } from './useIsMobile'
 import type { PaperChart } from '../content/charts'
 
 // Plot geometry in viewBox units, in two sizes. Each box is sized to include
@@ -45,18 +46,11 @@ const GEO = {
   },
 }
 
-// Which box to draw. Matches Paper.css's own 768px breakpoint, so the geometry
-// and the font-size override always switch together.
+// Which box to draw. `useIsMobile` is Paper.css's own 768px breakpoint, so the
+// geometry and the font-size override always switch together. The hook was
+// this function's body until Proficiency needed the same question answered.
 function useCompactGeometry() {
-  const [compact, setCompact] = useState(() => window.matchMedia('(max-width: 768px)').matches)
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)')
-    const sync = () => setCompact(mq.matches)
-    sync()
-    mq.addEventListener('change', sync)
-    return () => mq.removeEventListener('change', sync)
-  }, [])
-  return compact ? GEO.compact : GEO.wide
+  return useIsMobile() ? GEO.compact : GEO.wide
 }
 
 /**

@@ -56,6 +56,17 @@
     --hover-tint: rgba(0, 0, 0, 0.032);
     /* For surfaces filled with --textcolor, which the normal tint can't shift. */
     --hover-tint-inverse: rgba(255, 255, 255, 0.16);
+    /* The nav bar's chips, in BOTH of the bar's states. The bar is chrome, not
+       a page-coloured surface, and --hover-tint is calibrated against the page
+       -- the same reasoning --well-hover-tint exists for. It matters most once
+       the bar DOCKS: the docked fill is --nav-solid, which is pure #fff here
+       and pure #000 in dark, and .022 white on pure black composites to
+       rgb(6,6,6). The hover simply vanished in dark mode. */
+    --nav-hover-tint: rgba(0, 0, 0, 0.06);
+    /* The Projects panel's shadow. Purely DOWNWARD, no ring: the panel hangs
+       off the bar's bottom edge as one continuous surface, and --nav-shadow's
+       `0 1px 3px` component would draw a seam across the join. */
+    --nav-drop-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
     --card-shadow: 0 0px 2px rgba(0, 0, 0, 0.20);
     --sub-card-shadow: 0 1px 5px rgba(0, 0, 0, 0.07);
 
@@ -128,6 +139,12 @@
     /* Kept low: on a pure-black page even a faint white tint reads as a jump. */
     --hover-tint: rgba(255, 255, 255, 0.022);
     --hover-tint-inverse: rgba(0, 0, 0, 0.14);
+    /* See the light-mode note. This is ~4.5x --hover-tint, and it has to be:
+       the docked bar in dark is --nav-solid #000000, where the page tint is
+       invisible outright. On the floating glass (which composites to about
+       rgb(34,34,39) over a dark page) it lands around rgb(56,56,61). */
+    --nav-hover-tint: rgba(255, 255, 255, 0.10);
+    --nav-drop-shadow: 0 10px 28px rgba(0, 0, 0, 0.65);
     --card-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
     --sub-card-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
 
@@ -599,6 +616,108 @@ html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
 }
+/* ---- Carousel dots (components/CarouselDots.tsx) ------------------------
+   Shared by the About gallery and the paper pages' FigureCarousel, which is
+   why they are here and not in either component's own sheet. Both sliders sit
+   between the same chevron pair, so they have to look identical. */
+.carousel-dots {
+    display: flex;
+    align-items: center;
+    /* No gap between the DOTS: their spacing is the buttons' own padding,
+       which is what keeps the touch targets touching with no dead strip
+       between them. The counter that follows gets its own margin instead. */
+    gap: 0;
+}
+
+/* easeInOutCubic, the slide curve for BOTH carousels — Kian asked for it by
+   name. cubic-bezier(0.645, 0.045, 0.355, 1) is the canonical form.
+   Symmetric: it accelerates and decelerates by the same amount, which is what
+   suits a slide where the incoming and outgoing images travel together and
+   neither is the one you are following. (The nav's --ease-dock is the
+   opposite kind of curve — fast out, long settle — because the bar has a
+   destination and the eye follows it there.)
+
+   It lives here, not beside either carousel, because the two must not drift:
+   About.css reads it for the gallery, Paper.css for FigureCarousel. */
+:root {
+    --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+/* The n / N badge, in the picture's top-right corner (CarouselCounter).
+   Fixed colours in both themes on purpose — it sits on a photograph or a
+   screenshot, not on a themed surface, so the scrim IS the contrast and a
+   token keyed to the page would be the wrong answer half the time. */
+.carousel-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    /* Not a pill: 6px on a ~22px badge is `.tag`'s own proportion, so this
+       reads as the same family of chip at a smaller size. */
+    border-radius: 6px !important;
+    background: rgba(0, 0, 0, 0.55);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    /* So the badge does not change width as the number does — a counter that
+       jitters between slides is exactly what an autoplaying carousel must not
+       do. */
+    font-variant-numeric: tabular-nums;
+    padding: 4px 8px;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+}
+
+.carousel-dot {
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 7px mark + 2 x 6px = a ~19x24 target. The mark is what you see; this is
+       what you hit. */
+    padding: 8px 6px;
+}
+
+.carousel-dot-mark {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px !important;
+    background: var(--muted);
+    /* Inactive dots are a step back from the active one in BOTH opacity and
+       colour: on the pure-black page --muted alone (#999) is bright enough to
+       read as active. */
+    opacity: 0.4;
+    transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.carousel-dot:hover .carousel-dot-mark {
+    opacity: 0.7;
+}
+
+.carousel-dot-on .carousel-dot-mark,
+.carousel-dot-on:hover .carousel-dot-mark {
+    background: var(--textcolor);
+    opacity: 1;
+}
+
+.carousel-dot:focus-visible {
+    /* The global reset clears outline, and these are real controls. */
+    outline: 2px solid var(--textcolor);
+    outline-offset: -2px;
+    border-radius: 4px !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .carousel-dot-mark {
+        transition: none;
+    }
+}
+
 /* Outbound-link arrow (components/ArrowOut.tsx). Sized in em so it scales with
    the label it follows; `currentColor` lets each caller set the color. */
 .arrow-out {

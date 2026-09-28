@@ -2,7 +2,7 @@
 //
 // Moved out of components/Proficiency.tsx for the reason the courses were: the
 // grid and the command palette's search index both read this list, and two
-// copies of twenty-five skill names would drift.
+// copies of twenty-eight skill names would drift.
 //
 // `src` is an SVG in public/svgs/. Skills without one fall back to the `abbr`
 // monogram — drop a file in and add `src` here and it swaps over automatically.
@@ -38,9 +38,19 @@ export const skillGroups: { label: string; skills: Skill[] }[] = [
       { title: 'JUnit', src: '/svgs/junit5.svg' },
       { title: 'Pandas', src: '/svgs/pandas.svg' },
       { title: 'PyTorch', src: '/svgs/pytorch.svg' },
-      // simple-icons has no PySpark glyph; the Apache Spark mark is the same
-      // project and is what the label already says.
-      { title: 'PySpark', src: '/svgs/apachespark.svg' },
+      // Took PySpark's slot. simple-icons has no LightGBM glyph either, so
+      // this is the project's OWN mark, lifted out of the official wordmark
+      // logo (microsoft/LightGBM, docs/logo/) -- the four coloured triangles,
+      // with the "LightGBM" text and its bounding rect dropped. That is why
+      // its viewBox is 630x1048 rather than square: it is the mark's real
+      // extent, and `object-fit: contain` letterboxes it in the tile.
+      { title: 'LightGBM', src: '/svgs/lightgbm.svg' },
+      { title: 'scikit-learn', src: '/svgs/scikitlearn.svg' },
+      // The third non-simple-icons icon, after MATLAB and LightGBM: simple-
+      // icons has no matplotlib glyph, so this is devicon's (MIT) -- the
+      // project's own polar-histogram mark. Left exactly as supplied; it is
+      // already square and needs no surgery, unlike LightGBM's wordmark.
+      // { title: 'Matplotlib', src: '/svgs/matplotlib.svg' },
     ],
   },
   {
@@ -52,6 +62,7 @@ export const skillGroups: { label: string; skills: Skill[] }[] = [
       { title: 'PostgreSQL', src: '/svgs/postgresql.svg' },
       { title: 'Firebase', src: '/svgs/firebase.svg' },
       { title: 'Postman', src: '/svgs/postman.svg' },
+      { title: 'Selenium', src: '/svgs/selenium.svg' },
     ],
   },
   {

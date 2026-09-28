@@ -224,32 +224,32 @@ export const rentalPrices: Paper = {
       blocks: [
         {
           type: 'p',
-          text: 'A gradient-boosted model that prices studios and one-bedrooms in Santa Cruz and Monterey counties to 12.9% typical error, against 15.2% for a neighbourhood-median lookup. It runs entirely in the browser, with no backend.',
+          text: 'This prices studios and one-bedrooms in Santa Cruz and Monterey counties. Typical error is 12.9%, against 15.2% for looking up the median in that neighbourhood. The whole thing runs in the browser, with no backend.',
         },
         {
           type: 'p',
-          text: 'Type an address or tap a pin on the map, and the app returns a monthly rent estimate for a studio or one-bedroom, an 80% range around it, and a breakdown of which inputs moved the number. The estimate is deliberately two numbers rather than one:',
+          text: 'Type an address or tap a pin on the map. You get a monthly rent estimate, an 80% range around it, and a list of which inputs pushed the number up or down. The estimate comes in two parts:',
         },
         {
           type: 'deflist',
           items: [
             {
               term: 'Typical',
-              detail: 'What a typical unit of that size costs on the chosen date, read off a fitted trend line.',
+              detail: 'What a unit of that size goes for on the date you picked, read off a fitted trend line.',
             },
             {
               term: 'Versus typical',
-              detail: 'How far this particular unit sits above or below that, which is what the trees predict.',
+              detail: 'How far this particular unit sits above or below that. This is the part the trees predict.',
             },
           ],
         },
         {
           type: 'p',
-          text: 'Time explains only 7.4% of the variation in rent here, so the second number is the part the model is actually doing. The interface never collapses the two into a single figure.',
+          text: 'Time only explains 7.4% of the variation in rent here, so the second number is where most of the work happens. The app keeps the two separate instead of showing one combined figure.',
         },
         {
           type: 'p',
-          text: 'A date slider runs from 2020 to two years ahead and re-prices the same unit against the market on the chosen date. That is not a forecast: where the market sits on a future date comes from a fitted trend line, not from evidence.',
+          text: 'A date slider runs from 2020 to two years out and re-prices the same unit against the market on whatever date you choose. This is not a forecast. Where the market sits on a future date comes off a fitted trend line, not off any evidence about that date.',
         },
       ],
     },
@@ -259,13 +259,13 @@ export const rentalPrices: Paper = {
       blocks: [
         {
           type: 'p',
-          text: 'Listings come from the RentCast API, which aggregates MLS and syndicated feeds. The raw pull is cached write-once, then filtered to the modelling slice, which runs from Feb 2020 to Sep 2026.',
+          text: 'Listings come from the RentCast API, which pulls together MLS and syndicated feeds. The raw download is cached once and never overwritten, then filtered down to what the model actually trains on. That slice covers Feb 2020 to Sep 2026.',
         },
         {
           // The baseline row carries no feature count, and the cell is left
           // EMPTY rather than set to an em dash: isQuantityColumn drops blank
-          // cells but not a dash, so a dash here would drag the whole column
-          // ragged left while the two beside it stayed right-aligned.
+          // cells but not a dash, so a dash here would drag the whole Features
+          // column ragged left while the two beside it stayed right-aligned.
           type: 'table',
           table: {
             title: 'The modelling slice',
@@ -280,15 +280,15 @@ export const rentalPrices: Paper = {
         },
         {
           type: 'p',
-          text: 'The data is longitudinal, not a snapshot: the same unit reappears as it is re-listed, which is what makes the leakage traps below real.',
+          text: 'The same unit shows up more than once, every time it is re-listed. That repetition is what makes the leakage problems further down a real concern rather than a theoretical one.',
         },
         {
           type: 'p',
-          text: 'Cleaning had to undo several source problems. Duplicate and churned re-listings are collapsed to one event each. squareFootage carried building-footprint values in places — 13,032 sqft on a one-bedroom — so it is capped by bedroom count. yearBuilt is 85% missing in this slice and lotSize 92%, so both are unusable. RentCast’s city is the mailing city and unreliable, so location comes from Census place polygons instead.',
+          text: 'A few things in the source needed fixing first. Duplicate and churned re-listings collapse to one event each. The squareFootage field sometimes holds the whole building’s footprint, which is how a one-bedroom ends up listed at 13,032 sqft, so it gets capped by bedroom count. yearBuilt is missing on 85% of this slice and lotSize on 92%, so neither is usable. RentCast’s city field is the mailing city and often is not where the unit sits, so location comes from Census place polygons instead.',
         },
         {
           type: 'p',
-          text: 'One constraint shapes what is published: the licence covers derivative works but not republishing the records. The model and aggregates derived from it are fine; addresses paired with rents are not. The block data the browser downloads is therefore coarsened — coordinates rounded to three decimal places, street numbers stripped.',
+          text: 'The licence allows derivative works but not republishing the records. The model and anything aggregated from it are fine to publish; a list of addresses paired with rents is not. So the block data the browser downloads gets coarsened first, with coordinates rounded to three decimal places and street numbers stripped.',
         },
       ],
     },
@@ -296,22 +296,25 @@ export const rentalPrices: Paper = {
       id: 'how-it-works',
       title: 'How it works',
       blocks: [
-        { type: 'p', text: 'Two decisions carry most of the design.' },
         {
           type: 'p',
-          text: 'Trees cannot extrapolate. Every test date lies past the end of the training range, and a gradient-boosted tree can only ever return a value it saw during training. So the model is a trend plus trees on the residual: a linear regression on months-since-2020 carries the date, and the trees learn only the deviation from it. Feeding the date to the trees as the sole time signal would silently flatline on any future date.',
+          text: 'Most of the design comes out of two problems.',
         },
         {
           type: 'p',
-          text: 'The split has two leakage traps, and they pull against each other. Splitting on a date (1 January 2026) is the honest test, since predicting the future from the past is the actual task. But the same building recurs across years, so a date split alone leaks: the model would memorise a complex from its 2024 listings and be scored on its 2026 ones. The fix is to group on rounded coordinates — latitude and longitude fingerprint a building more reliably than any id — and drop from train any building that also appears in test. That removed 228 buildings and brought the overlap to zero.',
+          text: 'The first is that trees cannot extrapolate. A gradient-boosted tree only ever returns a value it saw while training, and every test date falls past the end of the training range. So the date is handled separately: a linear regression on months-since-2020 carries the trend, and the trees learn only the deviation from it. Hand the date to the trees as the only time signal and predictions go flat past the last training date, without anything failing loudly enough to notice.',
         },
         {
           type: 'p',
-          text: 'The 24 features are bedroom and bathroom counts, size, property type, geographic distances computed in EPSG:3310 (to the coastline, UCSC, CSUMB, Highway 17, the nearest town centre and Santa Cruz downtown), Census place and county, and tract-level demographics with Zillow ZORI rent indices. Three candidates are deliberately excluded: price_per_sqft and rent_vs_zip_zori are computed from price, and daysOnMarket is downstream of it.',
+          text: 'The second is leakage, and there are two kinds that pull against each other. Splitting on a date (1 January 2026) is the right test, since predicting the future from the past is the actual job. But buildings recur across years, so a date split on its own still leaks: the model memorises a complex from its 2024 listings and then gets scored on its 2026 ones. The fix is to group by rounded coordinates, since latitude and longitude identify a building more reliably than any id in the feed, and drop from training any building that also turns up in test. That took out 228 buildings and left no overlap.',
         },
         {
           type: 'p',
-          text: 'The geographic reference points are hand-coded and validated against Census polygons by 33 automated checks, because a wrong coordinate corrupts a feature silently rather than loudly.',
+          text: 'The 24 features are bedroom and bathroom counts, size, property type, distances computed in EPSG:3310 (to the coastline, UCSC, CSUMB, Highway 17, the nearest town centre and Santa Cruz downtown), Census place and county, and tract-level demographics alongside Zillow ZORI rent indices. Three obvious candidates are left out: price_per_sqft and rent_vs_zip_zori are both computed from price, and daysOnMarket is downstream of it.',
+        },
+        {
+          type: 'p',
+          text: 'The geographic reference points are hand-coded, so 33 automated checks validate them against Census polygons. A wrong coordinate does not throw an error, it just quietly corrupts a feature.',
         },
       ],
     },
@@ -321,7 +324,7 @@ export const rentalPrices: Paper = {
       blocks: [
         {
           type: 'p',
-          text: 'Trained on 1,765 listings from Feb 2020 to Dec 2025, tested on 783 from Jan to Sep 2026 — the following year, never a random sample.',
+          text: 'Trained on 1,765 listings from Feb 2020 to Dec 2025 and tested on 783 from Jan to Sep 2026. The test set is the following year, not a random sample.',
         },
         {
           type: 'table',
@@ -338,15 +341,15 @@ export const rentalPrices: Paper = {
         },
         {
           type: 'p',
-          text: 'Two rows deserve a note. The ridge benchmark matters because it establishes that the trees earned their place rather than being reached for first. And the plain LightGBM scores marginally better than the shipped model on this test window — but it has no mechanism for pricing a date beyond its training range, so the trend version is the one that ships.',
+          text: 'The ridge row is there to show the trees earned their place rather than being the first thing reached for. The plain LightGBM row scores a little better than what ships, but it has no way to price a date past its training range, so the trend version is the one deployed.',
         },
         {
           type: 'p',
-          text: 'The headline number hides a real spread. Error runs about 9% in Monterey and Salinas, where the data is thick, and 17% in unincorporated areas where it is thin. Any single figure quoted for this model should be read as the middle of a 9–17% range.',
+          text: 'One number hides a lot of spread. Error runs around 9% in Monterey and Salinas, where there is plenty of data, and 17% in unincorporated areas where there is not. Read any single figure quoted for this model as the middle of a 9–17% range.',
         },
         {
           type: 'p',
-          text: 'The ranges shown in the app are conformal prediction intervals, calibrated on 355 held-out listings rather than assumed: k = 0.211 in log space, or roughly a factor of 1.24 either way. Measured coverage is 81.2% against an 80% target, at a median width of $970. The deployed 18-feature model measures 79.6%.',
+          text: 'The ranges in the app are conformal prediction intervals, calibrated on 355 held-out listings rather than assumed from a distribution. k = 0.211 in log space, which works out to roughly a factor of 1.24 either way. Coverage measures 81.2% against an 80% target, at a median width of $970. The 18-feature model that ships measures 79.6%.',
         },
       ],
     },
@@ -356,23 +359,23 @@ export const rentalPrices: Paper = {
       blocks: [
         {
           type: 'p',
-          text: 'The app ships this list in its own interface, because a rent estimate without its limits invites more confidence than it has earned.',
+          text: 'The app shows this list in its own interface too. A rent estimate with no limits attached gets trusted further than it should be.',
         },
         {
           type: 'list',
           items: [
-            'No amenities. The source carries no listing description, so views, renovations, furnishing, utilities, parking and laundry are all invisible. Two units identical on every field available here ranged from $1,600 to $6,500 in Pacific Grove.',
-            'Extremes get pulled to the middle. Expensive units are under-predicted by roughly $500 in the top fifth, cheap ones over-predicted. The estimate is most trustworthy between $1,850 and $2,700.',
-            'Accuracy varies by area, from about 9% error in Monterey and Salinas to 17% in unincorporated areas with less data.',
-            'ADUs and cottages are under-represented. The feed draws on MLS and syndicated listings, which miss much of the informal studio and one-bedroom market in this region.',
-            'Asking rent, not contract rent. Long-tenured below-market tenancies never appear in the data at all.',
-            'Some coordinates are wrong at the source. The upstream geocoder misplaces a small number of addresses — 116 and 200 West Cliff Drive sit about half a mile inland in the data when both are on the water. Where a pin looks misplaced, the distance-to-ocean feature is wrong, and the estimate with it.',
-            'It does not forecast the market. It prices a unit against the prevailing market. Where that market sits on a future date comes from a fitted trend line of +4.3% per year, not from evidence.',
+            'No amenities. There is no listing description in the source, so views, renovations, furnishing, utilities, parking and laundry are all invisible to the model. Two units matching on every field available here ranged from $1,600 to $6,500 in Pacific Grove.',
+            'Extremes get pulled toward the middle. Expensive units come in about $500 low in the top fifth, cheap ones come in high. The estimate is most reliable between $1,850 and $2,700.',
+            'Accuracy varies by area, from around 9% error in Monterey and Salinas to 17% in unincorporated areas where there is less data.',
+            'ADUs and cottages are under-represented. The feed is MLS and syndicated listings, which miss much of the informal studio and one-bedroom market around here.',
+            'Asking rent, not contract rent. Long-tenured below-market tenancies never show up in the data at all.',
+            'Some coordinates are wrong before they reach the model. The upstream geocoder misplaces a handful of addresses: 116 and 200 West Cliff Drive both sit about half a mile inland in the data, and both are on the water. If a pin looks wrong, the distance-to-ocean feature is wrong too, and the estimate with it.',
+            'It does not forecast the market. It prices a unit against the market as it stands. Where that market sits on a future date comes off a fitted trend line of +4.3% a year, not off evidence.',
           ],
         },
         {
           type: 'p',
-          text: 'The first item is the main cause of the regression to the mean in the second: without descriptions, nothing distinguishes a renovated ocean-view studio from a dark one on the same block.',
+          text: 'The first item causes the second. With no descriptions, there is nothing in the data separating a renovated ocean-view studio from a dark one on the same block, so both get the same estimate.',
         },
       ],
     },
@@ -382,32 +385,32 @@ export const rentalPrices: Paper = {
       blocks: [
         {
           type: 'p',
-          text: 'The app has no backend. The trained LightGBM trees are exported to JSON, and the tree evaluator, the feature assembly and the geographic maths are ported to JavaScript, so inference happens on the visitor’s machine.',
+          text: 'There is no backend. The trained LightGBM trees are exported to JSON, and the tree evaluator, the feature assembly and the geographic maths are all ported to JavaScript, so the prediction happens on the visitor’s own machine.',
         },
         {
           type: 'p',
-          text: 'Porting a model is only credible if the port is exact, so two harnesses check it on every change:',
+          text: 'A port like that is only worth anything if it matches, so two harnesses check it on every change:',
         },
         {
           // The worst difference is 4.5e-13 dollars. Written out rather than in
           // scientific notation: the superscripts would be the first codepoints
           // on the site outside the font audit's range (see CLAUDE.md,
-          // "Typography"), and the run of zeros makes the point better anyway.
+          // "Typography"), and the run of zeros makes the point anyway.
           type: 'deflist',
           items: [
             {
               term: 'npm run verify',
-              detail: 'Scores 300 listings through both implementations. The JavaScript is bit-identical to Python on all 300, at a worst difference of $0.00000000000045.',
+              detail: 'Scores 300 listings through both implementations. The JavaScript matches Python on all 300, at a worst difference of $0.00000000000045.',
             },
             {
               term: 'verify_features.mjs',
-              detail: 'Rebuilds the feature row in the browser and compares it to the Python one, end to end, at $0.00 worst difference.',
+              detail: 'Rebuilds the feature row in the browser and compares it against the Python one, end to end. Worst difference is $0.00.',
             },
           ],
         },
         {
           type: 'p',
-          text: 'The browser runs an 18-feature model at 12.9% error rather than the 24-feature one at 12.6%. The six omitted features are Census-tract and ZIP-level market averages that would need roughly 2 MB of extra polygon data to compute exactly in-browser, and they are worth 0.3 percentage points. Every feature that remains is computed exactly as it was during training.',
+          text: 'The browser runs an 18-feature model at 12.9% error instead of the 24-feature one at 12.6%. The six that got cut are Census-tract and ZIP-level market averages, and computing them exactly in the browser would mean shipping about 2 MB of extra polygon data for 0.3 percentage points. Everything that stayed is computed the same way it was during training.',
         },
         {
           type: 'table',
@@ -424,7 +427,7 @@ export const rentalPrices: Paper = {
         },
         {
           type: 'p',
-          text: 'The map, the estimate panel and the controls are responsive down to 320px, and the published bundle carries only coarsened block data.',
+          text: 'The map, the estimate panel and the controls work down to 320px wide, and the published bundle carries only the coarsened block data.',
         },
       ],
     },

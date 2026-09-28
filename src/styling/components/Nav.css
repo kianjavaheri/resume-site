@@ -59,23 +59,19 @@
         backdrop-filter 0.45s ease;
 }
 
-/* The rule that draws itself out from the centre as the bar docks. It is a
-   ::after inside the bar rather than a border, so it can be scaled from the
-   middle; `.nav`'s own `overflow: hidden` keeps the scale from ever painting
-   past the bar. --card-border is the internal-divider token, which is exactly
-   what this is — the same call the footer's hairline makes. */
-.nav::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 1px;
-    background: var(--card-border);
-    transform: scaleX(0);
-    transform-origin: center;
-    transition: transform 0.45s var(--ease-dock);
-}
+/* THE DOCKED BAR HAS NO HAIRLINE. There used to be one here: a 1px
+   --card-border rule on a ::after, scaled out from the bar's centre to both
+   edges as it docked, delayed 0.12s so it arrived after the bar did.
+
+   Kian cut it. On the solid docked bar it read as a stray grey line across
+   the top of the page rather than as the divider it was meant to be — the bar
+   already separates itself from the content by being opaque and flush to the
+   edge, so the rule was drawing a boundary that was already there.
+
+   Gone with it: `.nav-docked::after`, the mobile duration match and the
+   reduced-motion fade. Don't reinstate one without re-reading this — the
+   draw-out was tuned against the dock's own 0.45s curve and the pair had a
+   deliberate direction (line last in, line first out). */
 
 /* Attached to the top of the screen past the halfway mark, and no longer
    glass. Three things happen together and the order is the point: the bar
@@ -111,17 +107,9 @@
     box-shadow: var(--nav-rim-off), var(--nav-shadow-off);
 }
 
-/* Drawn only once the bar has started moving — the line is the arrival, not
-   the journey. Undocking uses the base rule's delay (none), so it retracts
-   first and the bar lifts away behind it. */
-.nav-docked::after {
-    transform: scaleX(1);
-    transition-delay: 0.12s;
-}
-
 .nav .name {
     font-size: 0.9rem;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0;
     white-space: nowrap;
     /* Never squeezed — the bar's padding is what moves, not the type. */
@@ -151,7 +139,42 @@
 }
 
 .nav-links a:hover {
-    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
+    background-image: linear-gradient(var(--nav-hover-tint), var(--nav-hover-tint));
+}
+
+/* The one link with a menu under it. `inline-flex` so the caret sits on the
+   text's baseline row rather than below it, and the gap is in em so it tracks
+   the label the way `.arrow-out` and `.cal-icon` do. */
+.nav-links a.nav-has-menu {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+}
+
+/* 1em, so it scales with the link instead of carrying a px size per caller --
+   the contract the rest of the inline icons use. */
+.nav-caret {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    /* --muted against the link's --textcolor: the caret is a hint about the
+       link, not a second thing to read. It comes up to full strength with the
+       menu, which is the moment it is actually saying something. */
+    color: var(--muted);
+    transition: transform 0.2s var(--ease-dock), color 0.2s ease;
+}
+
+.nav-menu-open .nav-caret {
+    transform: rotate(180deg);
+    color: var(--textcolor);
+}
+
+/* A caret that spins is exactly the motion this setting exists to suppress --
+   and the direction still reads, because it is a flip and not a journey. */
+@media (prefers-reduced-motion: reduce) {
+    .nav-caret {
+        transition: color 0.2s ease;
+    }
 }
 
 /* ---- Projects dropdown ------------------------------------------------- */
@@ -164,29 +187,53 @@
    `left` is set inline from the link's measured position; the rest is here. */
 .nav-dropdown {
     position: fixed;
-    /* The bar's own bottom edge: top 12px + height 56px. The gap below it is
-       this element's transparent padding, which is what the pointer crosses on
-       its way to the panel — an actual gap would drop the menu mid-travel. */
+    /* The bar's own bottom edge: top 12px + height 56px, and measured inline
+       rather than trusted, because the bar sits at two heights. */
     top: 68px;
-    padding-top: 10px;
-    z-index: 99;
+    /* FLUSH, no bridging padding. The panel used to float 10px below the bar
+       as its own rounded island, and that padding was the pointer's bridge
+       across the gap. The panel now grows straight out of the bar's bottom
+       edge, so there is no gap and nothing to bridge. */
+    padding-top: 0;
+    /* ABOVE the bar (100), not below it, and that is what makes the join
+       invisible. The bar casts --nav-shadow downward; underneath it, the
+       panel's top 24px were painted over by that shadow and the two read as
+       two surfaces with a dark seam between them. They do not overlap -- the
+       panel starts exactly where the bar ends -- so nothing is hidden by
+       raising it. */
+    z-index: 101;
 }
 
+/* It is the BAR'S SURFACE CONTINUING DOWNWARD, not a panel floating under it.
+   Three things carry that, and none of them works alone:
+
+   - The top corners are SQUARE and the panel is flush against the bar, so the
+     join has no edge at all. The bar's own corners are 20px, but the Projects
+     link sits nowhere near one, and a pill's bottom edge is straight
+     everywhere in between -- so a square-topped box hung off it merges.
+   - There is no rim. `--nav-rim`'s bright `inset 0 1px 0` is a specular
+     highlight along a top edge, and this element no longer has a top edge to
+     light; drawn anyway it was a bright line straight across the seam.
+   - The shadow is `--nav-drop-shadow`, which casts only downward.
+     `--nav-shadow`'s second `0 1px 3px` component rings all four sides, and
+     the top of that ring landed on the join.
+
+   The bottom corners stay rounded, because that edge IS an edge. 8px, and the
+   old reason for the panel's radius no longer applies: it used to be 10px to
+   look deliberately SMALLER than the 20px pill it hung off, so it would not
+   read as a second pill. It is not a separate object any more, so the only
+   constraint left is the one inside it -- the rows are 6px, and a container's
+   corner has to stay looser than its contents'. */
 .nav-dropdown-panel {
     display: flex;
     flex-direction: column;
-    /* The pill's material exactly — same fill, blur, saturation and rim — so
-       the panel reads as part of the bar rather than as a second surface. No
-       border: a solid line on glass reads as drawn rather than lit. */
+    /* The pill's material exactly — same fill, blur and saturation, so the two
+       are literally the same surface. */
     background-color: var(--nav-glass);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     backdrop-filter: blur(24px) saturate(180%);
-    box-shadow: var(--nav-rim), var(--nav-shadow);
-    /* 10px, NOT the bar's 20px. The panel deliberately stopped matching the
-       pill's corner here — at 20px on a 242px box it read as a pill of its own
-       hanging off the bar rather than as a menu. The items inside came down
-       with it, to keep the inner corner tighter than its container's. */
-    border-radius: 10px !important;
+    box-shadow: var(--nav-drop-shadow);
+    border-radius: 0 0 8px 8px !important;
     padding: 8px;
     /* Wide enough for `Shipment Quoting Microservice` on one line, capped so a
        future long label wraps instead of stretching the panel across the bar.
@@ -209,7 +256,7 @@
 
 /* The nav links' own hover, at the nav links' own tint. */
 .nav-dropdown-panel a:hover {
-    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
+    background-image: linear-gradient(var(--nav-hover-tint), var(--nav-hover-tint));
 }
 
 /* The panel takes the bar's material in BOTH states, so it drops the glass when
@@ -220,11 +267,11 @@
    pinned to the screen's edge and isn't floating over anything any more, but
    the panel still is, and a solid menu with no shadow would read as a hole
    punched in the page. */
-.nav-docked ~ .nav-dropdown .nav-dropdown-panel {
+.nav-docked~.nav-dropdown .nav-dropdown-panel {
     background-color: var(--nav-solid);
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-    box-shadow: var(--nav-rim-off), var(--nav-shadow);
+    box-shadow: var(--nav-drop-shadow);
 }
 
 .theme-toggle {
@@ -241,7 +288,7 @@
 }
 
 .theme-toggle:hover {
-    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
+    background-image: linear-gradient(var(--nav-hover-tint), var(--nav-hover-tint));
 }
 
 /* Hamburger — hidden on desktop */
@@ -260,7 +307,7 @@
 }
 
 .hamburger:hover {
-    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
+    background-image: linear-gradient(var(--nav-hover-tint), var(--nav-hover-tint));
 }
 
 /* Full-screen mobile menu */
@@ -292,7 +339,7 @@
 }
 
 .nav-search:hover {
-    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
+    background-image: linear-gradient(var(--nav-hover-tint), var(--nav-hover-tint));
     color: var(--textcolor);
 }
 
@@ -350,15 +397,6 @@
             box-shadow 0.36s ease,
             -webkit-backdrop-filter 0.36s ease,
             backdrop-filter 0.36s ease;
-    }
-
-    /* Matched to the bar so the two don't desync. */
-    .nav::after {
-        transition: transform 0.36s var(--ease-dock);
-    }
-
-    .nav-docked::after {
-        transition-delay: 0.1s;
     }
 
     .nav-links {
@@ -427,7 +465,7 @@
     }
 
     /* No trailing rule against the panel's rounded bottom edge */
-    .mobile-menu > *:last-child {
+    .mobile-menu>*:last-child {
         border-bottom: none;
     }
 }
@@ -447,17 +485,5 @@
             box-shadow 0.15s ease,
             -webkit-backdrop-filter 0.15s ease,
             backdrop-filter 0.15s ease;
-    }
-
-    .nav::after,
-    .nav-docked::after {
-        transition: opacity 0.15s ease;
-        transition-delay: 0s;
-        transform: scaleX(1);
-        opacity: 0;
-    }
-
-    .nav-docked::after {
-        opacity: 1;
     }
 }

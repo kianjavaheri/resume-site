@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { works } from '../content/projects'
 import SearchIcon from './SearchIcon'
+import CaretDown from './CaretDown'
 import { openPalette, shortcutLabel } from './openPalette'
 import './../styling/components/Nav.css'
 
@@ -51,6 +52,11 @@ function Navbar({ switchTheme, isChecked }: any) {
 
   // Never dock while the mobile menu is open: the menu panel hangs from the
   // bar's floating position, and docking would move the bar out from under it.
+  //
+  // `docked` is therefore the bar's CURRENT LOOK, which the open menu
+  // suppresses, while `pastAbout` is the durable "the header has scrolled
+  // away" fact. The command palette needs the second one, not the first --
+  // see the data attribute on <nav> below.
   const docked = pastAbout && !menuOpen
 
   const close = () => setMenuOpen(false)
@@ -117,7 +123,18 @@ function Navbar({ switchTheme, isChecked }: any) {
 
   return (
     <>
-      <nav ref={navRef} className={`nav ${docked ? 'nav-docked' : ''}`}>
+      {/* `data-past-about` is NOT the same thing as `.nav-docked`, and the
+          difference is the whole point of it. The mobile menu forces the bar
+          undocked, and the menu's Search row closes the menu and opens the
+          palette in one click -- so a palette reading `.nav-docked` sees the
+          class the menu had just suppressed, takes the glass, and then sits
+          over a bar that re-docks flat behind it. This attribute ignores the
+          menu, so the palette matches the bar it will actually be covering. */}
+      <nav
+        ref={navRef}
+        className={`nav ${docked ? 'nav-docked' : ''}`}
+        data-past-about={pastAbout ? 'true' : 'false'}
+      >
         <a href="/" className="name" onClick={close}>
           Kian Javaheri
         </a>
@@ -126,14 +143,21 @@ function Navbar({ switchTheme, isChecked }: any) {
           <a href="#about" onClick={scrollTo('about')}>About</a>
           <a href="#education" onClick={scrollTo('education')}>Education</a>
           <a href="#experience" onClick={scrollTo('experience')}>Experience</a>
+          {/* The one link that expands, and the caret is what says so. It
+              flips to point UP from `projectsOpen` rather than from a CSS
+              :hover, because the pointer leaves the link the moment it moves
+              down onto the panel -- a :hover flip would snap the caret back
+              down while the menu it describes was still open. */}
           <a
             href="#projects"
             ref={projectsRef}
+            className={`nav-has-menu${projectsOpen ? ' nav-menu-open' : ''}`}
             onClick={scrollTo('projects')}
             onMouseEnter={openProjects}
             onMouseLeave={closeProjects}
           >
             Projects
+            <CaretDown />
           </a>
           <a href="#skills" onClick={scrollTo('skills')}>Skills</a>
           <a href="#contact" onClick={scrollTo('contact')}>Contact</a>
@@ -167,9 +191,11 @@ function Navbar({ switchTheme, isChecked }: any) {
           onMouseEnter={openProjects}
           onMouseLeave={closeProjects}
         >
-          {/* The outer div is transparent and starts at the bar's bottom edge;
-              the glass is on the inner panel. That padding is the bridge the
-              pointer crosses, so there is no dead gap to fall through. */}
+          {/* The outer div starts at the bar's bottom edge and no longer
+              carries a top padding: the panel is FLUSH with the bar now, so
+              there is no gap to bridge in the first place. The pointer's only
+              journey is across the bar's own bottom padding, which the 120ms
+              close delay covers. */}
           <div className="nav-dropdown-panel">
             {works.map((w) => (
               <Link key={w.to} to={w.to} onClick={() => setProjectsOpen(false)}>

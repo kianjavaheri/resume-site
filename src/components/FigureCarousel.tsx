@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import type { CarouselFigure } from '../content/papers'
+import CarouselDots, { CarouselCounter } from './CarouselDots'
+import { useCarouselAutoplay } from './useCarouselAutoplay'
 
 // Figures shown one at a time instead of stacked down the page. A hand-written
 // page writes a `carousel` block; a generated one declares `figureCarousels` in
@@ -25,7 +27,22 @@ function Chevron({ dir }: { dir: 'prev' | 'next' }) {
 function FigureCarousel({ figures, plain }: { figures: CarouselFigure[]; plain?: boolean }) {
   const [idx, setIdx] = useState(0)
   const n = figures.length
-  const go = (d: number) => setIdx((i) => (i + d + n) % n)
+  const advance = () => setIdx((i) => (i + 1) % n)
+
+  // Cycles on its own until the reader touches a control, then stops for
+  // good. See useCarouselAutoplay for the five things that suspend it.
+  const { rootRef, takeOver, pauseProps } = useCarouselAutoplay({ count: n, advance })
+
+  // Every control routes through here, so none of them can forget to hand
+  // over. `takeOver` is idempotent.
+  const go = (d: number) => {
+    takeOver()
+    setIdx((i) => (i + d + n) % n)
+  }
+  const jump = (i: number) => {
+    takeOver()
+    setIdx(i)
+  }
 
   // EVERY slide stays mounted, which is what keeps the arrows honest: the
   // browser fetches the whole set as the carousel comes into range, so a click
@@ -46,9 +63,11 @@ function FigureCarousel({ figures, plain }: { figures: CarouselFigure[]; plain?:
 
   return (
     <div
+      ref={rootRef}
       className={`paper-carousel${plain ? ' paper-carousel-plain' : ''}`}
       role="group"
       aria-roledescription="carousel"
+      {...pauseProps}
     >
       <div className="paper-carousel-frame" style={{ aspectRatio: String(1 / ratio) }}>
         {figures.map((f, i) => (
@@ -60,9 +79,18 @@ function FigureCarousel({ figures, plain }: { figures: CarouselFigure[]; plain?:
             width={f.width}
             height={f.height}
             loading="lazy"
-            className={`paper-carousel-img${i === idx ? ' paper-carousel-img-on' : ''}`}
+            /* Three states, not two: the active slide, the ones already
+               passed (parked LEFT) and the ones still ahead (parked RIGHT).
+               That is what makes the direction read — with a single "on"
+               class every inactive slide would sit on the same side and
+               going back would look identical to going forward. */
+            className={
+              'paper-carousel-img' +
+              (i === idx ? ' paper-carousel-img-on' : i < idx ? ' paper-carousel-img-before' : '')
+            }
           />
         ))}
+        <CarouselCounter index={idx} count={n} />
       </div>
       <div className="paper-carousel-bar">
         {/* A live region announces CHANGES only — its content on first paint is
@@ -79,7 +107,15 @@ function FigureCarousel({ figures, plain }: { figures: CarouselFigure[]; plain?:
           >
             <Chevron dir="prev" />
           </button>
-          <span className="paper-carousel-count">{idx + 1} / {n}</span>
+          {/* Dots to jump straight to a slide. Every slide is already
+              mounted here, so unlike the About gallery there is nothing to
+              await — a jump is a plain setIdx. */}
+          <CarouselDots
+            count={n}
+            index={idx}
+            itemLabel="figure"
+            onSelect={jump}
+          />
           <button
             type="button"
             className="paper-carousel-arrow"
