@@ -18,6 +18,46 @@
     --about-gallery-col: 2;
     --about-col-gap: 32px;
     --about-gutter: 28px;
+    /* The containing block for `.dot-grid`'s `inset: 0`. Safe to add: the only
+       other absolutely positioned thing in this card is `.gallery-img`, which
+       resolves against `.gallery-frame`. */
+    position: relative;
+    /* So the contact band can be pushed to the card's foot with `margin-top:
+       auto` once the card is taller than its content. The canvas is absolutely
+       positioned and so is NOT a flex item. */
+    display: flex;
+    flex-direction: column;
+}
+
+/* THE CARD FILLS THE FIRST SCREEN. `.home` clears the floating pill with
+   `padding-top: 80px`, so the card's top edge is at y=80 and this puts its
+   bottom edge exactly on the fold — Education starts just below it.
+
+   `min-height`, not `height`: on a short viewport the content still wins and
+   the card grows past the fold rather than clipping.
+
+   The extra height is what the dot field needs. At content size the card has
+   almost no open space, and a field that only lives in the margins is not
+   worth having. */
+@media (min-width: 769px) {
+    .about-section {
+        /* THE FOLD LANDS ON HALF THE GAP below the card, not on the card's own
+           bottom edge — Kian's call, and it reads better: a sliver of page
+           under the card says "this continues" where a flush edge says "this
+           is the whole screen". 80px is `.home`'s padding-top, which clears
+           the floating pill. */
+        min-height: calc(100vh - 80px - var(--card-gap) / 2);
+        /* Overrides the line above where supported. Desktop is the same either
+           way; this is for a tablet with a retracting toolbar. */
+        min-height: calc(100dvh - 80px - var(--card-gap) / 2);
+    }
+
+    /* Pinned to the foot, so the gap the card gains opens up BETWEEN the
+       content and the icons — one large clear area for the dots — rather than
+       stranding the icons mid-card with dead space beneath them. */
+    .about-social {
+        margin-top: auto;
+    }
 }
 
 /* About content: title + bio left, gallery right, both top-aligned. The top

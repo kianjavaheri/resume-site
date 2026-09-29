@@ -292,7 +292,7 @@ a {
 .cards-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--card-gap);
     padding: 0 var(--page-gutter) 44px;
     max-width: var(--page-max);
     margin: 0 auto;
@@ -502,7 +502,8 @@ a {
 /* ── Mobile ──────────────────────────────────── */
 @media (max-width: 768px) {
     .cards-wrapper {
-        gap: 10px;
+        /* The token, not the `gap`, so anything else reading it follows. */
+        --card-gap: 10px;
         padding: 0 var(--page-gutter) 32px;
     }
 
@@ -649,28 +650,52 @@ html {
    token keyed to the page would be the wrong answer half the time. */
 .carousel-badge {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 12px;
+    right: 12px;
     z-index: 2;
-    /* Not a pill: 6px on a ~22px badge is `.tag`'s own proportion, so this
-       reads as the same family of chip at a smaller size. */
-    border-radius: 6px !important;
+    /* INSTAGRAM'S BADGE, copied deliberately — Kian asked for it by name and
+       supplied a reference shot.
+
+       10px on a ~24px badge, so there is about 2px of flat edge left down each
+       side: very round, but not the stadium a `999px` would give. That is what
+       the reference shows, and it is why this does NOT take `.tag`'s 6px like
+       the rest of the site's chips. It is the site's roundest thing after
+       `.exp-date`, which is the trade for matching the reference exactly. */
+    border-radius: 10px !important;
+    /* Glass, not a flat scrim. The fill alone was doing all the work at
+       blur(4px); the real blur is what makes it read as a lens over the photo
+       rather than a sticker on it. `saturate` is the nav glass's own trick —
+       blur alone averages a photo to grey mush, and the boost puts the colour
+       back so the badge still shows what is under it. */
     background: rgba(0, 0, 0, 0.55);
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(16px) saturate(180%);
+    /* The specular top edge, same idea as --nav-rim. Fixed rather than the
+       token, because this sits on a photograph in both themes. */
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
     color: #fff;
-    font-size: 0.62rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
+    /* 12px/600 and NO tracking. It was 0.62rem/500 at 0.08em, which is the
+       site's micro-label — right for a uppercase caption, wrong here: the
+       letterspacing is exactly the "spaced out" Kian was looking at, and it
+       pushed `2 / 4` to 44px where the reference is compact. */
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0;
     /* So the badge does not change width as the number does — a counter that
        jitters between slides is exactly what an autoplaying carousel must not
        do. */
     font-variant-numeric: tabular-nums;
-    padding: 4px 8px;
+    padding: 6px 10px;
     line-height: 1;
     pointer-events: none;
     user-select: none;
 }
+
+/* KEEP THE FILL AT 0.55 OR DARKER. The blur averages the backdrop, so the
+   worst case is a blown-out sky: 0.45 x 255 = ~115 grey, and white on that is
+   4.57:1 — just over AA for normal text. Lightening it to match the reference
+   shot more closely (its backdrop is mid-tone, so the badge reads grey there)
+   drops the text below 4.5:1 over a bright photo. */
 
 .carousel-dot {
     background: none;

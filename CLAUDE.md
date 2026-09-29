@@ -294,6 +294,7 @@ src/
     CheckIcon.tsx      # Its copied state — swaps into the same box, so nothing shifts
     SearchIcon.tsx     # Inline SVG magnifier for the two palette triggers
     CalendarIcon.tsx   # Inline SVG calendar for the Experience date chips; 1em via .cal-icon
+    DotGrid.tsx        # The canvas dot field behind the About card; dots swell near the pointer
     Resume.tsx         # DEAD — not imported anywhere
   pages/
     Home.tsx           # Root; .cards-wrapper; theme via useTheme
@@ -333,6 +334,7 @@ src/
     components/
       About.css        # Hero, contact row, gallery (4/3, border-radius 24px, two-way slide)
       Contact.css      # 3-col grid of .contact-card; icon + label left, arrow right
+      DotGrid.css      # The canvas's inset/stacking, and the `color` it reads its ink from
       Courses.css      # .courses-grid + .course-card + .course-card-num — imported by Education.tsx
       Footer.css       # Quiet in-flow bar + the two page-context gutter rules
       Nav.css          # Floating pill, glass, .nav-docked, the Projects dropdown + its caret
@@ -704,9 +706,121 @@ The same three links the Contact section carries — LinkedIn, GitHub, Email —
   - At ≤768px the `::after` is `display: none` — one column, so the band's own centre *is* the text's centre.
 - **They ARE the Projects cards' icon buttons.** `.about-social-link` is a copy of `.project-icon-link` — 40px, `border-radius: 8px`, a recessed `--well-bg` chip carrying `--well-shadow`, `--textcolor` mark at 19px, `--well-hover-tint` on hover, 8px apart. **Keep the two in step**: if one is retuned, retune the other. Verified with `getComputedStyle`: every property identical in both themes.
   - It carries the **`a.about-social-link:visited` restatement** for the reason `.project-icon-link` documents — `a:visited` is 0-1-1 and outranks a bare class, and these are outbound links, so they *will* be visited.
-- **Two earlier treatments were tried and dropped**, which is worth knowing before a third: 46px outlined **circles** (Kian's original reference), then 46px outlined rounded squares at `.scroll-top`'s 14px radius. The reasoning against the well was that it reads as a dent when it sits alone on a flat card rather than inset into a sub-card — true, but **two icon-button treatments on one page was the worse problem**, and Kian's call was to match. Note also that nothing else on the site is a circle: 20px section cards, 14px sub-cards, 6px tags, and **`.exp-date` is now the only round thing left** — the nav's hover chips came off their pill too.
+- **Two earlier treatments were tried and dropped**, which is worth knowing before a third: 46px outlined **circles** (Kian's original reference), then 46px outlined rounded squares at `.scroll-top`'s 14px radius. The reasoning against the well was that it reads as a dent when it sits alone on a flat card rather than inset into a sub-card — true, but **two icon-button treatments on one page was the worse problem**, and Kian's call was to match. Note also that nothing else on the site is a circle: 20px section cards, 14px sub-cards, 6px tags, and **`.exp-date` is the only fully round thing left** — the nav's hover chips came off their pill too. The carousel's `n/N` badge is the near exception at 10px on a 24px box, and it is copying Instagram deliberately (see *The two carousels share their controls*).
 - Icon-only, so **`aria-label` is the link's only name** and doubles as the tooltip — the same contract the Projects cards' icon links use. `:focus-visible` is restated because the global reset clears `outline`.
 - `.about-content-area`'s own bottom padding is what spaces the row from the bio above it.
+
+## The dot grid behind the About card
+
+`DotGrid.tsx` — a canvas of dots on a 24px pitch filling the About card. Dots within 130px of the pointer swell (1px → 3.4px) and brighten (alpha .11 → .5), falling off with distance; everything else is quiet texture. **Purely for fun** — Kian asked for it, nothing depends on it, and the card renders exactly as before if the canvas fails to get a 2D context.
+
+**It is not rendered at all below 769px.** `About.tsx` gates it on `useIsMobile()`. There is no pointer to track, the card is already taller than the viewport there, and this is the one thing on the page that exists purely for fun — it should not cost a phone a canvas, two observers and a per-dot field build. Rendering nothing beats hiding it in CSS, which would do all that work and then paint it to no one.
+
+### The dots keep out of the copy's way, and the taper is the whole point
+
+The first version ran the field across the entire card and the dots sat behind the bio. **The fix Kian asked for is a taper, not a crop** — "I don't want just a clean rectangle cut off ... the dots just taper off and become less responsive to hovers". He was right to reject the rectangle: a hard edge where the effect stops is far more obvious than a gradient where it thins out.
+
+So every dot carries a **weight** from its distance to the nearest box of real content, and that weight scales **both** its resting alpha **and** how far it can swell. A dot is dark until `SHELTER_DEAD` (10px) from the nearest box and reaches full strength `SHELTER_RAMP` (140px) after that.
+
+**The ramp is LINEAR, not smoothstepped, and the boundary is JITTERED.** Both came out of a second round: the first version used `smoothstep(d / 88)` and Kian still saw "a hard rectangle border". Two separate causes, and fixing only one would not have done it:
+
+- **Smoothstep is flat at both ends**, so it crammed the whole visible transition into the middle two rows of a 24px grid — the eye reads two rows going 0.19 → 0.57 as an edge. Linear over a longer distance spreads it across about six rows instead. Measured below the resume button: the ramp went from 3 rows with a biggest step of 0.048 to **5 rows with a biggest step of 0.031**, and the first row is fainter (0.038 against 0.065) so the onset is softer too.
+- **The real culprit was that the boundary was an iso-contour.** However long the ramp, every dot at the same distance got the *same* weight — so the field's edge traced a rounded rectangle, which is precisely what "a hard rectangle border" describes. `SHELTER_JITTER` (0.26) adds a deterministic per-dot offset, so the edge dissolves into noise instead of drawing itself. The hash is `sin`-based and keyed on the grid index, so the same cell always gets the same value and the field does not shimmer when it is rebuilt on a resize.
+
+**The jitter is applied in `buildField`, not in `weightAt`.** `weightAt` stays smooth because it is also what the *pointer* is weighed against, and a noisy pointer response would feel like the effect was stuttering.
+
+- **Distance is to the RECTANGLE, not its centre.** `Math.max(q.l - x, 0, x - q.r)` per axis is 0 while the point is inside that axis's span, so the taper follows the shape of a wide paragraph instead of ballooning out of its middle.
+- **`About.tsx` passes the selector list as the `shelter` prop**, so `DotGrid` stays general and knows nothing about About's class names.
+- **It lists the TEXT ELEMENTS, not their wrappers.** `.about-text` would shelter the entire left column including the open space under the resume button — which is exactly where the field should be liveliest.
+- **`.about-social-inner` is deliberately NOT sheltered.** The contact chips are opaque `--well-bg` tiles with their own shadow, so they just sit on top of the field. Kian's call: "the buttons should just sit above the grid and the block shouldn't be treated differently." Sheltering them punched a hole in the one area of the card the dots have all to themselves. Measured after: mean alpha left of, right of and below the chips is 0.19–0.20, against 0.16 mid-card.
+
+**TWO weights damp the bloom, and it needs both.** The dot's own weight was not enough on its own, and the reason is geometric: `INFLUENCE` (130px) reaches further than `SHELTER` (88px), so a pointer parked just under the resume button still caught a crowd of full-weight dots below it and bloomed almost normally. The fix is a second weight measured **at the cursor itself** (`weightAt(px, py)`), scaling the whole effect — so a hover in a sheltered spot is quiet wherever the dots around it happen to fall.
+
+`POINTER_FLOOR` (0.15) keeps a sheltered hover from doing *literally* nothing, which would read as broken rather than as damped. Measured at 1440x900: just under the resume button the local ink goes 6,820 → 11,176 and peak alpha 28 → 54; in the middle of the open field it goes 23,808 → **118,903** with peak alpha 28 → **95**. The bloom is **10.6x stronger in the open**. Before the pointer weight it was 25.5x against 18.5x — a difference Kian correctly called "not noticeable enough".
+
+**The field is inset from the card's LEFT AND RIGHT edges** (`EDGE_INSET` 24, then a 120px ramp — lengthened with the shelter ramp, and jittered by the same per-dot offset). It was creeping up both sides in the gutter beside the copy, which read as the grid escaping the card rather than sitting in it. Measured: both gutters are now exactly 0 against 0.161 mid-card.
+
+**Top and bottom are deliberately NOT inset.** The header and the copy already shelter the top, and fading the bottom would strip the dots from around the contact icons — the one place they were just asked for. The bottom edge strip measures 0.165, i.e. full strength.
+- The base grid can no longer be one path and one fill, since every dot has its own alpha. That is fine: `paintBase` runs on layout and on a theme change, never per frame.
+- `document.fonts.ready` triggers a relayout, because the copy reflowing moves the very boxes the field is measured from.
+
+Measured at 1440x900: mean alpha over the bio, the title and the gallery is **exactly 0**. Walking down from under the resume button in 24px steps the field rises **0.038 → 0.069 → 0.083 → 0.100 → 0.125 → 0.142** and then plateaus. (For the hover response, which needed a second weight to become noticeable, see below.)
+
+### The card fills the first screen
+
+`min-height: calc(100dvh - 80px - var(--card-gap) / 2)` on `.about-section` above 769px, with a `100vh` line before it as the fallback. `.home` clears the floating pill with `padding-top: 80px`, so the card's top edge is at y=80.
+
+**The fold lands on HALF THE GAP below the card, not on the card's own bottom edge.** Kian's call, and it reads better: a sliver of page under the card says "this continues", where a flush edge says "this is the whole screen". Verified at 1024x768, 1280x800, 1440x900 and 1800x1200 — the card's bottom sits exactly 6px above the fold against a 12px stack gap.
+
+**`--card-gap` is a token for this**, declared on `.home` beside `--page-max` and read by `.cards-wrapper` as its `gap` and by this `min-height`. It was a literal `12px` in `.cards-wrapper`; two literals would have drifted the moment the stack's rhythm changed — the same rule every other shared measurement here follows. The ≤768px block overrides the **token** (10px) rather than the `gap`, so anything reading it follows.
+
+**`min-height`, not `height`**: on a short viewport the content still wins and the card grows past the fold rather than clipping.
+
+**The extra height is what makes the field worth having** — at content size the card has almost no open space, and a field that only lives in the margins is not worth the code. The card becomes a flex column and `.about-social` takes `margin-top: auto`, so the height it gains opens up BETWEEN the content and the icons — one large clear area — rather than stranding the icons mid-card with dead space beneath them.
+
+**It responds to the pointer, and that does NOT contradict "About has no hover tint".** That rule exists because a tint on a card whose header does nothing reads as *click me* — a promise the card can't keep. This is ambient motion *under* the content: it follows the cursor anywhere on the card, dead space included, so it never points at a control. The distinction is the same one that keeps `.hover-card` and `.expandable-card` apart.
+
+- **A canvas, not elements.** At a 24px pitch the card holds well over a thousand dots once it is a viewport tall. That many nodes, each transforming, is a layout and compositing cost for decoration — and this sits directly under a `backdrop-filter` nav bar that already re-rasterises on every scroll frame.
+- **The resting grid is drawn ONCE to an offscreen canvas and blitted each frame.** A frame then only draws the ~100 dots actually inside the pointer's reach, found by *index arithmetic* on the grid rather than by distance-testing every dot. Without it, every frame costs the whole grid whether anything moved or not.
+- **The falloff is smoothstepped** (`u*u*(3-2u)`), not linear. A linear falloff leaves a visible circular rim at the edge of the influence radius.
+- **Easing is frame-rate independent** — `1 - Math.exp(-dt / tau)`, not a fixed per-frame fraction, which would move twice as fast on a 120Hz display. The pointer is eased too (`tau` 55ms), so the field glides between move events instead of snapping.
+- **The eased position is seeded on entry.** Without it the field swoops in from wherever the pointer last left, usually the far corner.
+- **The rAF loop stops itself.** When the pointer leaves, `strength` eases to 0, the grid settles exactly back to rest and the loop cancels. Measured: the ink mass under the pointer goes 22,176 → 325,328 (14.7x) and back to exactly 22,176; a point 500px away is byte-identical throughout.
+- **There IS an `IntersectionObserver` now**, which there deliberately was not before the idle pulse — see *Three gates* below for why that reasoning expired.
+- **Touch is ignored** (`e.pointerType === 'touch'`), the same call `FigureChart` makes: a drag across the card is the reader scrolling the page past it, and there is no hover to track on a finger. This is belt-and-braces now that the grid doesn't render below 769px at all — a touch-capable laptop still hits it.
+- **`prefers-reduced-motion: reduce` renders the grid but nothing in it moves** — no pointer listeners, no pulse, no loop. Texture is not motion; a field chasing the cursor, or breathing on its own, is exactly what the setting is asking us not to do.
+
+### The idle pulse
+
+A band of brightness sweeps down the card on a **`PULSE_CYCLE`** (5s at the time of writing — Kian has been tuning it), of which it travels for 62% and rests for the remainder. He asked whether it was a good idea; it is, but only at this scale and only gated.
+
+- **It is much shallower than the hover** — 1.9px / .24 alpha against the pointer's 3.4 / .5. What makes the hover feel responsive is that everything else is still, and a loud pulse spends exactly that.
+- **The rest phase is the difference between a pulse and an animation.** A band that never stops is something animating at you; one that arrives, passes and leaves is a breath. The rest is also free: a frame with no band and no pointer does *no canvas work at all* — `restPainted` short-circuits the clear-and-blit once the grid has settled.
+- **The band enters above the card and leaves below it** (`-PULSE_BAND` to `h + PULSE_BAND`), so the sweep has no visible start or end.
+- **Phase comes from absolute time** (`now % PULSE_CYCLE`), not an accumulator, so after a scroll or a tab switch the band resumes mid-sweep instead of snapping back to the top.
+- **It is scaled by the dot's shelter weight like everything else**, so the band does not light up behind the copy as it passes over it.
+#### It yields to pointer MOTION, not to presence — and that distinction was a bug
+
+This started as `1 - strength`, and `strength` stays pinned at 1 for as long as the cursor is anywhere over the card. So **parking the mouse on the grid and letting go suppressed the pulse indefinitely.** Kian found it and described the symptom exactly: "if I hover around the grid and then stop, the pulse won't go, but if I toggle the theme off and on, then stop, then it works" — toggling the theme means moving the pointer up to the nav, which *leaves* the card and releases `strength`.
+
+The fix is a separate `activity` value, and it is **held then eased**, not decayed from each event:
+
+- `lastMoveAt` is stamped on every `pointermove`, and `activity` eases toward 1 while `now - lastMoveAt < ACTIVITY_HOLD` (450ms), toward 0 after.
+- **A pure per-event decay was tried first and sagged between events.** At a 600ms time constant a slowly dragged mouse (pointermove every ~120ms) let `activity` fall to ~0.82 in the gaps, so the band flickered back in at up to a third strength while the reader was still moving. Measured 0.31, then 0.155 with a longer constant. The hold takes it to **0**.
+- The bloom under a parked cursor still stays put — `strength` is untouched. It is only the pulse that stops caring.
+
+Measured at 1280x800: with the cursor **parked and still** on the card, the band swings 103,161 — the pulse runs, which is the bug fixed. With the cursor **continuously moving**, a strip far outside `INFLUENCE` swings **exactly 0** — it still yields completely. Roughly 1.5s from the last move to the band returning.
+
+**Give `activity` time to saturate before measuring the moving case.** A window opened 700ms into the movement catches it still ramping and reports a 16,020 leak that is not there in steady state; that mistake was made once while testing this.
+
+#### Three gates, and this reverses an earlier decision
+
+The pointer effect could rely on "no cursor here means nothing to do". **The pulse cannot** — an ungated idle animation is a rAF held open for as long as the tab exists, which is a battery draw on a page someone has left open. So it runs only when all three hold:
+
+1. **`live`** — not `prefers-reduced-motion`. The grid still *renders*, because texture is not motion, but neither the pulse nor the pointer moves. **Watched rather than read once**, unlike before: someone turning the setting on should stop an animation that is already running.
+2. **`onScreen`** — an `IntersectionObserver` at `threshold: 0`, the same call `useCarouselAutoplay` makes. A higher threshold would never fire for a card that is a viewport tall.
+3. **`tabVisible`** — a background tab gets no frames on most engines anyway, but this makes the stop explicit and keeps the band from lurching on return.
+
+**This file used to say there was deliberately no `IntersectionObserver` here**, on the sound reasoning that a card off screen cannot have the pointer over it. That stopped being true the moment something moved without being asked to.
+
+Verified over a **full cycle** at each condition, because a shorter window can land entirely inside the rest phase and make a running pulse look stopped — that mistake was made once while testing this. At the current 5s cycle: on screen and foreground, total ink swings 193,948 → 685,278; scrolled past, range **exactly 0**; tab hidden, range **exactly 0**.
+
+**Testing it in the hidden preview pane needs the same workaround as the carousel autoplay**, and for the same reason — the pane reports `visibilityState: 'hidden'`, so gate 3 correctly suspends everything and nothing ever moves. Redefine `visibilityState` on the document and dispatch `visibilitychange`, and put the test iframe on screen so gate 2 passes too.
+
+### Two things it has to be told, because a canvas cannot read CSS
+
+- **The ink.** A 2D context can't resolve a custom property, so `DotGrid.css` sets `color: var(--textcolor)` on the canvas and the component takes `getComputedStyle(canvas).color`, varying the alpha itself. That is what lets the dots invert with the theme without the component knowing any token names. A `MutationObserver` on `<html>`'s `data-theme` repaints on a theme change — verified live, with no reload: the dots go `rgb(255,255,255)` → `rgb(0,0,0)` on the toggle.
+- **Its size.** A `ResizeObserver` on the card relays out, rebuilds the shelter field and repaints the base grid. The card's height is now the viewport's, so this fires on every window resize — 688px at 1024x768, 1120px at 1800x1200 — and the canvas matches it exactly. The backing store is `devicePixelRatio` capped at **2**: past that it grows faster than anyone can see on a field of 1px dots.
+
+### The stacking is the one part that bites
+
+A positioned element with `z-index: 0` paints **above** non-positioned block content in the same stacking context, so the canvas would sit on top of the bio rather than behind it. Three things make it work, and all three are required:
+
+1. `.about-section` takes `position: relative`, so `inset: 0` resolves against the card. Safe to add — the only other absolutely positioned thing in there is `.gallery-img`, which resolves against `.gallery-frame`.
+2. The card's own three content blocks are lifted to `z-index: 1` explicitly.
+3. The canvas is `pointer-events: none`, so a click aimed at the resume button or a contact link never lands on it. Verified with `elementFromPoint` over the resume button: it returns `.resume-link`, not the canvas.
+
+It needs **no radius of its own** — `.section-card` is `overflow: hidden` at 20px, so the canvas is clipped to the card's corner for free.
 
 ## About gallery
 
@@ -755,7 +869,16 @@ The About gallery and the paper pages' `FigureCarousel` are different components
 
 - **`CarouselDots.tsx`** draws the dots, and owns the rule about when there are any: **ten or fewer** slides get dots you can click to jump; more falls back to no dots at all, with the corner badge carrying the position on its own. Eleven dots in a ~210px row sit ~10px apart, which is under any usable touch target and reads as a texture rather than a set of controls. Every current caller is well inside the limit (4 photos, 3 diagrams, 7 screenshots), so in practice everything on the site has dots today. Each dot is a real `<button>` with `aria-current`; the **mark is an inner span**, so the button stays a ~19x24 target while the dot it draws stays 7px.
   - Not a `tablist`: that role promises roving focus and arrow-key navigation, which this does not implement. Same rule as the Projects dropdown declining `aria-haspopup`.
-- **`CarouselCounter`** (exported from the same file) is the `n / N` badge, **in the picture's top-right corner** rather than in the control row — Instagram's placement, at Kian's request, less rounded than Instagram's pill at 6px on a ~22px badge, which is `.tag`'s own proportion. It started in the control row beside the dots and came out: the dots were already saying the same thing 20px away. **Fixed `rgba(0,0,0,.55)` fill and white ink in BOTH themes**, which is the one place on the site that is right — it sits on a photograph or a screenshot, not on a themed surface, so no token describes what is behind it and the scrim *is* the contrast. `tabular-nums`, so it cannot jitter as the number changes. Its parent must be `position: relative`; both frames already are, since their slides are absolutely positioned.
+- **`CarouselCounter`** (exported from the same file) is the `n/N` badge, **in the picture's top-right corner** rather than in the control row. It started beside the dots and came out: the dots were already saying the same thing 20px away.
+
+  **It is Instagram's badge, copied on purpose** — Kian asked for it by name and supplied a reference shot, including its corner radius. The first attempt used the site's own chip idiom and read wrong in three ways at once, all of which are worth knowing because each one alone looked fine:
+  - **`1/4`, not `1 / 4`.** The two spaces around the slash were half of what made it look "spaced out".
+  - **No tracking, and 12px/600.** It was 0.62rem/500 at `0.08em` — the site's uppercase micro-label, which is right for a caption and wrong for a number. The tracking was the other half. Closed up, the badge went 44x18 to **41x24**: narrower *and* taller, which is the reference's proportion.
+  - **10px radius, not `.tag`'s 6px.** On a 24px badge that leaves ~2px of flat edge down each side — very round, but not the stadium `999px` would give, which is what the reference shows. It makes this the site's roundest thing after `.exp-date`, and that is the accepted trade for matching the reference.
+
+  **The glass is real now**: `blur(16px) saturate(180%)` with a `inset 0 1px 0` specular rim, where it was a flat `blur(4px)` scrim. `saturate` is the nav glass's own trick — blur alone averages a photo to grey mush and the boost puts the colour back, so the badge reads as a lens over the picture rather than a sticker on it.
+
+  **KEEP THE FILL AT `rgba(0,0,0,.55)` OR DARKER.** The blur averages the backdrop, so the worst case is a blown-out sky: `0.45 x 255` ≈ 115 grey, and white on that is **4.76:1**, just over AA. Lightening it to match the reference shot more literally — its backdrop is mid-tone, so its badge reads grey — drops the text under 4.5:1 over a bright photo. Fixed colours in BOTH themes, which is the one place on the site that is right: this sits on a photograph, not a themed surface, so no token describes what is behind it. `tabular-nums`, so it cannot jitter as the number changes. Its parent must be `position: relative`; both frames already are, since their slides are absolutely positioned.
 - **`useCarouselAutoplay.ts`** advances either carousel every **6 seconds** — long enough to read a figure's label, short enough that a four-photo gallery gets round itself. One value for both.
 
   **Autoplay is content that moves without being asked, so it stops in five situations and every one matters:**
@@ -1357,11 +1480,11 @@ A floating pill, not a groove: no track, a 12px gutter with a 6px mark inside it
 | **≤1100px** | Skills, Projects | Skill groups go from 2×2 back to stacked; project grid 3 columns → 2 |
 | **≤1024px** | Experience, Education, About, Courses | Reduced padding; `.edu-main` → `auto 210px 1fr` becomes `auto 170px 1fr`; courses → 3 columns; Experience's meta column → **185px** (was 170 until Google Sans Flex). Projects left this breakpoint when it became a grid |
 | **≤900px** | Paper pages, Navbar | The contents list is hidden — no room beside the text. The nav's palette chip goes too: the bar clips what it can't fit, and the fit there is tighter than it looks (see *Palette trigger* in `Nav.css`) |
-| **≤768px** | everywhere | Single-column layouts, hamburger nav, gallery below bio, education logo on top, contact cards stack, courses → 2 columns, project grid → 1 column, survey explorer rows stack label-over-bar, the awards rail turns vertical and its steps loosen to 26px, **skill names hide and become tap-to-reveal (and the tiles become `<button>`s)**, **the palette input goes to 16px**, nav dock shortens to 0.36s, `--page-gutter` → 16 and `--paper-gutter` → 20, PDFs open in a new tab |
+| **≤768px** | everywhere | Single-column layouts, hamburger nav, **the About card drops its full-viewport `min-height` and the dot grid is not rendered at all**, gallery below bio, education logo on top, contact cards stack, courses → 2 columns, project grid → 1 column, survey explorer rows stack label-over-bar, the awards rail turns vertical and its steps loosen to 26px, **skill names hide and become tap-to-reveal (and the tiles become `<button>`s)**, **the palette input goes to 16px**, nav dock shortens to 0.36s, `--page-gutter` → 16 and `--paper-gutter` → 20, PDFs open in a new tab |
 | **≤520px** | Courses only | `.course-card-num` watermark drops out |
 | **≤480px** | About only | Further font/padding reductions |
 
-There are **eight** `prefers-reduced-motion: reduce` blocks — `Nav.css` 2 (the dock; the Projects caret's rotation), `Paper.css` 3 (the chart marker's `r`; the survey bar's `width`; the figure carousel's slide), and one each in `About.css` (the gallery slide), `Projects.css` (the card's hover lift) and `App.css` (the carousel dots' transition). `Nav.css`'s dock block cuts the travel to a 0.15s cross-fade (it used to also fade the hairline out — that line is gone, see *The docked bar has NO hairline*). `About.css` swaps the gallery's full-width slide for a fade. `Projects.css` drops the card's hover lift and keeps the tint.
+There are **eight** `prefers-reduced-motion: reduce` CSS blocks (plus one JS check, in `DotGrid.tsx` — the dot field can't be suppressed from a stylesheet, since what has to stop is a rAF loop) — `Nav.css` 2 (the dock; the Projects caret's rotation), `Paper.css` 3 (the chart marker's `r`; the survey bar's `width`; the figure carousel's slide), and one each in `About.css` (the gallery slide), `Projects.css` (the card's hover lift) and `App.css` (the carousel dots' transition). `Nav.css`'s dock block cuts the travel to a 0.15s cross-fade (it used to also fade the hairline out — that line is gone, see *The docked bar has NO hairline*). `About.css` swaps the gallery's full-width slide for a fade. `Projects.css` drops the card's hover lift and keeps the tint.
 
 Those three sit at the END of their files, so they win on source order. The `Paper.css` blocks and the caret's each sit directly beneath the rule they suppress, which is unambiguous because nothing later re-declares those transitions.
 

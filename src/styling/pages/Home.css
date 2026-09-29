@@ -21,6 +21,10 @@
        so the bar's contents stay put above the cap by construction. */
     --page-max: 1800px;
     --page-gutter: 36px;
+    /* The stack's vertical gap. A token because `.about-section` sizes itself
+       to land the fold on HALF of it — see the note there. Two literals would
+       drift the moment the rhythm changed. */
+    --card-gap: 12px;
 }
 
 @media (max-width: 768px) {

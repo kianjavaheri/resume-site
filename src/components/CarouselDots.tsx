@@ -61,14 +61,17 @@ function CarouselDots({
   )
 }
 
-/* The `n / N` badge, sitting in the top-right CORNER OF THE PICTURE rather
- * than in the control row — Instagram's placement, at Kian's request, and
- * less rounded than Instagram's pill: 6px on a ~22px badge, the proportion
- * `.tag` and `.project-wip` already share.
+/* The `n/N` badge, sitting in the top-right CORNER OF THE PICTURE — Instagram's
+ * badge, copied deliberately at Kian's request, down to its corner radius. The
+ * glass, the radius and the type are in `.carousel-badge` in App.css.
  *
  * It moved off the control row because the dots were already saying the same
  * thing 20px away, and two position indicators side by side is one too many.
  * In the corner it is out of the way but still on the thing it describes.
+ *
+ * **`1/4`, with NO SPACES around the slash**, which is the other half of what
+ * made the first version look "spaced out" — the CSS dropped the 0.08em
+ * tracking, and this drops the two spaces. Instagram writes it closed up.
  *
  * FIXED dark fill and white ink in BOTH themes, which is the one place on the
  * site that is right: this sits on a photograph or a screenshot, not on a
@@ -81,7 +84,7 @@ function CarouselDots({
 export function CarouselCounter({ index, count }: { index: number; count: number }) {
   // A single slide has no position to report.
   if (count < 2) return null
-  return <span className="carousel-badge">{index + 1} / {count}</span>
+  return <span className="carousel-badge">{index + 1}/{count}</span>
 }
 
 export default CarouselDots

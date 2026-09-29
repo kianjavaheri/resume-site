@@ -4,6 +4,8 @@ import LinkIcon from './LinkIcon'
 import { contactLinks, isMailto } from '../content/contact-links'
 import ArrowOut from './ArrowOut'
 import CarouselDots, { CarouselCounter } from './CarouselDots'
+import DotGrid from './DotGrid'
+import { useIsMobile } from './useIsMobile'
 import { useCarouselAutoplay } from './useCarouselAutoplay'
 import './../styling/components/About.css'
 
@@ -24,6 +26,29 @@ const images = [
   '/images/img3.jpg',
   '/images/img4.jpg',
 ]
+
+/* What the dot field keeps its distance from — every box of actual content in
+ * the card. DotGrid measures each one's rect and tapers the dots out as they
+ * approach it, so the effect thins toward the copy instead of stopping at a
+ * rectangle. It lists the TEXT ELEMENTS rather than their wrappers on purpose:
+ * `.about-text` would shelter the whole left column including the open space
+ * under the button, which is exactly where the field should be liveliest.
+ *
+ * It is a prop rather than a constant inside DotGrid so that component stays
+ * general — it knows nothing about About's class names.
+ */
+const SHELTERED = [
+  '.card-header-static',
+  '.about-hero-name',
+  '.about-bio',
+  '.resume-link',
+  '.about-gallery',
+  // `.about-social-inner` is deliberately NOT here. The contact chips are
+  // opaque `--well-bg` tiles with their own shadow, so they simply sit on top
+  // of the field — Kian's call: "the buttons should just sit above the grid
+  // and the block shouldn't be treated differently". Sheltering them punched
+  // a hole in the one part of the card the dots have all to themselves.
+].join(', ')
 
 // Resolves once the bitmap is actually ready to paint, so a slide never starts
 // on an image the browser still has to fetch — that showed as an empty frame
@@ -196,10 +221,23 @@ function Gallery() {
 
 function About() {
   const [resumeOpen, setResumeOpen] = useState(false)
+  const isMobile = useIsMobile()
 
   return (
     <>
       <section id="about" className="section-card about-section">
+        {/* First in the DOM and behind everything — see DotGrid.css for the
+            stacking, and DotGrid.tsx for why it tracks the pointer on a card
+            that deliberately has no hover tint.
+
+            NOT RENDERED ON A PHONE. There is no pointer to track, the card is
+            already taller than the viewport there so it has no open space to
+            fill, and this is the one thing on the page that exists purely for
+            fun — it should not cost a phone a canvas, two observers and a
+            per-dot field build. Rendering nothing beats hiding it in CSS,
+            which would do all that work and then paint it to no one. */}
+        {!isMobile && <DotGrid shelter={SHELTERED} />}
+
         <div className="card-header-static">
           <span className="card-title">About</span>
         </div>
