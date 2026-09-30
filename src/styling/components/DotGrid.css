@@ -14,15 +14,24 @@
     pointer-events: none;
     /* THE CANVAS READS ITS INK FROM THIS. A 2D context cannot resolve a CSS
        variable, so the component takes `getComputedStyle(canvas).color` and
-       varies the alpha itself — which is what lets the dots invert with the
-       theme without the component knowing any token names. */
-    color: var(--textcolor);
+       varies the alpha itself — which is what lets the dots follow the theme
+       without the component knowing any token names.
+
+       It is `--about-ink`, NOT `--textcolor`: the field is blue in light and
+       white in dark, so the two no longer agree. The token is shared with
+       PulseRing, which occupies this slot now. See App.css. */
+    color: var(--about-ink);
 }
 
 /* A positioned element with `z-index: 0` paints ABOVE non-positioned block
    content in the same stacking context, so without this the canvas would sit
    on top of the bio rather than behind it. Every block of the card's own
-   content is lifted over it explicitly. */
+   content is lifted over it explicitly.
+
+   THIS RULE SERVES BOTH FIGURES. It is about the card's content, not about
+   the canvas, so it is written once here and covers PulseRing too — which is
+   why it stays in this file even though the dot grid is not currently
+   rendered. Moving it would mean maintaining two copies of the same lift. */
 .about-section > .card-header-static,
 .about-section > .about-content-area,
 .about-section > .about-social {

@@ -83,29 +83,24 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
   // Body scroll lock and Escape, shared with the PDF modal.
   useModalChrome(onClose)
 
-  // The panel wears the bar's material in BOTH of the bar's states, the same
-  // rule the Projects dropdown follows: glass while the bar is glass, flat and
-  // opaque once it has docked. A reading page has no nav bar at all and its
-  // top bar is already a flat `--page-base`, so the palette goes solid there
-  // too rather than being the one floating glass object on the page.
-  //
-  // Read ONCE, on open, and that is sound rather than lazy: `useModalChrome`
-  // locks the body's scrolling for as long as this is mounted, so the bar
-  // cannot dock or undock underneath it.
-  //
-  // It reads `data-past-about`, NOT the `.nav-docked` class, and that is a bug
-  // fix rather than a preference. On a phone the palette is opened from the
-  // mobile menu's Search row, which closes the menu and opens the palette in
-  // the same click -- and an open menu forces the bar UNDOCKED (its panel
-  // hangs from the floating position). Both state updates batch into one
-  // render, so this initialiser ran while `.nav-docked` was still absent: the
-  // palette took the glass and then sat over a bar that re-docked flat behind
-  // it. The attribute tracks the scroll position alone and ignores the menu.
-  const [solid] = useState(
-    () =>
-      location.pathname !== '/' ||
-      document.querySelector('.nav')?.getAttribute('data-past-about') === 'true'
-  )
+  /* THE PANEL IS ALWAYS GLASS, ON EVERY PAGE AND AT ANY SCROLL POSITION.
+   *
+   * It used to take the bar's material in both of the bar's states — glass
+   * while the bar was glass, flat once it had docked — and to go flat on a
+   * reading page, which has no bar at all. Kian dropped the flat variant
+   * everywhere, including on the bar itself, so there is nothing left to
+   * match and no state to read.
+   *
+   * WHAT WENT WITH IT is worth knowing before anyone reintroduces a flat
+   * state: a `solid` flag read once on open, which had to read the nav's
+   * `data-past-about` attribute rather than its `.nav-docked` class. On a
+   * phone the palette opens from the mobile menu's Search row, which closes
+   * the menu and opens the palette in one click — and an open menu forces the
+   * bar UNDOCKED, because its panel hangs from the floating position. Both
+   * updates batch into one render, so an initialiser reading the class saw it
+   * still absent, took the glass, and then sat over a bar that re-docked flat
+   * behind it. The attribute tracks scroll alone and ignores the menu.
+   */
 
   const results = useMemo(() => search(query), [query])
 
@@ -172,7 +167,7 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
       }}
     >
       <div
-        className={`palette${solid ? ' palette-solid' : ''}`}
+        className="palette"
         role="dialog"
         aria-modal="true"
         aria-label="Search this site"

@@ -59,10 +59,45 @@
     /* The nav bar's chips, in BOTH of the bar's states. The bar is chrome, not
        a page-coloured surface, and --hover-tint is calibrated against the page
        -- the same reasoning --well-hover-tint exists for. It matters most once
-       the bar DOCKS: the docked fill is --nav-solid, which is pure #fff here
+       the bar DOCKS: the docked fill used to be a flat page white here
        and pure #000 in dark, and .022 white on pure black composites to
        rgb(6,6,6). The hover simply vanished in dark mode. */
     --nav-hover-tint: rgba(0, 0, 0, 0.06);
+    /* The ink for whatever ambient figure the About card is carrying — the
+       pulsing ring today (components/PulseRing.tsx), the dot field before it
+       (components/DotGrid.tsx). ONE TOKEN FOR BOTH, deliberately: they are
+       alternative treatments of the same slot and must not be able to drift
+       to different colours. Kian's call: blue in light, plain white in dark.
+
+       It is a TOKEN OF ITS OWN rather than --textcolor, which is what the
+       canvas used to read, because the two now disagree in light mode.
+
+       The hex is Kian's, picked by eye rather than derived from the chart
+       palette — it was #2a78d6 (the thesis charts' first series) for one
+       round and is now a cleaner, more saturated blue. It is NOT a reference
+       to `--chart-s1`, which is declared in Paper.css and scoped to `.paper`
+       and so does not resolve on the home page at all.
+
+       Dark stays pure white — a blue at .11 alpha on a near-black card reads
+       as muddy grey rather than as blue, so the tint buys nothing there. */
+    --about-ink: rgb(3, 111, 252);
+    /* Multiplies the field's three alphas (rest, pulse, hover peak). At 9 the
+       resting dot saturates — 0.11 x 9 clamps to 1 — so the light field is
+       SOLID rgb(3,111,252), which is what Kian asked for. It was 1, the
+       constants' own tuning, and the dots read as a transparent wash.
+
+       WHAT SOLID COSTS, since it is not obvious: at rest = 1 there is no
+       brightness headroom left above it, so the hover and the pulse clamp to
+       the same 1 and their alpha lift becomes a no-op. Both now read by
+       RADIUS alone (1px -> 3.4px on hover, -> 1.9px on the pulse). Measured,
+       the hover still moves 4.5x the ink in its window, so the response is
+       intact — but if the field should ever breathe in brightness again,
+       this is the number to bring down. About 7 leaves the rest at 0.77
+       with the lift still working. */
+    --dot-grid-alpha-scale: 9;
+    /* The ring's equivalent. 1 is the constants' own tuning in PulseRing.tsx,
+       which were set against this theme. */
+    --ring-alpha-scale: 1;
     /* The Projects panel's shadow. Purely DOWNWARD, no ring: the panel hangs
        off the bar's bottom edge as one continuous surface, and --nav-shadow's
        `0 1px 3px` component would draw a seam across the join. */
@@ -74,11 +109,32 @@
        fill dark enough that it still composites to ~#e2e5ec over the white
        page. Raising the alpha to keep it visible is what killed the glass. */
     --nav-glass: rgba(197, 203, 217, 0.50);
-    /* The rim is what sells glass at this alpha — a bright top edge plus a
-       fainter ring, standing in for the specular highlight on a real bevel.
-       It carries the pill's edge over photos, where the shadow is lost. */
-    --nav-rim: inset 0 1px 0 rgba(255, 255, 255, 0.65),
-               inset 0 0 0 1px rgba(255, 255, 255, 0.30);
+    /* The specular rim on glass: a bright top edge plus a fainter full ring,
+       standing in for the highlight on a real bevel. It is what carries a
+       floating panel's EDGE over a photograph, where the drop shadow is lost
+       against the picture.
+
+       IT SURVIVES ON THE COMMAND PALETTE AND NOWHERE ELSE. --nav-rim below
+       is the same geometry at zero alpha. The two were ONE token until the
+       bar's border was cut, and the palette lost its edge with it — the bar
+       is chrome pinned across the top and reads fine bare, where the palette
+       is a modal floating over arbitrary content and without a rim it washes
+       out into whatever is behind it. */
+    --glass-rim: inset 0 1px 0 rgba(255, 255, 255, 0.65),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.30);
+    /* THE NAV'S RIM IS OFF. Kian's call: on a 56px pill that ring read as a
+       drawn border around the bar rather than as a highlight. The blur, the
+       saturation boost and the fill carry the material on their own.
+
+       Kept at zero alpha rather than deleted so the bar and the mobile menu
+       panel still have ONE rim token between them — the panel shares it and
+       is bare with the bar, deliberately, since it hangs off the bar's bottom
+       edge and reads as part of it. Setting `box-shadow: none` on each
+       instead would work, but would put the decision in two places.
+
+       The palette does NOT share it; it reads --glass-rim above. */
+    --nav-rim: inset 0 1px 0 rgba(255, 255, 255, 0),
+        inset 0 0 0 1px rgba(255, 255, 255, 0);
     /* Two-part: a soft cast for float, a tight one to define the edge. */
     --nav-shadow: 0 6px 24px rgba(0, 0, 0, 0.10), 0 1px 3px rgba(0, 0, 0, 0.07);
 
@@ -87,20 +143,20 @@
     --scrollbar-thumb: rgba(0, 0, 0, 0.22);
     --scrollbar-thumb-hover: rgba(0, 0, 0, 0.38);
 
-    /* The DOCKED bar's fill, once it has attached to the top of the screen and
-       stopped being glass. Page-coloured, with the hairline under it carrying
-       the separation — the classic docked header, and the honest one: a bar
-       pinned to the edge isn't floating over anything any more, so a material
-       that implies depth is a lie. Its own token rather than `--page-base`
-       directly, so the bar can be tuned without moving the page. */
-    --nav-solid: #ffffff;
-    /* Structural twins of --nav-rim / --nav-shadow at zero alpha. box-shadow
-       does not interpolate to `none`, so without these the glass's rim and
-       float would SNAP off at the start of the dock while everything else
-       animated. Keep the geometry identical if either is retuned. */
-    --nav-rim-off: inset 0 1px 0 rgba(255, 255, 255, 0),
-                   inset 0 0 0 1px rgba(255, 255, 255, 0);
-    --nav-shadow-off: 0 6px 24px rgba(0, 0, 0, 0), 0 1px 3px rgba(0, 0, 0, 0);
+    /* THREE TOKENS WERE DELETED HERE, and they are named so a search for them
+       lands on this note rather than on nothing:
+
+       --nav-solid       the docked bar's flat page-coloured fill
+       --nav-rim-off     a zero-alpha twin of --nav-rim
+       --nav-shadow-off  a zero-alpha twin of --nav-shadow
+
+       They existed because docking used to swap the glass for a flat fill,
+       and `box-shadow` does not interpolate to `none` — so the rim and the
+       float needed shadows of identical geometry at zero alpha to animate
+       towards, or they would snap off on the first frame. Kian's call to keep
+       the glass docked (and on the Projects panel and the palette, which both
+       followed the bar), so nothing swaps material any more and all three had
+       no consumers left. The dock is pure geometry now. */
 
     --toggle-btn-bg: rgba(0, 0, 0, 0.09);
     --toggle-btn-bg-hover: rgba(0, 0, 0, 0.13);
@@ -140,10 +196,24 @@
     --hover-tint: rgba(255, 255, 255, 0.022);
     --hover-tint-inverse: rgba(0, 0, 0, 0.14);
     /* See the light-mode note. This is ~4.5x --hover-tint, and it has to be:
-       the docked bar in dark is --nav-solid #000000, where the page tint is
+       the docked bar in dark used to be a flat #000000, where the page tint is
        invisible outright. On the floating glass (which composites to about
        rgb(34,34,39) over a dark page) it lands around rgb(56,56,61). */
     --nav-hover-tint: rgba(255, 255, 255, 0.10);
+    /* Pure white, matching --textcolor here. See the light-mode note. */
+    --about-ink: #ffffff;
+    /* WHITE AT LIGHT MODE'S ALPHA RENDERS GREY HERE, which is the whole
+       reason this token exists: .11 of #ffffff over the card's rgb(16,16,18)
+       composites to rgb(44,44,46). The ink was never the problem. At 2.2 the
+       resting dot lands near rgb(69,69,70) and the hover peak saturates to
+       white. Raise it further if the field still reads muted — it is one
+       number and the three alphas keep their proportions. */
+    --dot-grid-alpha-scale: 2.2;
+    /* Same compositing problem, smaller correction than the dots needed: the
+       ring is a 1px stroke rather than a field of discs, so it holds up
+       better on the near-black card and 1.6 is enough to match light's
+       weight. */
+    --ring-alpha-scale: 1.3;
     --nav-drop-shadow: 0 10px 28px rgba(0, 0, 0, 0.65);
     --card-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
     --sub-card-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
@@ -151,19 +221,19 @@
     /* Same pairing as light: low alpha, fill lifted to compensate so it still
        composites to ~#222227 over the black page. */
     --nav-glass: rgba(68, 68, 78, 0.50);
-    /* Much fainter than light mode — a bright rim on a dark pill reads as a
-       drawn border rather than a highlight. */
-    --nav-rim: inset 0 1px 0 rgba(255, 255, 255, 0.14),
-               inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    /* Much fainter than light's — a bright rim on a dark panel reads as a
+       drawn border rather than as a highlight. */
+    --glass-rim: inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    /* Off, as in light — see the note there. This was the theme the bar's
+       border was most obvious in: even at .06 the ring stood clear of a
+       pure-black page and outlined it. */
+    --nav-rim: inset 0 1px 0 rgba(255, 255, 255, 0),
+        inset 0 0 0 1px rgba(255, 255, 255, 0);
     --nav-shadow: 0 6px 28px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.5);
 
     --scrollbar-thumb: rgba(255, 255, 255, 0.20);
     --scrollbar-thumb-hover: rgba(255, 255, 255, 0.36);
-
-    --nav-solid: #000000;
-    --nav-rim-off: inset 0 1px 0 rgba(255, 255, 255, 0),
-                   inset 0 0 0 1px rgba(255, 255, 255, 0);
-    --nav-shadow-off: 0 6px 28px rgba(0, 0, 0, 0), 0 1px 3px rgba(0, 0, 0, 0);
 
     --toggle-btn-bg: rgba(255, 255, 255, 0.12);
     --toggle-btn-bg-hover: rgba(255, 255, 255, 0.18);
@@ -385,7 +455,7 @@ a {
 
 /* Child combinator, not descendant: a nested .section-body-wrapper (the
    coursework blocks inside Education) must not inherit the outer open state. */
-.section-open > .section-body-wrapper {
+.section-open>.section-body-wrapper {
     grid-template-rows: 1fr;
 }
 
@@ -617,6 +687,7 @@ html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
 }
+
 /* ---- Carousel dots (components/CarouselDots.tsx) ------------------------
    Shared by the About gallery and the paper pages' FigureCarousel, which is
    why they are here and not in either component's own sheet. Both sliders sit

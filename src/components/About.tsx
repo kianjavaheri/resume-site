@@ -4,7 +4,7 @@ import LinkIcon from './LinkIcon'
 import { contactLinks, isMailto } from '../content/contact-links'
 import ArrowOut from './ArrowOut'
 import CarouselDots, { CarouselCounter } from './CarouselDots'
-import DotGrid from './DotGrid'
+import PulseRing from './PulseRing'
 import { useIsMobile } from './useIsMobile'
 import { useCarouselAutoplay } from './useCarouselAutoplay'
 import './../styling/components/About.css'
@@ -27,7 +27,12 @@ const images = [
   '/images/img4.jpg',
 ]
 
-/* What the dot field keeps its distance from — every box of actual content in
+/* KEPT FOR <DotGrid />, WHICH IS NOT CURRENTLY RENDERED — see the note at the
+ * canvas below. This is unused today and that is on purpose; it is the other
+ * half of reinstating the dot field in one line, and re-deriving it later
+ * would mean re-deriving the reasoning with it.
+ *
+ * What the dot field keeps its distance from — every box of actual content in
  * the card. DotGrid measures each one's rect and tapers the dots out as they
  * approach it, so the effect thins toward the copy instead of stopping at a
  * rectangle. It lists the TEXT ELEMENTS rather than their wrappers on purpose:
@@ -37,6 +42,7 @@ const images = [
  * It is a prop rather than a constant inside DotGrid so that component stays
  * general — it knows nothing about About's class names.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const SHELTERED = [
   '.card-header-static',
   '.about-hero-name',
@@ -226,17 +232,50 @@ function About() {
   return (
     <>
       <section id="about" className="section-card about-section">
-        {/* First in the DOM and behind everything — see DotGrid.css for the
-            stacking, and DotGrid.tsx for why it tracks the pointer on a card
-            that deliberately has no hover tint.
+        {/* First in the DOM and behind everything — DotGrid.css carries the
+            stacking rules that lift the card's own content over it, and they
+            are written to serve whichever figure is in this slot.
 
-            NOT RENDERED ON A PHONE. There is no pointer to track, the card is
-            already taller than the viewport there so it has no open space to
-            fill, and this is the one thing on the page that exists purely for
-            fun — it should not cost a phone a canvas, two observers and a
-            per-dot field build. Rendering nothing beats hiding it in CSS,
-            which would do all that work and then paint it to no one. */}
-        {!isMobile && <DotGrid shelter={SHELTERED} />}
+            THE DOT GRID USED TO BE HERE AND IS DELIBERATELY STILL IN THE
+            REPO. `DotGrid.tsx`, `DotGrid.css` and the `SHELTERED` list below
+            are all intact and working; Kian moved away from the look, not
+            from the code. Putting it back is this line plus the import — it
+            reads the same `--about-ink` token, and its shelter prop is the
+            constant still declared above. Don't delete it as dead code, and
+            read its own header before reinstating it: the shelter taper, the
+            two-weight bloom and the pulse's activity gate each took a round
+            of tuning that is not obvious from the outside.
+
+            IT IS FITTED TO THE GAP, not placed at fractions of the card.
+            `above` and `below` name the blocks it sits between and
+            `centreOn` the one it lines up with — all three the TEXT COLUMN's
+            side of the card, which is where Kian wanted it. That is also why
+            the gallery is not in `above`: it is the right-hand column and
+            the figure never reaches it, so letting it set the band's top
+            edge only robbed height for no reason.
+
+            They name DRAWN blocks rather than wrappers on purpose.
+            `.about-content-area`'s bottom sits 36px below the last thing
+            inside it, and `.about-social`'s top is EXACTLY its icons' top
+            with no padding at all — so wrappers threw away room at one end
+            and claimed room that wasn't there at the other. That band is content-driven where the card's height
+            is a viewport, so it is 191px at 1024x768 and three times that on
+            a tall window; any fixed fraction is right at one size only.
+
+            NOT RENDERED ON A PHONE. The dot grid's reason was that there is
+            no pointer to track; this one is ambient and would work fine, so
+            the reason here is COST — a canvas, two observers and forty
+            stroked paths a frame is not something to hand a phone for
+            decoration, and the card loses its full-viewport height at that
+            width anyway. Rendering nothing beats hiding it in CSS, which
+            would do all the work and then paint it to no one. */}
+        {!isMobile && (
+          <PulseRing
+            above=".about-text"
+            below=".about-social"
+            centreOn=".about-text"
+          />
+        )}
 
         <div className="card-header-static">
           <span className="card-title">About</span>

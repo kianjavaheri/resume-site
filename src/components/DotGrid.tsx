@@ -22,9 +22,24 @@ import './../styling/components/DotGrid.css'
  * on the card, including over dead space, so it never points at a control.
  */
 
-const PITCH = 24 // px between dots
+const PITCH = 18 // px between dots
 const BASE_R = 1 // px radius at rest
 const PEAK_R = 3.4 // px radius directly under the pointer
+/* THE THREE ALPHAS ARE LIGHT MODE'S, AND DARK SCALES THEM.
+ *
+ * They were one set for both themes, and in dark that was wrong in a way the
+ * hex alone hides: the ink there is pure #ffffff, but 0.11 of it over the
+ * card's rgb(16,16,18) composites to rgb(44,44,46) — so the dots rendered
+ * GREY on a canvas whose ink is white. Kian read that as the colour being
+ * wrong; it is the opacity.
+ *
+ * The fix is a single per-theme multiplier, `--dot-grid-alpha-scale`, rather
+ * than three separate tokens: rest, pulse and peak were tuned against each
+ * other (the pulse is deliberately much shallower than the hover, which is
+ * what makes the hover feel like a response), and scaling them together is
+ * the only way to raise the field without spending that relationship. It is
+ * clamped at 1 per value, so a large scale flattens the top of the range
+ * before it flattens the bottom. */
 const BASE_A = 0.11 // alpha at rest, before shelter
 const PEAK_A = 0.5
 const INFLUENCE = 130 // px — how far the pointer reaches
@@ -122,6 +137,11 @@ function DotGrid({ shelter }: { shelter?: string }) {
     let ox = 0
     let oy = 0
     let ink = 'rgb(0,0,0)'
+    // The three constants above, scaled by --dot-grid-alpha-scale for the
+    // current theme. Recomputed wherever the ink is.
+    let baseA = BASE_A
+    let peakA = PEAK_A
+    let pulseA = PULSE_A
     // Per-dot 0..1: how much of the effect this dot is allowed. See buildField.
     let weight = new Float32Array(0)
     // The content rects, in card-local px. Kept past buildField because the
@@ -156,11 +176,23 @@ function DotGrid({ shelter }: { shelter?: string }) {
     // idle frame can skip the clear+blit entirely.
     let restPainted = false
 
-    // Read straight off the element's computed `color`, which DotGrid.css sets
-    // to var(--textcolor). The canvas never has to know the token names, and
+    // Read straight off the element's computed style, which DotGrid.css keys
+    // to the theme tokens. The canvas never has to know the token names, and
     // this is the only way it can: a 2D context can't resolve a CSS variable.
-    const readInk = () => {
-      ink = getComputedStyle(canvas).color || 'rgb(0,0,0)'
+    //
+    // `color` carries the ink. The alpha scale has to come through as a custom
+    // property instead — there is no ordinary CSS property that means "how
+    // opaque should this canvas draw", so it is read by name. A missing or
+    // unparseable value falls back to 1, i.e. the light-mode constants, which
+    // is what the field did before this existed.
+    const readPaint = () => {
+      const cs = getComputedStyle(canvas)
+      ink = cs.color || 'rgb(0,0,0)'
+      const raw = parseFloat(cs.getPropertyValue('--dot-grid-alpha-scale'))
+      const scale = Number.isFinite(raw) && raw > 0 ? raw : 1
+      baseA = Math.min(1, BASE_A * scale)
+      peakA = Math.min(1, PEAK_A * scale)
+      pulseA = Math.min(1, PULSE_A * scale)
     }
 
     /* THE SHELTER FIELD — why the dots don't sit behind the text.
@@ -235,7 +267,7 @@ function DotGrid({ shelter }: { shelter?: string }) {
         for (let j = 0; j < rows; j++) {
           const k = weight[i * rows + j]
           if (k <= 0.01) continue
-          bctx.globalAlpha = BASE_A * k
+          bctx.globalAlpha = baseA * k
           bctx.beginPath()
           bctx.arc(ox + i * PITCH, oy + j * PITCH, BASE_R, 0, TAU)
           bctx.fill()
@@ -291,7 +323,7 @@ function DotGrid({ shelter }: { shelter?: string }) {
             const k = weight[i * rows + j]
             if (k <= 0.01) continue
             const t = a * k
-            ctx.globalAlpha = BASE_A * k + (PULSE_A - BASE_A) * t
+            ctx.globalAlpha = baseA * k + (pulseA - baseA) * t
             ctx.beginPath()
             ctx.arc(ox + i * PITCH, y, BASE_R + (PULSE_R - BASE_R) * t, 0, TAU)
             ctx.fill()
@@ -342,7 +374,7 @@ function DotGrid({ shelter }: { shelter?: string }) {
           // falloff leaves a hard circle you can see the boundary of.
           const t = smoothstep(1 - d / INFLUENCE) * strength * k * pw
           if (t <= 0.004) continue
-          ctx.globalAlpha = BASE_A * k + (PEAK_A - BASE_A) * t
+          ctx.globalAlpha = baseA * k + (peakA - baseA) * t
           ctx.beginPath()
           ctx.arc(x, y, BASE_R + (PEAK_R - BASE_R) * t, 0, TAU)
           ctx.fill()
@@ -372,6 +404,13 @@ function DotGrid({ shelter }: { shelter?: string }) {
       // on the right and bottom edges.
       ox = (w - (cols - 1) * PITCH) / 2
       oy = (h - (rows - 1) * PITCH) / 2
+      // Re-read before repainting. The paint values were previously picked up
+      // on mount and on a theme change only, which made a change to
+      // --dot-grid-alpha-scale look like it did nothing: the token resolved
+      // to its new value, `paintBase` ran on the next relayout, and it still
+      // drew with the alphas read at mount. Reading here costs one
+      // getComputedStyle per layout — never per frame.
+      readPaint()
       buildField()
       paintBase()
       restPainted = false
@@ -458,7 +497,8 @@ function DotGrid({ shelter }: { shelter?: string }) {
       start()
     }
 
-    readInk()
+    // layout() re-reads for itself; this only covers the paths that repaint
+    // without a relayout.
     layout()
 
     // The card's height changes with the viewport, and the copy inside it
@@ -471,7 +511,7 @@ function DotGrid({ shelter }: { shelter?: string }) {
     // `data-theme` moves on <html> (index.html's pre-paint script and useTheme
     // both write it) — the ink has to follow it.
     const mo = new MutationObserver(() => {
-      readInk()
+      readPaint()
       paintBase()
       paintFrame()
     })

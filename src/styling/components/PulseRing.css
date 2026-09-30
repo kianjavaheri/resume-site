@@ -1,0 +1,28 @@
+/* The distorted pulsing ring behind the About card (components/PulseRing.tsx).
+ *
+ * It takes the dot grid's slot exactly — same absolute fill of the card, same
+ * stacking, same `pointer-events: none`. The stacking rules that lift the
+ * card's content above it live in DotGrid.css and are written to cover both,
+ * so that the two can be swapped without touching them.
+ *
+ * No radius of its own: `.section-card` is `overflow: hidden` at 20px, so the
+ * canvas is clipped to the card's corner for free. Its host, `.about-section`,
+ * carries the `position: relative` that makes `inset: 0` resolve against the
+ * card.
+ */
+.pulse-ring {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    /* Decoration, and underneath everything: a click aimed at the resume
+       button or a contact link must never land here. */
+    pointer-events: none;
+    /* THE CANVAS READS ITS INK FROM THIS. A 2D context cannot resolve a
+       custom property, so the component takes `getComputedStyle(canvas).color`
+       and varies the alpha itself.
+
+       `--about-ink` is shared with the dot grid, which is the point: the two
+       are alternative treatments of the same slot and should not be able to
+       drift to different colours. */
+    color: var(--about-ink);
+}

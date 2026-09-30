@@ -33,23 +33,21 @@
     background-color: var(--nav-glass);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     backdrop-filter: blur(24px) saturate(180%);
-    box-shadow: var(--nav-rim), var(--nav-shadow);
+    /* --glass-rim, NOT --nav-rim. The bar dropped its rim and this panel must
+       not follow: it floats over whatever the page happens to show, including
+       the About gallery's photograph, where the drop shadow is invisible and
+       the rim is the only thing drawing its edge. They were one token, and
+       the palette washed out the moment the bar's was cut. */
+    box-shadow: var(--glass-rim), var(--nav-shadow);
     border-radius: 20px !important;
     overflow: hidden;
 }
 
-/* Flat and opaque, for a docked nav bar or a reading page — see the note in
-   CommandPalette.tsx. This is exactly what `.nav-docked ~ .nav-dropdown
-   .nav-dropdown-panel` does to the Projects menu, and for the same reasons:
-   the rim goes to its zero-alpha twin with the bar's, but `--nav-shadow`
-   STAYS, because unlike the docked bar this panel is still floating over the
-   page and a solid box with no shadow reads as a hole punched in it. */
-.palette-solid {
-    background-color: var(--nav-solid);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    box-shadow: var(--nav-rim-off), var(--nav-shadow);
-}
+/* THE PALETTE IS ALWAYS GLASS — there is no flat variant. It used to go
+   opaque whenever the bar had docked, and on a reading page, where there is
+   no bar at all. Kian's call to drop both: the panel is a floating modal and
+   the material is the same wherever it opens, which is one fewer state and
+   one fewer thing to keep in step with the bar. */
 
 /* ---- The field --------------------------------------------------------- */
 

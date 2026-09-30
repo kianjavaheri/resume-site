@@ -134,6 +134,7 @@ export const works: Array<WorkProps> = [
     ],
     image: { src: '/images/projects/material-boxes.fbf45ff3.webp', width: 854, height: 480, alt: 'The mod in Minecraft: a chest marked as a Material Box, its slots colour-coded by progress beside a materials checklist' },
     blurb: 'A client-side Fabric mod that tracks the materials a Minecraft build needs, colour-coding chests by what is still missing.',
-    tags: ['Java', 'Fabric', 'Minecraft Modding', 'Claude API'],
+    // tags: ['Java', 'Fabric', 'Minecraft Modding', 'Claude API'],
+    tags: ['Java', 'Fabric', 'Minecraft Modding'],
   },
 ]

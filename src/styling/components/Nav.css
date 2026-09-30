@@ -101,10 +101,21 @@
        62 = 36 (gutter) + 26 (the pill's own padding); 50 = 36 + 14. */
     padding-left: max(62px, calc(50% - var(--page-max) / 2 + 62px));
     padding-right: max(50px, calc(50% - var(--page-max) / 2 + 50px));
-    background-color: var(--nav-solid);
-    -webkit-backdrop-filter: blur(0px) saturate(100%);
-    backdrop-filter: blur(0px) saturate(100%);
-    box-shadow: var(--nav-rim-off), var(--nav-shadow-off);
+    /* THE MATERIAL IS DELIBERATELY NOT TOUCHED HERE. Docking is a pure
+       GEOMETRY change now — top, width, max-width, radius and padding — and
+       the bar keeps the glass it was floating with.
+
+       It used to go flat: `--nav-solid`, `backdrop-filter` animated down to
+       `blur(0px) saturate(100%)`, and the rim and float to their zero-alpha
+       twins. Kian's call to drop that. The old reasoning was that a bar
+       pinned to the screen's edge is not floating over anything any more, so
+       a material implying depth is a lie — but it IS still over the page,
+       with content scrolling under it, which is exactly what the blur is for.
+
+       `.nav`'s own transition still lists background-color, box-shadow and
+       backdrop-filter, and they are NOT dead: `--nav-glass` and
+       `--nav-shadow` differ per theme, so those legs are what make a theme
+       toggle fade rather than snap. */
 }
 
 .nav .name {
@@ -259,20 +270,11 @@
     background-image: linear-gradient(var(--nav-hover-tint), var(--nav-hover-tint));
 }
 
-/* The panel takes the bar's material in BOTH states, so it drops the glass when
-   the bar does. A GENERAL SIBLING selector is the only way to reach it: the
-   panel is a sibling of <nav>, not a child (see above for why it has to be).
-
-   It keeps `--nav-shadow` where the docked bar gives its up — the bar is
-   pinned to the screen's edge and isn't floating over anything any more, but
-   the panel still is, and a solid menu with no shadow would read as a hole
-   punched in the page. */
-.nav-docked~.nav-dropdown .nav-dropdown-panel {
-    background-color: var(--nav-solid);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    box-shadow: var(--nav-drop-shadow);
-}
+/* THERE IS NO DOCKED VARIANT OF THIS PANEL ANY MORE. It used to go flat with
+   the bar, reached by a general sibling selector (the panel is a sibling of
+   <nav>, not a child). The bar keeps its glass when it docks now, so the
+   panel does too by simply not being overridden — which is the whole point of
+   it taking the bar's material rather than declaring its own. */
 
 .theme-toggle {
     font-size: 0.82rem;
@@ -426,8 +428,10 @@
         -webkit-backdrop-filter: blur(24px) saturate(180%);
         backdrop-filter: blur(24px) saturate(180%);
         border-radius: 20px !important;
-        /* Same material as the pill — the rim replaces the solid border the
-           panel used to carry, which read as a drawn line on glass. */
+        /* Same material as the pill, rim included — and the rim is now off
+           (see --nav-rim in App.css), so this is fill + blur + float alone.
+           It carries no `border` either: a solid line on glass reads as
+           drawn rather than lit, which is why one was removed here before. */
         box-shadow: var(--nav-rim), var(--nav-shadow);
         z-index: 99;
         padding: 6px 24px;
