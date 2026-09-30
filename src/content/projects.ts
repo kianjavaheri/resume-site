@@ -121,7 +121,7 @@ export const works: Array<WorkProps> = [
     ],
     image: { src: '/images/projects/rental-prices.3ab58f9d.webp', width: 900, height: 506, alt: 'The rent model web app: a map of Santa Cruz with priced blocks, and an estimate panel showing a prediction interval' },
     blurb: 'A rent model for studios and one-bedrooms across Santa Cruz and Monterey counties. Type an address, get a price and the range it probably falls in.',
-    tags: ['LightGBM', 'Linear Regression', 'Gradient Boosting', 'Feature Engineering'],
+    tags: ['LightGBM', 'Linear Regression', 'Gradient Boosting', 'Ridge Regression', 'Feature Engineering'],
   },
   {
     wip: true,
