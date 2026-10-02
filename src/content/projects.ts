@@ -93,7 +93,7 @@ export const works: Array<WorkProps> = [
     blurb: 'Five recent studies on whether a basic income is affordable, across developing and developed economies, and what the choice of funding does to growth.',
     tags: ['Macroeconomics', 'Policy Analysis'],
   },
-  // HIDDEN, not deleted — Kian's call, Sep 2026: he wants to understand the
+  // HIDDEN, not deleted — A deliberate hold, Sep 2026: the project should be better understood the
   // project better before it represents him. Everything it needs is still here:
   // the page in project-pages.ts, its seven images under public/images/
   // wage-effects/ and public/og/, and the thumbnail above.
@@ -132,9 +132,34 @@ export const works: Array<WorkProps> = [
       { label: 'View CurseForge', icon: 'curseforge', href: 'https://www.curseforge.com/minecraft/mc-mods/material-boxes' },
       { label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/material-boxes' },
     ],
-    image: { src: '/images/projects/material-boxes.fbf45ff3.webp', width: 854, height: 480, alt: 'The mod in Minecraft: a chest marked as a Material Box, its slots colour-coded by progress beside a materials checklist' },
-    blurb: 'A client-side Fabric mod that tracks the materials a Minecraft build needs, colour-coding chests by what is still missing.',
+    image: { src: '/images/projects/material-boxes.fbf45ff3.webp', width: 854, height: 480, alt: 'The mod in Minecraft: a chest marked as a Material Box, its slots color-coded by progress beside a materials checklist' },
+    blurb: 'A client-side Fabric mod that tracks the materials a Minecraft build needs, color-coding chests by what is still missing.',
     // tags: ['Java', 'Fabric', 'Minecraft Modding', 'Claude API'],
     tags: ['Java', 'Fabric', 'Minecraft Modding'],
+  },
+  // LAST IN THE GRID, and that is the order it should keep: it is the site
+  // itself, not a project, so it reads as a footnote to the five above rather
+  // than competing with them. It still earns a card rather than a footer link,
+  // because a reader who skims the grid and leaves is exactly the reader it is
+  // written for — and because the authorship note belongs somewhere findable
+  // rather than buried.
+  //
+  // The thumbnail is the site's OWN ambient figure, rendered to a still from
+  // the same constants components/PulseRing.tsx animates — so the card cannot
+  // show a motif the page no longer uses. See docs/components.md.
+  {
+    title: 'How This Site Is Built',
+    navLabel: 'Colophon',
+    to: '/projects/colophon',
+    links: [
+      { label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/resume-site' },
+    ],
+    image: { src: '/images/projects/colophon.7105eb66.webp', width: 900, height: 506, alt: 'The blue ring that drifts behind the About card, drawn as overlapping translucent strokes on a pale background' },
+    blurb: 'Notes on the creation of this site and what I did.',
+    // NOT a tech stack, deliberately. The tags credit the design work, not what
+    // the project contains — and on this one the code was not hand-written.
+    // React and Vite here would claim exactly the thing the page is careful
+    // not to.
+    tags: ['System Design', 'Agentic Coding'],
   },
 ]

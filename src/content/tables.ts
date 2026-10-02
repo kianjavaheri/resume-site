@@ -48,7 +48,7 @@ export const paperTables: Record<string, PaperTable> = {
       'Trade balance with China (Exports – Imports as % of GDP)',
     ],
     rows: [
-      // CORRECTED, deliberately and with Kian's sign-off: the thesis prints
+      // CORRECTED, deliberately and with the author's sign-off: the thesis prints
       // this as `1.95%`, positive, which would mean a trade surplus with China
       // in 2016. Every other year is negative and Figure 2 plots this one
       // negative too, so the published table is missing a minus sign. This is

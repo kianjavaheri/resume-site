@@ -1,4 +1,4 @@
-// Kian's three public contacts, in one place because two components draw them:
+// The three public contacts, in one place because two components draw them:
 // the Contact section's cards and the row of icons at the foot of About.
 //
 // `icon` names come from LinkIcon's set, the same one the Projects cards draw

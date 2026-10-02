@@ -9,7 +9,11 @@ Three-state preference stored in localStorage under the key **`theme-pref`**: `'
 - `Home.tsx` reads `window.matchMedia('(prefers-color-scheme: dark)')` and subscribes to its `change` event, so the site follows the OS theme live with no reload.
 - Clicking the nav toggle writes an explicit `'light'`/`'dark'`, which pins the site and stops it following the system.
 - The resolved theme is applied as `data-theme` on the `.home` div.
-- **`index.html` carries a small inline pre-paint script** that reads `theme-pref` and sets `documentElement` background + `color-scheme` before React mounts. Without it, dark-mode visitors get a white flash on every load. Keep it in sync with `--page-base` if those colors change.
+- **`index.html` carries a small inline pre-paint script** that reads `theme-pref` and sets three things on `documentElement` before React mounts: `data-theme`, `color-scheme` and an inline `background`. Without it, dark-mode visitors get a white flash on every load. It carries literal hexes because it runs before any stylesheet; keep them in sync with `--page-base`.
+- **`useTheme` must re-write ALL THREE on every change, not just `data-theme`.** It only did the attribute for a long time, so after a runtime theme switch the root kept its **load-time** `color-scheme` forever.
+  - **The symptom was nowhere near the cause.** The command palette's text came out inverted — black rows on a dark panel, or white on a light one — and only sometimes, because whether it looked wrong depended on which theme the page was *loaded* in. `.palette-row-title` sets no `color` of its own, so it inherits; and the palette renders **outside** `.home`/`.paper`, the only thing on the site that does, so what it inherits is the UA's default text color — which is exactly what `color-scheme` governs. Everything inside a themed div was unaffected, which is what made it look like a palette bug.
+  - The scrollbar and the root's overscroll background were stale for the same reason, silently.
+  - `useTheme` reads the background from `--page-base` rather than repeating a hex: by the time React runs, App.css is loaded and the token is the source of truth.
 
 The key is `theme-pref`, **not** `theme`. The old `theme` key was abandoned because `use-local-storage` persists its default on mount, so every prior visitor had `"light"` written to disk and would have been pinned to light forever.
 
@@ -38,7 +42,7 @@ Defined on `[data-theme='light']` / `[data-theme='dark']`:
 | `--hover-tint-inverse` | `rgba(255,255,255,.16)` | `rgba(0,0,0,.14)` | Hover tint for `--textcolor`-filled surfaces |
 | `--nav-hover-tint` | `rgba(0,0,0,.06)` | `rgba(255,255,255,.10)` | Hover tint for the nav bar's chips, in BOTH of its states |
 | `--nav-drop-shadow` | `0 10px 24px rgba(0,0,0,.12)` | `0 10px 28px rgba(0,0,0,.65)` | The Projects panel's downward-only cast |
-| `--about-ink` | `rgb(3,111,252)` | `#ffffff` | The ink for the About card's ambient figure — the pulsing ring today, the dot field before it. **One token for both**, so the two treatments of one slot can't drift to different colours |
+| `--about-ink` | `rgb(3,111,252)` | `#ffffff` | The ink for the About card's ambient figure — the pulsing ring today, the dot field before it. **One token for both**, so the two treatments of one slot can't drift to different colors |
 | `--ring-alpha-scale` | `1` | `1.3` | Multiplies the ring's per-copy stroke alpha. Dark needs a smaller correction than the dots did — a 1px stroke holds up better on the near-black card than a field of discs |
 | `--dot-grid-alpha-scale` | `9` | `2.2` | Multiplies the DOT FIELD's three alphas (retained; the field is not currently rendered) (rest/pulse/peak). Light saturates to a solid dot; dark needs its own value because white at `.11` over the card composites to grey. **Reload after changing it** — a stylesheet swap repaints nothing |
 | `--ease-in-out-cubic` | `cubic-bezier(.645,.045,.355,1)` | same | The carousels' slide curve (on `:root`, not per theme) |
@@ -71,7 +75,7 @@ Why it matters:
   ```
 - On surfaces filled with `--textcolor` (the scroll-to-top button), use `--hover-tint-inverse` — the normal tint is keyed to the page and would be invisible.
 - On surfaces filled with `--well-bg` (the coursework headers), use `--well-hover-tint`. `--hover-tint` in dark is only `.022` alpha — deliberately held down for the pure-black page — and on a well it is imperceptible.
-- **On the nav bar's chips — the links, the theme toggle, the hamburger, the palette chip and the dropdown's rows — use `--nav-hover-tint`.** Same reasoning one step further: the bar is chrome, not a page-coloured surface. **This was a real bug in dark mode**, back when docking swapped the glass for a flat fill: that fill was pure `#000`, and `.022` white on pure black composites to `rgb(6,6,6)` — a 6-point step, invisible, so the hover simply did not exist on the docked bar. At `.10` it lands on `rgb(26,26,26)`, a 26-point step. Measured across all four cases at the time (docked/floating × light/dark) the old tint gave steps of 6, 5, 8 and 8; the new one gives 26, 22, 15 and 14. **The docked-flat case is gone now** — the bar keeps its glass — but the tint stays: it was the better value in the floating cases too (15 and 14 against 8 and 8).
+- **On the nav bar's chips — the links, the theme toggle, the hamburger, the palette chip and the dropdown's rows — use `--nav-hover-tint`.** Same reasoning one step further: the bar is chrome, not a page-colored surface. **This was a real bug in dark mode**, back when docking swapped the glass for a flat fill: that fill was pure `#000`, and `.022` white on pure black composites to `rgb(6,6,6)` — a 6-point step, invisible, so the hover simply did not exist on the docked bar. At `.10` it lands on `rgb(26,26,26)`, a 26-point step. Measured across all four cases at the time (docked/floating × light/dark) the old tint gave steps of 6, 5, 8 and 8; the new one gives 26, 22, 15 and 14. **The docked-flat case is gone now** — the bar keeps its glass — but the tint stays: it was the better value in the floating cases too (15 and 14 against 8 and 8).
 
 ### Nesting goes DOWN, not up
 
@@ -122,7 +126,7 @@ One genuine cosmetic difference was left alone: at exactly 1280, Developer Tools
 
 #### The headings separate by size, not weight
 
-One pass, after the Google Sans Flex swap, took most of the site's headings down a step. The result is that **hierarchy here is carried by size and colour, with weight nearly flat** — 500 for almost everything, 600 reserved for the two places that should be loudest.
+One pass, after the Google Sans Flex swap, took most of the site's headings down a step. The result is that **hierarchy here is carried by size and color, with weight nearly flat** — 500 for almost everything, 600 reserved for the two places that should be loudest.
 
 | | was | now |
 |---|---|---|

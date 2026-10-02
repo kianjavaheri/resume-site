@@ -18,6 +18,14 @@ import './../styling/components/Projects.css'
 // needs no :has() support. The cost is that clicking the tag row doesn't
 // navigate, which is the right behaviour anyway.
 function WorkCard({ image, to, wip, release, title, blurb, tags, links }: WorkProps) {
+  /* DERIVED, NOT A FLAG. A card earns the LIVE badge by carrying a link whose
+     icon is `site`, which is already what that icon means — somewhere you can
+     open and use the thing right now, in a browser, without installing
+     anything. A separate `live?: boolean` would be a second copy of the same
+     fact and could disagree with the links below it.
+     GitHub, CurseForge and a PDF are deliberately NOT live: source you have to
+     build, a mod you have to install into Minecraft, a document you read. */
+  const live = links?.some((l) => l.icon === 'site') ?? false
   return (
     <div className="sub-card project-card">
       <Link to={to} className="project-main">
@@ -34,10 +42,11 @@ function WorkCard({ image, to, wip, release, title, blurb, tags, links }: WorkPr
             the last word rather than floating beside the first line. */}
         <h2 className="project-title">
           {title}
-          {(release || wip) && (
+          {(release || wip || live) && (
             // Grouped so the badges wrap as a unit — on a phone WIP used to
             // break onto a line of its own, away from the release badge.
             <span className="project-badges">
+              {live && <span className="project-live">Live</span>}
               {release && <span className="project-release">{release}</span>}
               {wip && <span className="project-wip">WIP</span>}
             </span>

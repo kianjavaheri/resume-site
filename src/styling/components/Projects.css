@@ -1,5 +1,5 @@
 /* A grid of uniform tiles, one per project, each one a link to that project's
-   page. Modelled on the reference portfolio Kian supplied: an edge-to-edge
+   page. Modelled on the supplied reference portfolio: an edge-to-edge
    picture, a flush-right title, a short justified blurb, then a rule and a
    pipe-separated tag line — the footer bottom-pinned.
 
@@ -31,7 +31,7 @@
     grid-auto-rows: 1fr;
     /* Wider than `.sub-cards-stack`'s own 8px. The gutter is the point — the
        cards narrow only as a consequence (381px to 371px at 1280, about 2.5%),
-       which is the "slightly less wide, a bit more air between them" Kian
+       which is the "slightly less wide, a bit more air between them"
        asked for. The double class already beats App.css here, so this needs no
        !important either. */
     gap: 24px;
@@ -127,7 +127,7 @@
 /* Left-aligned. The reference sets its titles flush right and that was tried
    here, but these titles run to eleven words where the reference's run to three,
    and four lines of ragged-left text is materially harder to read than one.
-   Kian's call, and the right one. The card's shortened titles are kept — e.g.
+   A deliberate call, and the right one. The card's shortened titles are kept — e.g.
    "Universal Basic Income vs. Targeted Welfare" without its subtitle, the page
    carries the full one — because a short label suits a grid tile either way.
 
@@ -289,9 +289,12 @@ a.project-icon-link:visited {
     height: 19px;
 }
 
-/* Badges sit inline after the project title, release first then WIP.
+/* Badges sit inline after the project title: LIVE first, then release, then
+   WIP — most useful to a visitor first, since LIVE is the one that says "you
+   can click this and use it right now".
    inline-block + their own line-height so the title's 1.35 doesn't stretch
    them; nudged up to sit on the title's x-height rather than its baseline. */
+.project-live,
 .project-wip,
 .project-release {
     display: inline-block;
@@ -307,7 +310,7 @@ a.project-icon-link:visited {
     vertical-align: 0.15em;
 }
 
-/* Only the fill differs. Both are fixed colours, not theme tokens, and both
+/* Only the fill differs. Both are fixed colors, not theme tokens, and both
    carry white text at the same ~4.3:1 — so neither badge shouts over the
    other when a project has both. */
 .project-wip {
@@ -316,6 +319,20 @@ a.project-icon-link:visited {
 
 .project-release {
     background: #2e8b57;
+}
+
+/* The site's own accent — `--about-ink`'s light value, the blue the About
+   card's ring is drawn in. Written as a LITERAL rather than as that token for
+   two reasons: these three badges are fixed colors in both themes (they sit
+   on a card, and a badge that changed color with the theme would read as
+   changing meaning), and `--about-ink` is pure white in dark, which would lose
+   the badge's white text entirely.
+
+   Measured 4.48:1 against its white text, against 4.26 and 4.25 for the other
+   two — the same band, so no badge shouts over another on a card carrying
+   several. A first attempt at #1a63d6 measured 5.53:1, which broke that. */
+.project-live {
+    background: rgb(3, 111, 252);
 }
 
 /* Keeps the badges together: they wrap onto the next line as a pair rather

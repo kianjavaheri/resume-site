@@ -1,6 +1,6 @@
 # kianjavaheri.com
 
-My personal site — an interactive résumé and a set of reading pages for the
+My personal site - an interactive résumé and a set of reading pages for the
 projects and papers behind it.
 
 **Live at [kianjavaheri.com](https://kianjavaheri.com)**
@@ -50,8 +50,3 @@ A few things worth knowing:
 - **Image filenames carry a content hash.** `public/` is copied verbatim, so a
   stable name is a permanently cached URL; the hash is what busts it.
 
-## Notes
-
-`CLAUDE.md` is the long version — the design system, why each decision was made,
-and the measurements behind the layout constants. It's written for whoever
-touches this next, including me.

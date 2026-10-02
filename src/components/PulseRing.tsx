@@ -18,7 +18,7 @@ import '../styling/components/PulseRing.css'
  * context the card renders exactly as it would have anyway, and nothing on
  * the page reads any state from here.
  *
- * AMBIENT ONLY — it does not track the pointer, which is Kian's call and the
+ * AMBIENT ONLY — it does not track the pointer, which is a deliberate call and the
  * behaviour in the reference recording. That also keeps it clear of the rule
  * that gives the About card no hover affordance: the card's header is static,
  * so a response to the cursor would be a promise the card can't keep. The dot

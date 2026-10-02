@@ -2,7 +2,7 @@
     /* Floating glass pill. The three parts work together and shouldn't be
        tuned in isolation: a low-alpha fill so content reads through, a blur
        that smears it into an unreadable wash, and a saturation boost that puts
-       the colour back — blurring alone leaves a flat grey slab.
+       the color back — blurring alone leaves a flat grey slab.
        Blur stays at 24px. Pushing it to 40 averages whatever is behind into a
        single flat tone, which loses the light/dark structure that tells you
        there is something back there at all. */
@@ -63,7 +63,7 @@
    --card-border rule on a ::after, scaled out from the bar's centre to both
    edges as it docked, delayed 0.12s so it arrived after the bar did.
 
-   Kian cut it. On the solid docked bar it read as a stray grey line across
+   It was cut. On the solid docked bar it read as a stray grey line across
    the top of the page rather than as the divider it was meant to be — the bar
    already separates itself from the content by being opaque and flush to the
    edge, so the rule was drawing a boundary that was already there.
@@ -107,7 +107,7 @@
 
        It used to go flat: `--nav-solid`, `backdrop-filter` animated down to
        `blur(0px) saturate(100%)`, and the rim and float to their zero-alpha
-       twins. Kian's call to drop that. The old reasoning was that a bar
+       twins. A deliberate call to drop that. The old reasoning was that a bar
        pinned to the screen's edge is not floating over anything any more, so
        a material implying depth is a lie — but it IS still over the page,
        with content scrolling under it, which is exactly what the blur is for.

@@ -1,6 +1,6 @@
 /* The site's typeface. To change it, this @import and the `font-family` on the
    `*` reset below are the only two places — nothing else names a font.
-   Kian is trying faces out. Previously used, same weight set, kept here so a
+   Typefaces are still being tried out. Previously used, same weight set, kept here so a
    swap back is a one-line change:
      family=Inter:wght@300;400;500;600;700;800
      family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800
@@ -57,7 +57,7 @@
     /* For surfaces filled with --textcolor, which the normal tint can't shift. */
     --hover-tint-inverse: rgba(255, 255, 255, 0.16);
     /* The nav bar's chips, in BOTH of the bar's states. The bar is chrome, not
-       a page-coloured surface, and --hover-tint is calibrated against the page
+       a page-colored surface, and --hover-tint is calibrated against the page
        -- the same reasoning --well-hover-tint exists for. It matters most once
        the bar DOCKS: the docked fill used to be a flat page white here
        and pure #000 in dark, and .022 white on pure black composites to
@@ -67,12 +67,12 @@
        pulsing ring today (components/PulseRing.tsx), the dot field before it
        (components/DotGrid.tsx). ONE TOKEN FOR BOTH, deliberately: they are
        alternative treatments of the same slot and must not be able to drift
-       to different colours. Kian's call: blue in light, plain white in dark.
+       to different colors. A deliberate call: blue in light, plain white in dark.
 
        It is a TOKEN OF ITS OWN rather than --textcolor, which is what the
        canvas used to read, because the two now disagree in light mode.
 
-       The hex is Kian's, picked by eye rather than derived from the chart
+       The hex was picked by eye rather than derived from the chart
        palette — it was #2a78d6 (the thesis charts' first series) for one
        round and is now a cleaner, more saturated blue. It is NOT a reference
        to `--chart-s1`, which is declared in Paper.css and scoped to `.paper`
@@ -83,7 +83,7 @@
     --about-ink: rgb(3, 111, 252);
     /* Multiplies the field's three alphas (rest, pulse, hover peak). At 9 the
        resting dot saturates — 0.11 x 9 clamps to 1 — so the light field is
-       SOLID rgb(3,111,252), which is what Kian asked for. It was 1, the
+       SOLID rgb(3,111,252), which is what was asked for. It was 1, the
        constants' own tuning, and the dots read as a transparent wash.
 
        WHAT SOLID COSTS, since it is not obvious: at rest = 1 there is no
@@ -122,7 +122,7 @@
        out into whatever is behind it. */
     --glass-rim: inset 0 1px 0 rgba(255, 255, 255, 0.65),
         inset 0 0 0 1px rgba(255, 255, 255, 0.30);
-    /* THE NAV'S RIM IS OFF. Kian's call: on a 56px pill that ring read as a
+    /* THE NAV'S RIM IS OFF. A deliberate call: on a 56px pill that ring read as a
        drawn border around the bar rather than as a highlight. The blur, the
        saturation boost and the fill carry the material on their own.
 
@@ -146,14 +146,14 @@
     /* THREE TOKENS WERE DELETED HERE, and they are named so a search for them
        lands on this note rather than on nothing:
 
-       --nav-solid       the docked bar's flat page-coloured fill
+       --nav-solid       the docked bar's flat page-colored fill
        --nav-rim-off     a zero-alpha twin of --nav-rim
        --nav-shadow-off  a zero-alpha twin of --nav-shadow
 
        They existed because docking used to swap the glass for a flat fill,
        and `box-shadow` does not interpolate to `none` — so the rim and the
        float needed shadows of identical geometry at zero alpha to animate
-       towards, or they would snap off on the first frame. Kian's call to keep
+       towards, or they would snap off on the first frame. A deliberate call to keep
        the glass docked (and on the Projects panel and the palette, which both
        followed the bar), so nothing swaps material any more and all three had
        no consumers left. The dock is pure geometry now. */
@@ -263,7 +263,7 @@ a {
 
 /* No `a:visited { color: inherit }` here. It was removed deliberately:
    `a:visited` (0-1-1) outranks a component's own class rule (0-1-0), so once a
-   link had been visited its colour reverted to the inherited page text colour.
+   link had been visited its color reverted to the inherited page text color.
    That turned the Selected Work icon buttons black-on-black — and because
    browsers hide :visited styling from JavaScript, computed styles and pixel
    tests all looked correct. Author styles already beat the UA's purple-visited
@@ -348,7 +348,7 @@ a {
 
 /* ── Cards page wrapper ───────────────────────── */
 /* Inset from the page edges, with each section a separate framed block rather
-   than one continuous run. The gutters also let the colour field show, which
+   than one continuous run. The gutters also let the color field show, which
    is what the nav refracts. */
 /* The home page's own box. --page-max CAPS it, and that cap is the reason the
    gallery photo and the project thumbnails now shrink when you zoom out: with
@@ -701,7 +701,7 @@ html {
     gap: 0;
 }
 
-/* easeInOutCubic, the slide curve for BOTH carousels — Kian asked for it by
+/* easeInOutCubic, the slide curve for BOTH carousels — It was asked for by
    name. cubic-bezier(0.645, 0.045, 0.355, 1) is the canonical form.
    Symmetric: it accelerates and decelerates by the same amount, which is what
    suits a slide where the incoming and outgoing images travel together and
@@ -716,7 +716,7 @@ html {
 }
 
 /* The n / N badge, in the picture's top-right corner (CarouselCounter).
-   Fixed colours in both themes on purpose — it sits on a photograph or a
+   Fixed colors in both themes on purpose — it sits on a photograph or a
    screenshot, not on a themed surface, so the scrim IS the contrast and a
    token keyed to the page would be the wrong answer half the time. */
 .carousel-badge {
@@ -724,7 +724,7 @@ html {
     top: 12px;
     right: 12px;
     z-index: 2;
-    /* INSTAGRAM'S BADGE, copied deliberately — Kian asked for it by name and
+    /* INSTAGRAM'S BADGE, copied deliberately — It was asked for by name and
        supplied a reference shot.
 
        10px on a ~24px badge, so there is about 2px of flat edge left down each
@@ -736,7 +736,7 @@ html {
     /* Glass, not a flat scrim. The fill alone was doing all the work at
        blur(4px); the real blur is what makes it read as a lens over the photo
        rather than a sticker on it. `saturate` is the nav glass's own trick —
-       blur alone averages a photo to grey mush, and the boost puts the colour
+       blur alone averages a photo to grey mush, and the boost puts the color
        back so the badge still shows what is under it. */
     background: rgba(0, 0, 0, 0.55);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
@@ -747,7 +747,7 @@ html {
     color: #fff;
     /* 12px/600 and NO tracking. It was 0.62rem/500 at 0.08em, which is the
        site's micro-label — right for a uppercase caption, wrong here: the
-       letterspacing is exactly the "spaced out" Kian was looking at, and it
+       letterspacing is exactly the "spaced out" look being avoided, and it
        pushed `2 / 4` to 44px where the reference is compact. */
     font-size: 0.75rem;
     font-weight: 600;
@@ -785,7 +785,7 @@ html {
     border-radius: 999px !important;
     background: var(--muted);
     /* Inactive dots are a step back from the active one in BOTH opacity and
-       colour: on the pure-black page --muted alone (#999) is bright enough to
+       color: on the pure-black page --muted alone (#999) is bright enough to
        read as active. */
     opacity: 0.4;
     transition: opacity 0.15s ease, background-color 0.15s ease;

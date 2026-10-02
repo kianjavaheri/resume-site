@@ -139,7 +139,7 @@ function SurveyExplorer({ heading }: { heading: string }) {
                     <span className="paper-survey-pct">{s.pct[i].toFixed(1)}%</span>
                     {s.counts ? <span className="paper-survey-count">{s.counts[i]}</span> : null}
                     {/* Names the series for anyone reading the row out of
-                        context, where colour alone says nothing. */}
+                        context, where color alone says nothing. */}
                     <span className="paper-survey-sr">{` ${s.label}`}</span>
                   </span>
                 </div>

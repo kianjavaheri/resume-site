@@ -455,7 +455,7 @@ export const materialBoxes: Paper = {
       blocks: [
         // The mod's own documentation opens the page. The card blurb that used
         // to sit here said the same thing in resume voice, two paragraphs
-        // above this one — Kian cut it rather than print both.
+        // above this one — It was cut rather than printing both.
         {
           type: 'p',
           text: 'Material Boxes is a client-side Fabric mod for Minecraft 26.2 that makes gathering materials for a build easier. You load your build\u2019s material list, mark storage containers as Material Boxes, and the mod shows you what\u2019s still missing: which slots to fill, how much is stored, and what you still need to collect.',

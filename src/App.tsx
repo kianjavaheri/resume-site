@@ -10,6 +10,7 @@ import Home from './pages/Home'
 import Paper from './pages/Paper'
 import NotFound from './pages/NotFound'
 import CommandPalette from './components/CommandPalette'
+import { Analytics } from '@vercel/analytics/react'
 
 
 // The reading pages moved from /papers/:slug to /projects/:slug. Anything
@@ -44,6 +45,17 @@ function App() {
       {/* Mounted outside the routes so ⌘K works on every page. It reads the
           theme tokens off <html>, which useTheme mirrors them onto. */}
       <CommandPalette />
+      {/* Vercel's own page-view counter. It renders nothing, and it NO-OPS off
+          Vercel — in `npm start` it logs that it is in development mode and
+          sends nothing, so there is no dev traffic to filter out later.
+
+          It is the one dependency here that `src/` imports purely for
+          instrumentation rather than for the bundle's output, which is worth
+          knowing against the "the dependency list is deliberately short" rule:
+          it is tiny and has no transitive deps of its own (`npm audit` stays
+          at 0). It also has to live outside the routes, or a route change
+          would unmount and remount it. */}
+      <Analytics />
     </div>
   );
 }

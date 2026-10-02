@@ -2,7 +2,7 @@ import React from 'react'
 
 // The site's inline icon set, keyed by name. Used by the Projects link buttons
 // and the Contact cards. Inline rather than <img> from public/svgs/ (how the
-// skill tiles do it) because these take their colour from the text around them,
+// skill tiles do it) because these take their color from the text around them,
 // which an <img> can't do.
 // GitHub, CurseForge and LinkedIn marks are simple-icons paths (CC0).
 const stroke = {

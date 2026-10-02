@@ -30,6 +30,11 @@ export type Block =
   // "what it covers", which a real table would send into a sideways scroll on
   // a phone, and whose first column wants to be a link.
   | { type: 'deflist'; items: { term: string; href?: string; detail: string }[] }
+  // Live commit activity for this repository, fetched in the browser from
+  // GitHub's public API. Carries no data of its own — the block is a marker
+  // saying "put the strip here", because the numbers are not known at build
+  // time and must not be baked into the bundle. See GitHubActivity.tsx.
+  | { type: 'activity' }
   // Figures shown one at a time instead of stacked. Written inline on a
   // hand-written page; on a GENERATED one the module can't be hand-edited, so
   // Paper.tsx folds a run of consecutive figures into this same shape from
@@ -113,8 +118,11 @@ import { thesis } from './thesis'
 // `wageEffects` is deliberately not imported — see the commented registry
 // line below and the matching entry in projects.ts.
 import { materialBoxes, rentalPrices } from './project-pages'
+// The site's own page. Its own module rather than project-pages.ts, which is
+// specifically "the projects with no source document" — this is not a project.
+import { colophon } from './colophon'
 
-// PDFs that are no longer offered for download. Kian withdrew the full-text
+// PDFs that are no longer offered for download. The full-text files were withdrawn
 // files for the thesis and the two capstones; the site links to the reading
 // pages instead, and to the ASU Library record for the thesis.
 //
@@ -212,6 +220,7 @@ export const papers: Record<string, Paper> = {
   // [wageEffects.slug]: wageEffects,
   [rentalPrices.slug]: rentalPrices,
   [materialBoxes.slug]: materialBoxes,
+  [colophon.slug]: colophon,
 }
 
 // Sections that end in a long run of survey charts. Everything from the

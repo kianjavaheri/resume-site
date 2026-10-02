@@ -63,8 +63,8 @@ function useCompactGeometry() {
  *   labelled; the axis and the tooltip carry the rest.
  * - **No in-chart title.** The figcaption underneath already names the chart,
  *   and a single-series chart needs no legend for the same reason.
- * - Series colour comes from the two validated categorical slots; all text
- *   stays on the page's own ink tokens, never the series colour.
+ * - Series color comes from the two validated categorical slots; all text
+ *   stays on the page's own ink tokens, never the series color.
  */
 function FigureChart({ chart, caption }: { chart: PaperChart; caption?: string }) {
   const uid = useId()
@@ -255,7 +255,7 @@ function FigureChart({ chart, caption }: { chart: PaperChart; caption?: string }
               ))}
             </g>
 
-            {/* Markers carry a surface-coloured ring so they stay legible where
+            {/* Markers carry a surface-colored ring so they stay legible where
                 the two series cross. */}
             {chart.series.map((s) =>
               s.values.map((v, i) => (

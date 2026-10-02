@@ -23,6 +23,6 @@
 
        `--about-ink` is shared with the dot grid, which is the point: the two
        are alternative treatments of the same slot and should not be able to
-       drift to different colours. */
+       drift to different colors. */
     color: var(--about-ink);
 }

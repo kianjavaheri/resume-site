@@ -54,7 +54,7 @@ footer::before {
 }
 
 /* Same 0.82rem/500 --muted as .paper-theme-toggle, the top bar's right-hand
-   item. The hierarchy is weight and colour, as everywhere else on the site. */
+   item. The hierarchy is weight and color, as everywhere else on the site. */
 .footer-meta {
     font-size: 0.82rem;
     font-weight: 500;

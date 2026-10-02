@@ -9,7 +9,7 @@ import { useIsMobile } from './useIsMobile'
 import { useCarouselAutoplay } from './useCarouselAutoplay'
 import './../styling/components/About.css'
 
-// The running order. Kian reordered the gallery and the FILES were renamed to
+// The running order. The gallery was reordered and the FILES were renamed to
 // match rather than the array being shuffled, so img1..img4 on disk really are
 // the gallery's 1st..4th. (It was briefly img3, img1, img_dep2, img2.) Keep it
 // that way -- renaming beats a comment explaining why the numbers are out of
@@ -51,7 +51,7 @@ const SHELTERED = [
   '.about-gallery',
   // `.about-social-inner` is deliberately NOT here. The contact chips are
   // opaque `--well-bg` tiles with their own shadow, so they simply sit on top
-  // of the field — Kian's call: "the buttons should just sit above the grid
+  // of the field — A deliberate call: "the buttons should just sit above the grid
   // and the block shouldn't be treated differently". Sheltering them punched
   // a hole in the one part of the card the dots have all to themselves.
 ].join(', ')
@@ -238,7 +238,7 @@ function About() {
 
             THE DOT GRID USED TO BE HERE AND IS DELIBERATELY STILL IN THE
             REPO. `DotGrid.tsx`, `DotGrid.css` and the `SHELTERED` list below
-            are all intact and working; Kian moved away from the look, not
+            are all intact and working; This moved away from the look, not
             from the code. Putting it back is this line plus the import — it
             reads the same `--about-ink` token, and its shelter prop is the
             constant still declared above. Don't delete it as dead code, and
@@ -249,7 +249,7 @@ function About() {
             IT IS FITTED TO THE GAP, not placed at fractions of the card.
             `above` and `below` name the blocks it sits between and
             `centreOn` the one it lines up with — all three the TEXT COLUMN's
-            side of the card, which is where Kian wanted it. That is also why
+            side of the card, which is where it belongs. That is also why
             the gallery is not in `above`: it is the right-hand column and
             the figure never reaches it, so letting it set the band's top
             edge only robbed height for no reason.

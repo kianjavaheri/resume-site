@@ -2,7 +2,7 @@ import React from 'react'
 
 // Back chevron for the paper pages' top bar. Inline SVG rather than a file in
 // public/svgs/, for the same reason as ArrowOut and CalendarIcon: it takes its
-// colour from the text around it, which an <img> can't do.
+// color from the text around it, which an <img> can't do.
 //
 // Stroked at 1.3 on a 14-unit viewBox, matching ArrowOut exactly, so the two
 // read as one icon set. Sized in CSS, not here.

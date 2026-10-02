@@ -40,7 +40,7 @@ export const skillGroups: { label: string; skills: Skill[] }[] = [
       { title: 'PyTorch', src: '/svgs/pytorch.svg' },
       // Took PySpark's slot. simple-icons has no LightGBM glyph either, so
       // this is the project's OWN mark, lifted out of the official wordmark
-      // logo (microsoft/LightGBM, docs/logo/) -- the four coloured triangles,
+      // logo (microsoft/LightGBM, docs/logo/) -- the four colored triangles,
       // with the "LightGBM" text and its bounding rect dropped. That is why
       // its viewBox is 630x1048 rather than square: it is the mark's real
       // extent, and `object-fit: contain` letterboxes it in the tile.
@@ -74,7 +74,7 @@ export const skillGroups: { label: string; skills: Skill[] }[] = [
     skills: [
       { title: 'JupyterHub', src: '/svgs/jupyter.svg' },
       // Promoted off the monogram fallback: simple-icons still has no MATLAB
-      // glyph, so this one is devicon's (MIT), the only multi-colour icon in
+      // glyph, so this one is devicon's (MIT), the only multi-color icon in
       // the set. It carries its own gradients, which is fine through <img>
       // where the ids stay scoped to the file.
       { title: 'MATLAB', src: '/svgs/matlab.svg' },

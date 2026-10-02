@@ -62,7 +62,7 @@ function CarouselDots({
 }
 
 /* The `n/N` badge, sitting in the top-right CORNER OF THE PICTURE — Instagram's
- * badge, copied deliberately at Kian's request, down to its corner radius. The
+ * badge, copied deliberately by request, down to its corner radius. The
  * glass, the radius and the type are in `.carousel-badge` in App.css.
  *
  * It moved off the control row because the dots were already saying the same

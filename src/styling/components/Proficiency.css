@@ -30,7 +30,7 @@
 }
 
 /* Same micro-label type as .skill-name — size and tracking are identical, so
-   this adds no new step to the type scale. The hierarchy is carried by colour
+   this adds no new step to the type scale. The hierarchy is carried by color
    alone: group labels take --textcolor, the skill names under the tiles stay
    --muted. Making the label bigger is what would turn this section noisy. */
 .skill-group-label {

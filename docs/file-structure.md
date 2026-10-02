@@ -36,6 +36,8 @@ src/
     Footer.tsx         # "Kian Javaheri" left, "© 2026" right; quiet, matches the paper top bar
     Scroll.tsx         # Back-to-top button; inverted fill, fades in past 400px
     ArrowOut.tsx       # Inline SVG ↗ for outbound links — replaces the emoji-prone U+2197
+    GitHubActivity.tsx # The colophon's 30-day commit strip; public GitHub API, no token
+    ProjectNav.tsx     # Prev/next chevrons on a reading page; order comes from `works`
     ArrowBack.tsx      # Inline SVG ← for the paper pages' back button; 1em via .arrow-back
     AnchorIcon.tsx     # Inline SVG chain-link for HeadingAnchor; 1em via .anchor-icon
     CheckIcon.tsx      # Its copied state — swaps into the same box, so nothing shifts
@@ -65,6 +67,7 @@ src/
     survey.ts          # All 10 survey questions x 7 subgroups; Q16 derived from tables.ts
     intros.ts          # Intro block by slug (abstract or overview), the gate flag and the
                        #   capstone's lead figure. Hand-written
+    colophon.ts        # The site's OWN reading page. Hand-written, third person — see paper-pages.md
     project-pages.ts   # Reading pages for the 3 projects with no source document. Hand-written.
                        #   All three have now grown past their stubs
   App.tsx              # <Routes>: "/" → Home, "/projects/:slug" → Paper,
@@ -88,6 +91,7 @@ src/
       Footer.css       # Quiet in-flow bar + the two page-context gutter rules
       Nav.css          # Floating pill, glass, .nav-docked, the Projects dropdown + its caret
       Palette.css      # The ⌘K panel: nav material, inverted selected row
+      ProjectNav.css   # The prev/next arrows: fixed edges, measured 1400px breakpoint
       Awards.css       # .award-card — .exp-logo copy + .award-track dot rail
       Proficiency.css  # .skill-group + label; .skills-grid flex-wrap; 64px .skill-icon-wrap; .skill-monogram
       Projects.css     # 3-across grid; .project-main link + sibling footer of chips and icons

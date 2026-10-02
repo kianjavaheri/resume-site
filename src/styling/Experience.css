@@ -38,7 +38,7 @@
    does the same job and is still 1rem/600 — so that pairing no longer holds,
    deliberately: the Experience card carries a name AND a role stacked, and two
    600 lines in a 185px column read as two headings competing rather than as a
-   hierarchy. Colour still separates them from the location and dates, which
+   hierarchy. Color still separates them from the location and dates, which
    are 400 `--muted`. */
 .exp-company {
     font-size: 0.95rem;

@@ -1,0 +1,92 @@
+/* Prev / next project arrows on a reading page (components/ProjectNav.tsx).
+ *
+ * Pinned to the viewport's edges and vertically centred, so they stay reachable
+ * however far down a 20,000px paper the reader is.
+ */
+.project-nav {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    /* A 40px hit target around a 16px glyph — the same pairing the Projects
+       cards' icon links use, and comfortably over the 24px minimum. The mark
+       stays small; only the target is generous. */
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* QUIET BY DESIGN, which is what "small but noticeable" asks for. No fill,
+       no border — `--muted` ink that comes up to full strength on hover. This
+       is `.project-go`'s treatment rather than the recessed `--well-bg` chip
+       the Projects cards and the About contact row use: those sit INSIDE a
+       sub-card, where a dent reads as depth, and these sit on the bare page,
+       where it would read as a hole. A signpost, not a button. */
+    color: var(--muted);
+    border-radius: 8px !important;
+    /* Above the article, below the sticky top bar and the palette. */
+    z-index: 5;
+    transition:
+        color 0.18s ease,
+        background-color 0.18s ease;
+}
+
+/* Per the site's hover convention this is a layered tint over the element's own
+   background rather than a replacement fill — there is no fill here to replace,
+   but using the token keeps it keyed to the page the way every other surface
+   is. `--hover-tint`, not `--well-hover-tint`: this sits on the page, not in a
+   well. */
+.project-nav:hover {
+    color: var(--textcolor);
+    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
+}
+
+/* The global reset clears `outline`, so focus has to be restated or these are
+   invisible to a keyboard. */
+.project-nav:focus-visible {
+    outline: 2px solid var(--textcolor);
+    outline-offset: 2px;
+    color: var(--textcolor);
+}
+
+/* These are outbound-looking <a>s to routes the reader WILL visit, and
+   `a:visited` is 0-1-1 — it outranks a bare class, so without this a visited
+   arrow would take the UA's purple. Same restatement `.about-social-link` and
+   `.project-icon-link` carry. */
+a.project-nav:visited {
+    color: var(--muted);
+}
+
+a.project-nav:visited:hover {
+    color: var(--textcolor);
+}
+
+.project-nav-prev {
+    left: 24px;
+}
+
+.project-nav-next {
+    right: 24px;
+}
+
+/* SHOWN ONLY WHERE THERE IS ROOM, AND THE THRESHOLD IS MEASURED.
+ *
+ * The reading page is capped at `--paper-max` (1320) and centred, so its
+ * content's left edge is `max(36, (vw - 1320) / 2 + 36)`. An arrow inset 24px
+ * occupies 24-64, so it stops touching the content at **vw 1376** and has 12px
+ * of air at 1400, 32px at 1440 and 112px at 1600. Verified against the live
+ * rects at 1024: the leftmost thing on the page is `.paper-toc` at x=36, with
+ * the page using its full width — there is no side room at all down there.
+ *
+ * 1400 was guessed at 1150 first, which would have put both arrows squarely on
+ * the contents list at every common laptop width. Don't lower it without
+ * re-deriving the formula; the cap is what dominates, not the arrow's size.
+ *
+ * Below this the reader still has the back button, the "Kian Javaheri" link
+ * and the command palette, so nothing becomes unreachable — but there is also
+ * no prev/next on a laptop, which is the real cost of a viewport-edge control
+ * on a page this wide. */
+@media (max-width: 1399px) {
+    .project-nav {
+        display: none;
+    }
+}

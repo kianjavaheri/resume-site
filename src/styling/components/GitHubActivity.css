@@ -1,0 +1,206 @@
+/* The commit calendar on the colophon page (components/GitHubActivity.tsx).
+ *
+ * GitHub's own layout and GitHub's own palette, deliberately: this is a
+ * recognisable object, and a reader clocks what it is before reading the
+ * sentence above it. That recognition is worth more here than matching the
+ * site's accent — which is the opposite of the call `.project-live` makes two
+ * files over, where a borrowed brand colour would have meant nothing.
+ */
+.gh-activity {
+    margin: 26px 0 8px;
+    /* The tooltip is absolutely positioned against this, not against the
+       calendar: the calendar is 81px wide and a pill centred on its leftmost
+       column would be clamped into nonsense, where this block is the article's
+       full width and gives the clamp something real to work with. */
+    position: relative;
+}
+
+.gh-activity-summary {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--muted);
+    margin: 0 0 14px;
+}
+
+/* The number is the one thing at full strength; the sentence around it is
+   apparatus. Same call `.paper-references` makes. */
+.gh-activity-summary strong {
+    font-weight: 500;
+    color: var(--textcolor);
+}
+
+/* --gh-cell and --gh-gap drive the squares AND the month labels above them, so
+   the labels sit over the right columns by construction rather than by a
+   second set of numbers that could drift. */
+.gh-activity-cal {
+    /* A touch larger than GitHub's own ~11px. Thirty days is only five
+       columns, so at their size the whole object is 67px wide and reads as a
+       postage stamp in a 780px column; 13px takes it to 81px without
+       stopping it looking like what it is. */
+    --gh-cell: 13px;
+    --gh-gap: 4px;
+    display: inline-block;
+}
+
+.gh-activity-months {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: var(--gh-cell);
+    gap: var(--gh-gap);
+    margin-bottom: 5px;
+}
+
+.gh-activity-month {
+    font-size: 0.68rem;
+    line-height: 1;
+    color: var(--muted);
+    /* The label is wider than its column and must not stretch it, or the
+       calendar's columns stop lining up with the months above them. */
+    width: 0;
+    white-space: nowrap;
+    overflow: visible;
+}
+
+/* Weeks are columns, weekdays are rows — GitHub's orientation. */
+.gh-activity-grid {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: var(--gh-cell);
+    gap: var(--gh-gap);
+}
+
+.gh-activity-week {
+    display: grid;
+    grid-template-rows: repeat(7, var(--gh-cell));
+    gap: var(--gh-gap);
+}
+
+.gh-activity-cell,
+.gh-activity-pad {
+    width: var(--gh-cell);
+    height: var(--gh-cell);
+    border-radius: 2px !important;
+}
+
+/* A day outside the window draws nothing at all. It is not a zero-commit day,
+   and showing it as one would be a different claim. */
+.gh-activity-pad {
+    background: none;
+}
+
+/* GITHUB'S PALETTE, both themes, taken as published. Level 0 is their empty
+   cell rather than this site's `--well-bg`: the whole point is that the object
+   is recognisable, and their empty square is as much a part of that as the
+   greens are. */
+[data-theme='light'] .gh-activity-cell {
+    background: #ebedf0;
+}
+
+[data-theme='light'] .gh-activity-l1 {
+    background: #9be9a8;
+}
+
+[data-theme='light'] .gh-activity-l2 {
+    background: #40c463;
+}
+
+[data-theme='light'] .gh-activity-l3 {
+    background: #30a14e;
+}
+
+[data-theme='light'] .gh-activity-l4 {
+    background: #216e39;
+}
+
+[data-theme='dark'] .gh-activity-cell {
+    background: #161b22;
+}
+
+[data-theme='dark'] .gh-activity-l1 {
+    background: #0e4429;
+}
+
+[data-theme='dark'] .gh-activity-l2 {
+    background: #006d32;
+}
+
+[data-theme='dark'] .gh-activity-l3 {
+    background: #26a641;
+}
+
+[data-theme='dark'] .gh-activity-l4 {
+    background: #39d353;
+}
+
+.gh-activity-foot {
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: var(--muted);
+    margin: 12px 0 0;
+}
+
+/* THE HOVER TOOLTIP.
+ *
+ * It replaces the native `title` attribute rather than sitting beside it —
+ * two tooltips for one cell is what you get if you leave `title` on, and the
+ * native one arrives about a second late and in the OS's styling.
+ *
+ * INVERTED, which is the site's own idiom for "unmistakable" — `--textcolor`
+ * fill with `--bgcolor` ink, the same treatment `.palette-row-active` and
+ * `.scroll-top` use. In light mode that is a near-black pill with white text,
+ * which is what GitHub's looks like anyway; in dark it flips, where GitHub
+ * would stay dark. Following the site is the better call: a fixed dark pill on
+ * the dark page would need a border to separate from it, and nothing else here
+ * is a bordered popover.
+ */
+.gh-activity-tip {
+    position: absolute;
+    /* `left` is the pill's own left edge, already centred and clamped in JS —
+       so there is no translateX here. Centring in CSS and correcting in JS
+       would mean two sources for one number. `top` is the hovered cell's own
+       top; this lifts the pill clear of it and leaves room for the caret. */
+    transform: translateY(calc(-100% - 8px));
+    z-index: 3;
+    background: var(--textcolor);
+    color: var(--bgcolor);
+    font-size: 0.78rem;
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: 0;
+    padding: 6px 10px;
+    border-radius: 7px !important;
+    white-space: nowrap;
+    /* It follows the pointer from cell to cell, so it must never eat the
+       mouseenter of the cell underneath it. */
+    pointer-events: none;
+    box-shadow: var(--nav-shadow);
+}
+
+.gh-activity-tip-caret {
+    position: absolute;
+    top: 100%;
+    width: 8px;
+    height: 8px;
+    margin-left: -4px;
+    background: var(--textcolor);
+    /* A rotated square rather than a border triangle, so it inherits the pill's
+       fill from one declaration and cannot drift from it. Pulled up by half its
+       diagonal so only the point shows below the pill's edge. */
+    transform: translateY(-4px) rotate(45deg);
+    border-radius: 1px !important;
+}
+
+/* No transition on the pill. It is repositioned on every cell the pointer
+   crosses, and easing that turns a tooltip into something that slides around
+   the page chasing the cursor. */
+
+/* Bigger cells on a phone, because they become TAP TARGETS there rather than
+   hover targets. GitHub's ~11px square is comfortable to point at and far too
+   small to hit with a thumb; 20px is still unmistakably the same object and is
+   the most the five columns can take without crowding a 335px column. */
+@media (max-width: 768px) {
+    .gh-activity-cal {
+        --gh-cell: 20px;
+        --gh-gap: 5px;
+    }
+}

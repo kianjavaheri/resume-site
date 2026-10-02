@@ -14,6 +14,8 @@ import { useTheme } from '../components/useTheme'
 import SurveyExplorer from '../components/SurveyExplorer'
 import FigureCarousel from '../components/FigureCarousel'
 import FigureChart from '../components/FigureChart'
+import GitHubActivity from '../components/GitHubActivity'
+import ProjectNav from '../components/ProjectNav'
 import { figureCarousels, papers } from '../content/papers'
 import type { Block, PaperTable } from '../content/papers'
 import { linkableIds, renderedSections } from '../content/paper-view'
@@ -147,6 +149,11 @@ function renderBlock(b: Block, i: number) {
   // by src lookup above; this is the direct route in.
   if (b.type === 'table') {
     return <PaperTableBlock key={i} table={b.table} />
+  }
+  // Carries no data — the numbers are fetched in the browser, because they
+  // change after the build and must not be baked into the bundle.
+  if (b.type === 'activity') {
+    return <GitHubActivity key={i} />
   }
   if (b.type === 'carousel') {
     return <FigureCarousel key={i} figures={b.figures} plain={b.plain} />
@@ -348,6 +355,12 @@ function Paper() {
 
   return (
     <div className="paper" data-theme={theme}>
+      {/* Prev / next across the Projects grid's own order. Inside `.paper` so
+          it resolves the theme tokens from the page div like everything else,
+          and before the top bar only because the bar is sticky and should win
+          the stacking regardless. */}
+      {slug ? <ProjectNav slug={slug} /> : null}
+
       <div className="paper-topbar">
         <div className="paper-topbar-left">
           {/* Icon only. `navigate(-1)` is a real history POP, which is what

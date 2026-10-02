@@ -13,7 +13,7 @@
 #   - 1200x630 (1.905), the size every unfurler crops toward. The thumbnails are
 #     16/9 (1.778), so they are FITTED by height and padded at the sides rather
 #     than cropped — losing nothing, the same call the thumbnails themselves
-#     make. The pad colour is sampled from each image's own edge, because white
+#     make. The pad color is sampled from each image's own edge, because white
 #     is only right if the image is actually white there.
 set -euo pipefail
 cd "$(dirname "$0")/.."

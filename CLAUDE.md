@@ -6,7 +6,7 @@ Portfolio for Kian Javaheri: May 2026 ASU/Barrett grad, **two degrees** (B.S. CS
 
 - **Never push to GitHub.** Commit locally only; Kian pushes.
 - **`npm run build` is `vite build` plus `scripts/prerender-meta.mjs`** (per-route meta + sitemap). `npm run preview` is the only way to test it.
-- **Hover is a layered `linear-gradient(var(--hover-tint), var(--hover-tint))` over the existing fill** — never a replacement colour, never `opacity`. Re-declare `--sub-card-grad` beneath it where present; pick the tint matching the surface.
+- **Hover is a layered `linear-gradient(var(--hover-tint), var(--hover-tint))` over the existing fill** — never a replacement color, never `opacity`. Re-declare `--sub-card-grad` beneath it where present; pick the tint matching the surface.
 - **Nesting goes down.** A card inside a card gets the recessed `--well-bg`, never a raised fill.
 - **`border-radius: 0 !important` is a global reset** — anything rounded needs `!important`.
 - **No card borders.** Cards carry shadows; `--card-border` is for internal dividers.

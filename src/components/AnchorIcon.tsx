@@ -2,7 +2,7 @@ import React from 'react'
 
 // The chain-link glyph on the heading anchors. Inline SVG rather than a file in
 // public/svgs/, for the reason ArrowOut and CalendarIcon give: it takes its
-// colour from the text around it, which an <img> can't do. It also sidesteps
+// color from the text around it, which an <img> can't do. It also sidesteps
 // the obvious alternative, a typed `#` — U+0023 carries Emoji=Yes and forms
 // keycap sequences, and this file's whole icon set exists because iOS Safari
 // picks an emoji presentation when one is available.

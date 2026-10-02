@@ -87,7 +87,7 @@ function PaletteDialog({ onClose }: { onClose: () => void }) {
    *
    * It used to take the bar's material in both of the bar's states — glass
    * while the bar was glass, flat once it had docked — and to go flat on a
-   * reading page, which has no bar at all. Kian dropped the flat variant
+   * reading page, which has no bar at all. The flat variant was dropped
    * everywhere, including on the bar itself, so there is nothing left to
    * match and no state to read.
    *

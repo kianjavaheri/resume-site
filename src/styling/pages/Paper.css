@@ -69,7 +69,7 @@
 }
 
 /* A layered tint over the page, per the site's hover convention — not a fill
-   swap, which on a page-coloured surface would composite away to nothing. */
+   swap, which on a page-colored surface would composite away to nothing. */
 .paper-back-btn:hover {
     background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
 }
@@ -146,7 +146,7 @@
     line-height: 1.15;
     /* NO max-width. It was `20ch`, which on the thesis — a 100-character
        title — held the head to a ~640px column and broke it over FOUR lines
-       while 600px of the page sat empty beside it. Kian's call: the head
+       while 600px of the page sat empty beside it. A deliberate call: the head
        block spans the page like the rule under it does.
 
        20ch is the right cap for a paragraph and the wrong one for a display
@@ -254,7 +254,7 @@
     border-left-color: var(--textcolor) !important;
 }
 
-/* The reading measure. 780 rather than 700 — Kian asked for a wider text
+/* The reading measure. 780 rather than 700 — a wider text measure was asked for
    area, and at 1rem/1.85 this is about 95 characters, at the top of what is
    comfortable but still inside it. Going much past this is where a line
    becomes hard to track back from. */
@@ -620,7 +620,7 @@
    the controls are a question picker plus a dimension picker, and why they sit
    above the chart rather than under it.
 
-   The series colours are the same two validated categorical slots the
+   The series colors are the same two validated categorical slots the
    Background charts use, and they are declared here as well as on .paper-chart
    because the two blocks are independent — neither is nested in the other. */
 .paper-survey {
@@ -865,7 +865,7 @@
 }
 
 /* Visually hidden, not display:none — the series name has to reach a screen
-   reader reading one row at a time, where the colour says nothing. */
+   reader reading one row at a time, where the color says nothing. */
 .paper-survey-sr {
     position: absolute;
     width: 1px;
@@ -895,14 +895,14 @@
    than screenshotted out of a spreadsheet. Inline SVG, so they take the page's
    own ink and invert with the theme instead of being a white slab on black.
 
-   The two series colours are categorical slots 1 and 2 of the validated
+   The two series colors are categorical slots 1 and 2 of the validated
    palette, stepped separately for each mode. Both pairs were checked against
    THIS site's surfaces — pure #ffffff and pure #000000, not a near-white and
    near-black — and pass the lightness band, chroma floor, CVD separation
    (worst ΔE 24.7 light / 26.8 dark against a ≥8 target), the normal-vision
    floor and 3:1 contrast. Re-run the validator if either hex changes.
 
-   Text never wears the series colour: identity comes from the line key beside
+   Text never wears the series color: identity comes from the line key beside
    it. The values a tooltip shows are all in Tables 1 and 2 further down the
    same section, which is the table view — the hover layer enhances, it never
    gates. */
@@ -988,9 +988,9 @@
 }
 
 /* `circle.` deliberately: the .paper-chart-s1/s2 rules below set `stroke` to
-   the series colour for the lines, at equal specificity and later in the file,
+   the series color for the lines, at equal specificity and later in the file,
    so a bare `.paper-chart-dot` loses and the ring silently paints in the series
-   colour instead of the surface — which is exactly where it stops doing its
+   color instead of the surface — which is exactly where it stops doing its
    job, on the markers that overlap. */
 circle.paper-chart-dot {
     stroke: var(--chart-surface);
@@ -1120,7 +1120,7 @@ circle.paper-chart-s2 {
    so the text is selectable, searchable and readable in both themes. The
    source tables are a blue-banded Word grid; this is the site's own idiom —
    no vertical rules, no outer box, hairline row separators, and the theme
-   tokens rather than the document's colours. */
+   tokens rather than the document's colors. */
 .paper-table-block {
     margin: 0 0 28px;
 }

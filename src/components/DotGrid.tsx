@@ -30,7 +30,7 @@ const PEAK_R = 3.4 // px radius directly under the pointer
  * They were one set for both themes, and in dark that was wrong in a way the
  * hex alone hides: the ink there is pure #ffffff, but 0.11 of it over the
  * card's rgb(16,16,18) composites to rgb(44,44,46) — so the dots rendered
- * GREY on a canvas whose ink is white. Kian read that as the colour being
+ * GREY on a canvas whose ink is white. This read as the color being
  * wrong; it is the opacity.
  *
  * The fix is a single per-theme multiplier, `--dot-grid-alpha-scale`, rather
@@ -68,7 +68,7 @@ const SHELTER_JITTER = 0.26
 //
 // Top and bottom are deliberately NOT inset. The header and the copy already
 // shelter the top, and fading the bottom would take the dots out from around
-// the contact icons — which is the one place Kian asked for them.
+// the contact icons — which is the one place they were asked for.
 const EDGE_INSET = 24
 const EDGE_FADE = 120
 // How much of the bloom survives in a fully sheltered spot. The pointer's OWN
@@ -204,7 +204,7 @@ function DotGrid({ shelter }: { shelter?: string }) {
      * jitter between — see the note on those constants.
      *
      * The alternative was clipping the canvas to a rectangle of empty space,
-     * which Kian rejected and which would have looked worse: a hard edge where
+     * which was rejected and would have looked worse: a hard edge where
      * the effect stops is far more obvious than a gradient where it thins out.
      *
      * Distance is to the RECTANGLE, not its centre — `max(l - x, 0, x - r)` per
@@ -352,7 +352,7 @@ function DotGrid({ shelter }: { shelter?: string }) {
        *
        * `pw` is the POINTER's, measured at the cursor itself. It scales the
        * whole effect, so hovering in a sheltered spot is quiet wherever the
-       * dots around it happen to sit. That is the behaviour Kian asked for —
+       * dots around it happen to sit. That is the behaviour asked for —
        * "hovering right under the view resume button would mean the dots
        * don't grow as large as if I hovered right in the middle".
        *

@@ -49,7 +49,7 @@
            landed on half the stack gap BELOW the card and left a 6px sliver
            of page showing — the reasoning being that a sliver says "this
            continues" where a flush edge says "this is the whole screen".
-           Kian reversed that call after the gallery went square and made the
+           That call was reversed after the gallery went square and made the
            card taller. */
         min-height: calc(100vh - 80px);
         /* Overrides the line above where supported. Desktop is the same either
@@ -148,7 +148,7 @@
 }
 
 /* The Projects cards' icon buttons, exactly — 40px, 8px radius, a recessed
-   `--well-bg` chip with the well's inset shadow. Kian asked for the two to
+   `--well-bg` chip with the well's inset shadow. The two were asked to
    match, so this rule is a copy of `.project-icon-link` and should be kept in
    step with it; if that one is retuned, retune this.
 
@@ -211,7 +211,7 @@ a.about-social-link:visited {
        SQUARE, AND THAT IS FOR THE ONE PORTRAIT PHOTO. `img4.jpg` is 992x1119
        (0.887) where the other three are ~1.3 landscape, so in the old 4/3
        frame `cover` could only show a 992x744 window of it — the top 66.5%,
-       which cut Kian off at the hip and read as a mistake rather than as a
+       which cut the subject off at the hip and read as a mistake rather than as a
        crop. No edit to the file fixes that: a 4/3 box cannot contain a
        portrait subject without adding width to it or changing the box.
 
@@ -230,7 +230,7 @@ a.about-social-link:visited {
     aspect-ratio: 1 / 1;
     overflow: hidden;
     /* 24px. It was 75px (a radius nothing else on the site used), then 14px to
-       match `.sub-card`; Kian asked for ~10px more than that, which lands here.
+       match `.sub-card`; ~10px more than that was asked for, which lands here.
        Softer than the panels around it without going back to a shape of its
        own. */
     border-radius: 24px !important;

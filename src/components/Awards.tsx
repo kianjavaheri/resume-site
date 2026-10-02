@@ -3,10 +3,10 @@ import './../styling/components/Awards.css'
 
 // Three academic honors, all from ASU — which is why the card carries the seal
 // once on the left rather than repeating the school on each entry. The New
-// American University Scholarship was here and Kian cut it.
+// American University Scholarship was here and was cut.
 //
 // Summa Cum Laude and Barrett also appear in Education, where they sit against
-// the degrees. Kian asked for them here as well: this section is the list of
+// the degrees. They are repeated here deliberately: this section is the list of
 // honors, and a reader skimming it should not have to have read that card.
 const awards: Array<{ name: string; detail?: string }> = [
   { name: "Dean's List", detail: 'All eight semesters' },

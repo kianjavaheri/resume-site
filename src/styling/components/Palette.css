@@ -45,7 +45,7 @@
 
 /* THE PALETTE IS ALWAYS GLASS — there is no flat variant. It used to go
    opaque whenever the bar had docked, and on a reading page, where there is
-   no bar at all. Kian's call to drop both: the panel is a floating modal and
+   no bar at all. A deliberate call to drop both: the panel is a floating modal and
    the material is the same wherever it opens, which is one fewer state and
    one fewer thing to keep in step with the bar. */
 
@@ -105,6 +105,17 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
+}
+
+/* THE PANEL DECLARES ITS OWN INK, and that is not redundant. Every other
+   surface on the site sits inside `.home` or `.paper`, which set `color`; the
+   palette renders OUTSIDE both, so without this its text falls back to the
+   UA's default, which is governed by `color-scheme` on <html> rather than by
+   any token here. That is how a stale `color-scheme` was able to invert the
+   rows after a theme switch — see useTheme.ts. The root cause is fixed there;
+   this makes the panel independent of it either way. */
+.palette {
+    color: var(--textcolor);
 }
 
 .palette-row {
@@ -195,11 +206,11 @@
 }
 
 /* The global reset leaves <mark> with the UA's yellow fill, which the site has
-   no colour for. The match is picked out by INK STRENGTH instead: full
+   no color for. The match is picked out by INK STRENGTH instead: full
    `--textcolor` where the text around it is `--muted`.
 
    It used to be `color: inherit` plus weight, and that was the bug — inside a
-   snippet the mark inherited `--muted`, so it was the same colour as its
+   snippet the mark inherited `--muted`, so it was the same color as its
    surroundings and read as an arbitrary bold word rather than as the thing
    that matched. Weight alone is not enough contrast to carry a highlight. */
 .palette-mark {
@@ -209,7 +220,7 @@
 }
 
 /* On the inverted row "full strength" is the inverted ink — the undimmed
-   version of the colour its surroundings were mixed down from above. */
+   version of the color its surroundings were mixed down from above. */
 .palette-row-active .palette-mark {
     color: var(--bgcolor);
 }
