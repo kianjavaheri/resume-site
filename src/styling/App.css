@@ -31,6 +31,21 @@
    no `greek` subset — Greek comes in via `math`. */
 @import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,300..800&display=swap');
 
+/* Theme-independent tokens. These live on :root, NOT in the light block
+   below: a token declared only under [data-theme='light'] does not exist in
+   dark, and a var() with nothing behind it makes the whole declaration
+   invalid. That is exactly how the nav's hover corners went square in dark.
+
+   The corners of the bar's hover chips, and of the rows in its dropdowns.
+   Four chips and two menus share them. The chips are 20px, which on a ~28px
+   chip renders as a full pill (a radius is capped at half the height). The
+   rows stay at 8px, under the dropdown panel's own 10px bottom corners
+   (Nav.css), so a container's corner stays looser than what it holds. */
+:root {
+    --nav-chip-radius: 20px;
+    --nav-row-radius: 8px;
+}
+
 [data-theme='light'] {
     --bgcolor: #ffffff;
     --textcolor: #000000;
@@ -61,8 +76,10 @@
        -- the same reasoning --well-hover-tint exists for. It matters most once
        the bar DOCKS: the docked fill used to be a flat page white here
        and pure #000 in dark, and .022 white on pure black composites to
-       rgb(6,6,6). The hover simply vanished in dark mode. */
-    --nav-hover-tint: rgba(0, 0, 0, 0.06);
+       rgb(6,6,6). The hover simply vanished in dark mode.
+       Was .06 (and .10 in dark); both cut by a quarter when the chips went
+       to pills, which read heavier at the same tint. */
+    --nav-hover-tint: rgba(0, 0, 0, 0.045);
     /* The ink for whatever ambient figure the About card is carrying — the
        pulsing ring today (components/PulseRing.tsx), the dot field before it
        (components/DotGrid.tsx). ONE TOKEN FOR BOTH, deliberately: they are
@@ -114,27 +131,31 @@
        floating panel's EDGE over a photograph, where the drop shadow is lost
        against the picture.
 
-       IT SURVIVES ON THE COMMAND PALETTE AND NOWHERE ELSE. --nav-rim below
-       is the same geometry at zero alpha. The two were ONE token until the
-       bar's border was cut, and the palette lost its edge with it — the bar
-       is chrome pinned across the top and reads fine bare, where the palette
-       is a modal floating over arbitrary content and without a rim it washes
-       out into whatever is behind it. */
+       THE COMMAND PALETTE IS THE ONLY THING THAT USES IT. The bar has its own,
+       quieter --nav-rim below. The two were ONE token until the bar's border
+       was cut, and the palette lost its edge with it. The palette is a modal
+       floating over arbitrary content, and without a rim it washes out into
+       whatever is behind it. */
     --glass-rim: inset 0 1px 0 rgba(255, 255, 255, 0.65),
         inset 0 0 0 1px rgba(255, 255, 255, 0.30);
-    /* THE NAV'S RIM IS OFF. A deliberate call: on a 56px pill that ring read as a
-       drawn border around the bar rather than as a highlight. The blur, the
-       saturation boost and the fill carry the material on their own.
+    /* THE NAV'S RIM, BACK ON AND QUIET. It was cut once because a full white
+       ring on a 56px pill read as a drawn border; this is a different shape.
+       A lit TOP edge inside, plus a hairline just OUTSIDE the pill — together
+       they read as a bevel, the bar catching light along its top and sitting
+       on the page, rather than as a stroke around it.
 
-       Kept at zero alpha rather than deleted so the bar and the mobile menu
-       panel still have ONE rim token between them — the panel shares it and
-       is bare with the bar, deliberately, since it hangs off the bar's bottom
-       edge and reads as part of it. Setting `box-shadow: none` on each
-       instead would work, but would put the decision in two places.
+       Two deliberate omissions:
+       - No inner ring. Its bottom edge would land on the seam where the
+         Projects dropdown hangs flush off the bar. The outer hairline lands
+         there too, but the dropdown is z-index 101 over the bar's 100 and
+         covers it.
+       - No dark inset along the bottom, for the same seam.
 
+       Same geometry in both themes so a theme toggle interpolates rather than
+       snapping. The mobile menu shares this token and gets the same edge.
        The palette does NOT share it; it reads --glass-rim above. */
-    --nav-rim: inset 0 1px 0 rgba(255, 255, 255, 0),
-        inset 0 0 0 1px rgba(255, 255, 255, 0);
+    --nav-rim: inset 0 1px 0 rgba(255, 255, 255, 0.55),
+        0 0 0 1px rgba(0, 0, 0, 0.06);
     /* Two-part: a soft cast for float, a tight one to define the edge. */
     --nav-shadow: 0 6px 24px rgba(0, 0, 0, 0.10), 0 1px 3px rgba(0, 0, 0, 0.07);
 
@@ -199,7 +220,7 @@
        the docked bar in dark used to be a flat #000000, where the page tint is
        invisible outright. On the floating glass (which composites to about
        rgb(34,34,39) over a dark page) it lands around rgb(56,56,61). */
-    --nav-hover-tint: rgba(255, 255, 255, 0.10);
+    --nav-hover-tint: rgba(255, 255, 255, 0.075);
     /* Pure white, matching --textcolor here. See the light-mode note. */
     --about-ink: #ffffff;
     /* WHITE AT LIGHT MODE'S ALPHA RENDERS GREY HERE, which is the whole
@@ -225,11 +246,12 @@
        drawn border rather than as a highlight. */
     --glass-rim: inset 0 1px 0 rgba(255, 255, 255, 0.14),
         inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-    /* Off, as in light — see the note there. This was the theme the bar's
-       border was most obvious in: even at .06 the ring stood clear of a
-       pure-black page and outlined it. */
-    --nav-rim: inset 0 1px 0 rgba(255, 255, 255, 0),
-        inset 0 0 0 1px rgba(255, 255, 255, 0);
+    /* On, as in light — see the note there. Far fainter: dark is where the
+       old ring stood out most, at .06 against the pure-black page. So the
+       hairline is a light one here (a dark line vanishes on black) and sits
+       well under that. */
+    --nav-rim: inset 0 1px 0 rgba(255, 255, 255, 0.10),
+        0 0 0 1px rgba(255, 255, 255, 0.04);
     --nav-shadow: 0 6px 28px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.5);
 
     --scrollbar-thumb: rgba(255, 255, 255, 0.20);

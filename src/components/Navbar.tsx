@@ -4,7 +4,13 @@ import { works } from '../content/projects'
 import SearchIcon from './SearchIcon'
 import CaretDown from './CaretDown'
 import { openPalette, shortcutLabel } from './openPalette'
+import { openCoursework } from './openCoursework'
 import './../styling/components/Nav.css'
+
+const courseworkLinks = [
+  { id: 'cs', label: 'Computer Science Courses' },
+  { id: 'econ', label: 'Economics Courses' },
+] as const
 
 function Navbar({ switchTheme, isChecked }: any) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -61,7 +67,7 @@ function Navbar({ switchTheme, isChecked }: any) {
 
   const close = () => setMenuOpen(false)
 
-  // ---- Projects dropdown -------------------------------------------------
+  // ---- Dropdowns (Projects, Education) ----------------------------------
   // A POINTER affordance, not a menu widget, and the panel is a sibling of
   // <nav> rather than a child of the link. Both of those are forced by one
   // thing: `.nav` has `overflow: hidden` (it clips the name and the links as
@@ -72,45 +78,58 @@ function Navbar({ switchTheme, isChecked }: any) {
   // Out here it can't be in the link's tab order or reached by `:focus-within`,
   // so it isn't announced as a popup and doesn't claim to be one. It only ever
   // enhances: clicking "Projects" still scrolls to the grid, where all six are
-  // links, and the mobile menu keeps its plain Projects entry.
-  const [projectsOpen, setProjectsOpen] = useState(false)
+  // links, and the mobile menu keeps its plain Projects entry. Education works
+  // the same way: its link still scrolls to the section, and the panel is a
+  // shortcut to the two coursework blocks inside it.
+  //
+  // ONE panel, one open menu at a time, so moving from Projects to Education
+  // swaps the panel rather than stacking two.
+  type MenuId = 'projects' | 'education'
+  const [openMenu, setOpenMenu] = useState<MenuId | null>(null)
   const [drop, setDrop] = useState({ left: 0, top: 0 })
   const navRef = useRef<HTMLElement>(null)
-  const projectsRef = useRef<HTMLAnchorElement>(null)
+  const menuRefs = {
+    projects: useRef<HTMLAnchorElement>(null),
+    education: useRef<HTMLAnchorElement>(null),
+  }
   const closeTimer = useRef<number>()
 
   // Both coordinates are measured rather than hard-coded, because the bar sits
   // at two heights now: floating at top 12 and docked at top 0.
-  const openProjects = () => {
+  const openDropdown = (id: MenuId) => {
     window.clearTimeout(closeTimer.current)
-    const link = projectsRef.current
+    const link = menuRefs[id].current
     const nav = navRef.current
     if (link && nav) {
       setDrop({ left: link.getBoundingClientRect().left, top: nav.getBoundingClientRect().bottom })
     }
-    setProjectsOpen(true)
+    setOpenMenu(id)
   }
+
+  // The panel's own hover only has to cancel a pending close, not reopen or
+  // re-measure: it is already showing whichever menu it belongs to.
+  const keepDropdown = () => window.clearTimeout(closeTimer.current)
 
   // A short delay, so a pointer that clips a corner on the way from the link to
   // the panel doesn't drop the menu. The gap between the two is bridged by the
   // panel's own transparent top padding, so this only covers the diagonal.
-  const closeProjects = () => {
+  const closeDropdown = () => {
     window.clearTimeout(closeTimer.current)
-    closeTimer.current = window.setTimeout(() => setProjectsOpen(false), 120)
+    closeTimer.current = window.setTimeout(() => setOpenMenu(null), 120)
   }
 
   // The bar moves out from under the panel on the way to the top, and after a
   // resize the panel would be left pointing at nothing.
   useEffect(() => {
-    setProjectsOpen(false)
+    setOpenMenu(null)
   }, [docked])
 
   useEffect(() => {
-    if (!projectsOpen) return
-    const onResize = () => setProjectsOpen(false)
+    if (!openMenu) return
+    const onResize = () => setOpenMenu(null)
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
-  }, [projectsOpen])
+  }, [openMenu])
 
   useEffect(() => () => window.clearTimeout(closeTimer.current), [])
 
@@ -141,20 +160,30 @@ function Navbar({ switchTheme, isChecked }: any) {
 
         <div className="nav-links">
           <a href="#about" onClick={scrollTo('about')}>About</a>
-          <a href="#education" onClick={scrollTo('education')}>Education</a>
+          <a
+            href="#education"
+            ref={menuRefs.education}
+            className={`nav-has-menu${openMenu === 'education' ? ' nav-menu-open' : ''}`}
+            onClick={scrollTo('education')}
+            onMouseEnter={() => openDropdown('education')}
+            onMouseLeave={closeDropdown}
+          >
+            Education
+            <CaretDown />
+          </a>
           <a href="#experience" onClick={scrollTo('experience')}>Experience</a>
-          {/* The one link that expands, and the caret is what says so. It
-              flips to point UP from `projectsOpen` rather than from a CSS
+          {/* A link that expands, and the caret is what says so. It
+              flips to point UP from `openMenu` rather than from a CSS
               :hover, because the pointer leaves the link the moment it moves
               down onto the panel -- a :hover flip would snap the caret back
               down while the menu it describes was still open. */}
           <a
             href="#projects"
-            ref={projectsRef}
-            className={`nav-has-menu${projectsOpen ? ' nav-menu-open' : ''}`}
+            ref={menuRefs.projects}
+            className={`nav-has-menu${openMenu === 'projects' ? ' nav-menu-open' : ''}`}
             onClick={scrollTo('projects')}
-            onMouseEnter={openProjects}
-            onMouseLeave={closeProjects}
+            onMouseEnter={() => openDropdown('projects')}
+            onMouseLeave={closeDropdown}
           >
             Projects
             <CaretDown />
@@ -184,12 +213,12 @@ function Navbar({ switchTheme, isChecked }: any) {
         </button>
       </nav>
 
-      {projectsOpen && (
+      {openMenu && (
         <div
           className="nav-dropdown"
           style={{ left: drop.left, top: drop.top }}
-          onMouseEnter={openProjects}
-          onMouseLeave={closeProjects}
+          onMouseEnter={keepDropdown}
+          onMouseLeave={closeDropdown}
         >
           {/* The outer div starts at the bar's bottom edge and no longer
               carries a top padding: the panel is FLUSH with the bar now, so
@@ -197,11 +226,30 @@ function Navbar({ switchTheme, isChecked }: any) {
               journey is across the bar's own bottom padding, which the 120ms
               close delay covers. */}
           <div className="nav-dropdown-panel">
-            {works.map((w) => (
-              <Link key={w.to} to={w.to} onClick={() => setProjectsOpen(false)}>
-                {w.navLabel ?? w.title}
-              </Link>
-            ))}
+            {openMenu === 'projects' &&
+              works.map((w) => (
+                <Link key={w.to} to={w.to} onClick={() => setOpenMenu(null)}>
+                  {w.navLabel ?? w.title}
+                </Link>
+              ))}
+            {/* Education opens and scrolls to a coursework block rather than
+                navigating, so these are in-page anchors. Education.tsx does
+                the expanding; see openCoursework.ts. */}
+            {openMenu === 'education' &&
+              courseworkLinks.map((c) => (
+                <a
+                  key={c.id}
+                  href="#education"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setOpenMenu(null)
+                    history.replaceState(null, '', '/')
+                    openCoursework(c.id)
+                  }}
+                >
+                  {c.label}
+                </a>
+              ))}
           </div>
         </div>
       )}

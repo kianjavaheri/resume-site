@@ -40,7 +40,8 @@ Defined on `[data-theme='light']` / `[data-theme='dark']`:
 | `--well-hover-tint` | `rgba(0,0,0,.045)` | `rgba(255,255,255,.05)` | Hover tint for surfaces on `--well-bg` |
 | `--hover-tint` | `rgba(0,0,0,.032)` | `rgba(255,255,255,.022)` | Hover tint for page-colored surfaces |
 | `--hover-tint-inverse` | `rgba(255,255,255,.16)` | `rgba(0,0,0,.14)` | Hover tint for `--textcolor`-filled surfaces |
-| `--nav-hover-tint` | `rgba(0,0,0,.06)` | `rgba(255,255,255,.10)` | Hover tint for the nav bar's chips, in BOTH of its states |
+| `--nav-hover-tint` | `rgba(0,0,0,.045)` | `rgba(255,255,255,.075)` | Hover tint for the nav bar's chips, in BOTH of its states |
+| `--nav-chip-radius` / `--nav-row-radius` | `20px` / `8px` | same (declared on `:root`) | Corners of the bar's hover chips (links, theme toggle, hamburger, search; 20px renders as a pill) and of the dropdown rows. The dropdown panel's bottom corners are 10px, a step looser than the rows |
 | `--nav-drop-shadow` | `0 10px 24px rgba(0,0,0,.12)` | `0 10px 28px rgba(0,0,0,.65)` | The Projects panel's downward-only cast |
 | `--about-ink` | `rgb(3,111,252)` | `#ffffff` | The ink for the About card's ambient figure — the pulsing ring today, the dot field before it. **One token for both**, so the two treatments of one slot can't drift to different colors |
 | `--ring-alpha-scale` | `1` | `1.3` | Multiplies the ring's per-copy stroke alpha. Dark needs a smaller correction than the dots did — a 1px stroke holds up better on the near-black card than a field of discs |
@@ -50,7 +51,7 @@ Defined on `[data-theme='light']` / `[data-theme='dark']`:
 | `--sub-card-shadow` | — | — | Inner card elevation |
 | `--nav-glass` | `rgba(197,203,217,.50)` | `rgba(68,68,78,.50)` | Nav pill fill |
 | `--glass-rim` | white `.65`/`.30` insets | white `.14`/`.06` insets | The specular rim on glass. **The command palette only** — it floats over arbitrary content, including the gallery photo, where the drop shadow is invisible and this is the only thing drawing its edge |
-| `--nav-rim` | **all zero** | **all zero** | The same geometry, off. The bar's rim was **cut** — on a 56px pill it read as a drawn border. Kept at zero alpha so the dock still has something to interpolate; the mobile menu shares it and is bare with the bar |
+| `--nav-rim` | white `.55` top inset + black `.06` outer hairline | white `.10` top inset + white `.04` outer hairline | The bar's bevel: a lit top edge inside, a hairline just outside. **No inner ring** (its bottom would cross the Projects dropdown's seam). An earlier full white ring was cut for reading as a drawn border; this is a different, quieter shape. The mobile menu shares it |
 | `--nav-shadow` | — | — | Floating elements (nav bar, scroll button) |
 
 `--toggle-btn-bg` / `--toggle-btn-bg-hover` feed only `.card-toggle-btn`, which is never rendered — see *Dead code and assets*.
@@ -75,7 +76,7 @@ Why it matters:
   ```
 - On surfaces filled with `--textcolor` (the scroll-to-top button), use `--hover-tint-inverse` — the normal tint is keyed to the page and would be invisible.
 - On surfaces filled with `--well-bg` (the coursework headers), use `--well-hover-tint`. `--hover-tint` in dark is only `.022` alpha — deliberately held down for the pure-black page — and on a well it is imperceptible.
-- **On the nav bar's chips — the links, the theme toggle, the hamburger, the palette chip and the dropdown's rows — use `--nav-hover-tint`.** Same reasoning one step further: the bar is chrome, not a page-colored surface. **This was a real bug in dark mode**, back when docking swapped the glass for a flat fill: that fill was pure `#000`, and `.022` white on pure black composites to `rgb(6,6,6)` — a 6-point step, invisible, so the hover simply did not exist on the docked bar. At `.10` it lands on `rgb(26,26,26)`, a 26-point step. Measured across all four cases at the time (docked/floating × light/dark) the old tint gave steps of 6, 5, 8 and 8; the new one gives 26, 22, 15 and 14. **The docked-flat case is gone now** — the bar keeps its glass — but the tint stays: it was the better value in the floating cases too (15 and 14 against 8 and 8).
+- **On the nav bar's chips — the links, the theme toggle, the hamburger, the palette chip and the dropdown's rows — use `--nav-hover-tint`.** Same reasoning one step further: the bar is chrome, not a page-colored surface. **This was a real bug in dark mode**, back when docking swapped the glass for a flat fill: that fill was pure `#000`, and `.022` white on pure black composites to `rgb(6,6,6)` — a 6-point step, invisible, so the hover simply did not exist on the docked bar. At `.10` it lands on `rgb(26,26,26)`, a 26-point step. Measured across all four cases at the time (docked/floating × light/dark) the old tint gave steps of 6, 5, 8 and 8; the new one gives 26, 22, 15 and 14. **The docked-flat case is gone now** — the bar keeps its glass — but the tint stays: it was the better value in the floating cases too (15 and 14 against 8 and 8). **Later turned down by a quarter** (`.06` → `.045` light, `.10` → `.075` dark) at Kian's request, once the chips became pills and read heavier. Dark's `.075` is still more than three times the `.022` that vanished.
 
 ### Nesting goes DOWN, not up
 

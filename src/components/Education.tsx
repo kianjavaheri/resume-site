@@ -1,16 +1,19 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import './../styling/Education.css'
 import './../styling/components/Courses.css'
 import { cseCourses, ecnCourses, type Course } from '../content/courses'
+import { COURSEWORK_EVENT, type CourseworkId } from './openCoursework'
 
 // One collapsible coursework block per degree. Reuses the section-body-wrapper
 // grid-rows animation, gated on `coursework-open` instead of `section-open`.
-function Coursework({ label, courses }: { label: string; courses: Course[] }) {
-  const [open, setOpen] = useState(false)
-
+// Its open state lives in Education, so the nav's dropdown can open it too.
+const Coursework = React.forwardRef<
+  HTMLDivElement,
+  { label: string; courses: Course[]; open: boolean; onToggle: () => void }
+>(function Coursework({ label, courses, open, onToggle }, ref) {
   return (
-    <div className={`coursework-block ${open ? 'coursework-open' : ''}`}>
-      <div className="coursework-header" onClick={() => setOpen(!open)}>
+    <div ref={ref} className={`coursework-block ${open ? 'coursework-open' : ''}`}>
+      <div className="coursework-header" onClick={onToggle}>
         <span className="coursework-label">
           <span className="coursework-title">{label}</span>
           <span className="coursework-sub">Coursework · {courses.length} courses</span>
@@ -39,13 +42,52 @@ function Coursework({ label, courses }: { label: string; courses: Course[] }) {
       </div>
     </div>
   )
-}
+})
 
 function Education() {
   const [open, setOpen] = useState(true)
   // The ASU card itself: collapsed shows school, degrees and honors; expanding
   // reveals the two coursework tabs, which then open individually.
   const [cardOpen, setCardOpen] = useState(false)
+  const [courseworkOpen, setCourseworkOpen] = useState<Record<CourseworkId, boolean>>({
+    cs: false,
+    econ: false,
+  })
+  const blockRefs = {
+    cs: useRef<HTMLDivElement>(null),
+    econ: useRef<HTMLDivElement>(null),
+  }
+  const toggleCoursework = (id: CourseworkId) =>
+    setCourseworkOpen((o) => ({ ...o, [id]: !o[id] }))
+
+  // The nav's Education dropdown. Opens all three levels at once (section,
+  // ASU card, the block itself) and scrolls to the block straight away, so the
+  // page starts moving with the expand rather than after it. That first scroll
+  // can land short: the block's position wobbles by ~20px while the levels
+  // around it open (measured). So once the 0.35s expand has settled, a second
+  // scroll corrects to the final position. The other block is left as the
+  // reader had it.
+  useEffect(() => {
+    let settle: number | undefined
+    const onOpen = (e: Event) => {
+      const id = (e as CustomEvent<CourseworkId>).detail
+      setOpen(true)
+      setCardOpen(true)
+      setCourseworkOpen((o) => ({ ...o, [id]: true }))
+      const scroll = () =>
+        blockRefs[id].current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      // One frame, so the first scroll measures the committed layout.
+      requestAnimationFrame(scroll)
+      window.clearTimeout(settle)
+      settle = window.setTimeout(scroll, 400)
+    }
+    window.addEventListener(COURSEWORK_EVENT, onOpen)
+    return () => {
+      window.removeEventListener(COURSEWORK_EVENT, onOpen)
+      window.clearTimeout(settle)
+    }
+    // Subscribed once: the refs inside blockRefs are stable across renders.
+  }, [])
 
   return (
     <section id="education" className={`section-card education-section ${open ? 'section-open' : ''}`}>
@@ -84,8 +126,20 @@ function Education() {
               <div className="section-body-wrapper">
                 <div className="section-body-inner">
                   <div className="edu-coursework" onClick={(e) => e.stopPropagation()}>
-                    <Coursework label="Computer Science" courses={cseCourses} />
-                    <Coursework label="Economics" courses={ecnCourses} />
+                    <Coursework
+                      ref={blockRefs.cs}
+                      label="Computer Science"
+                      courses={cseCourses}
+                      open={courseworkOpen.cs}
+                      onToggle={() => toggleCoursework('cs')}
+                    />
+                    <Coursework
+                      ref={blockRefs.econ}
+                      label="Economics"
+                      courses={ecnCourses}
+                      open={courseworkOpen.econ}
+                      onToggle={() => toggleCoursework('econ')}
+                    />
                   </div>
                 </div>
               </div>

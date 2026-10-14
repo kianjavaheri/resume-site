@@ -33,8 +33,8 @@
     background-color: var(--nav-glass);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     backdrop-filter: blur(24px) saturate(180%);
-    /* --glass-rim, NOT --nav-rim. The bar dropped its rim and this panel must
-       not follow: it floats over whatever the page happens to show, including
+    /* --glass-rim, NOT --nav-rim. The bar's rim is a much quieter bevel, and
+       this panel needs the stronger one: it floats over whatever the page happens to show, including
        the About gallery's photograph, where the drop shadow is invisible and
        the rim is the only thing drawing its edge. They were one token, and
        the palette washed out the moment the bar's was cut. */

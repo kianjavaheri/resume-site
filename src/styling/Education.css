@@ -43,6 +43,9 @@
    sub-card gradient, so they read as raised against it. */
 .coursework-block {
     border-radius: 14px !important;
+    /* Where the nav's Education dropdown scrolls it to: clear of the docked
+       bar (56px) with a little room, so the header is not tucked under it. */
+    scroll-margin-top: 72px;
     background-color: var(--well-bg);
     box-shadow: var(--well-shadow);
 }

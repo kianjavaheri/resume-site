@@ -139,12 +139,12 @@
     font-weight: 500;
     letter-spacing: 0;
     padding: 6px 14px;
-    /* 4px, not a pill. `999px` on a 27.5px chip renders as a ~13.75px corner,
-       so "10px less" lands here. All three chips in the bar — the links, the
-       theme toggle and the hamburger — move together: they are the same
-       control at the same size in the same row, and a pill beside a rounded
-       square on hover reads as an oversight. */
-    border-radius: 4px !important;
+    /* --nav-chip-radius (20px), which on a 27.5px chip renders as a full
+       pill. All the chips in the bar — the links, the theme toggle, the
+       search and the hamburger — move together: they are the same control at
+       the same size in the same row, and a pill beside a rounded square on
+       hover reads as an oversight. */
+    border-radius: var(--nav-chip-radius) !important;
     transition: background-image 0.15s;
     color: var(--textcolor);
 }
@@ -229,12 +229,12 @@
      `--nav-shadow`'s second `0 1px 3px` component rings all four sides, and
      the top of that ring landed on the join.
 
-   The bottom corners stay rounded, because that edge IS an edge. 8px, and the
-   old reason for the panel's radius no longer applies: it used to be 10px to
-   look deliberately SMALLER than the 20px pill it hung off, so it would not
-   read as a second pill. It is not a separate object any more, so the only
-   constraint left is the one inside it -- the rows are 6px, and a container's
-   corner has to stay looser than its contents'. */
+   The bottom corners stay rounded, because that edge IS an edge. They are
+   10px. The panel was once 10px for a different reason: to look deliberately
+   SMALLER than the 20px pill it hung off, so it would not read as a second
+   pill. That reason is gone now that it is not a separate object. The only
+   constraint left is the one inside it: the rows are --nav-row-radius (8px),
+   and a container's corner has to stay looser than its contents'. */
 .nav-dropdown-panel {
     display: flex;
     flex-direction: column;
@@ -244,7 +244,7 @@
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     backdrop-filter: blur(24px) saturate(180%);
     box-shadow: var(--nav-drop-shadow);
-    border-radius: 0 0 8px 8px !important;
+    border-radius: 0 0 10px 10px !important;
     padding: 8px;
     /* Wide enough for `Shipment Quoting Microservice` on one line, capped so a
        future long label wraps instead of stretching the panel across the bar.
@@ -253,7 +253,7 @@
     max-width: 288px;
 }
 
-/* 400, a step lighter than the nav links' own 500: a menu of six destinations
+/* 400, a step lighter than the nav links' own 500: a menu of destinations
    is a list to scan, and the bar's links are the things that look clickable. */
 .nav-dropdown-panel a {
     font-size: 0.82rem;
@@ -261,7 +261,7 @@
     letter-spacing: 0;
     color: var(--textcolor);
     padding: 9px 14px;
-    border-radius: 6px !important;
+    border-radius: var(--nav-row-radius) !important;
     transition: background-image 0.15s;
 }
 
@@ -284,7 +284,7 @@
     user-select: none;
     padding: 6px 14px;
     /* With the nav links — see the note there. */
-    border-radius: 4px !important;
+    border-radius: var(--nav-chip-radius) !important;
     transition: background-image 0.15s;
     color: var(--muted);
 }
@@ -304,7 +304,7 @@
     cursor: pointer;
     padding: 6px 12px;
     /* With the nav links — see the note there. */
-    border-radius: 4px !important;
+    border-radius: var(--nav-chip-radius) !important;
     transition: background-image 0.15s;
 }
 
@@ -319,8 +319,8 @@
 
 /* ---- Palette trigger ---------------------------------------------------- */
 /* The same chip as the nav links and the theme toggle beside it — same size,
-   same 4px corner, same tint on hover. It is a control in that row, so it moves
-   with them; see the note on `.nav-links a`. */
+   same --nav-chip-radius corner, same tint on hover. It is a control in that
+   row, so it moves with them; see the note on `.nav-links a`. */
 .nav-search {
     display: inline-flex;
     align-items: center;
@@ -331,7 +331,7 @@
     /* 6px vertical to match the links' chip height, and square horizontally so
        the glyph sits centred rather than left of centre. */
     padding: 6px 10px;
-    border-radius: 4px !important;
+    border-radius: var(--nav-chip-radius) !important;
     transition: background-image 0.15s, color 0.15s;
 }
 
@@ -428,8 +428,8 @@
         -webkit-backdrop-filter: blur(24px) saturate(180%);
         backdrop-filter: blur(24px) saturate(180%);
         border-radius: 20px !important;
-        /* Same material as the pill, rim included — and the rim is now off
-           (see --nav-rim in App.css), so this is fill + blur + float alone.
+        /* Same material as the pill, rim included (see --nav-rim in App.css):
+           fill + blur + the bar's quiet bevel + float.
            It carries no `border` either: a solid line on glass reads as
            drawn rather than lit, which is why one was removed here before. */
         box-shadow: var(--nav-rim), var(--nav-shadow);

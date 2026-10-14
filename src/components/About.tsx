@@ -4,8 +4,9 @@ import LinkIcon from './LinkIcon'
 import { contactLinks, isMailto } from '../content/contact-links'
 import ArrowOut from './ArrowOut'
 import CarouselDots, { CarouselCounter } from './CarouselDots'
-import PulseRing from './PulseRing'
-import { useIsMobile } from './useIsMobile'
+// PulseRing is switched off for now — see the commented-out render in About().
+// import PulseRing from './PulseRing'
+// import { useIsMobile } from './useIsMobile'
 import { useCarouselAutoplay } from './useCarouselAutoplay'
 import './../styling/components/About.css'
 
@@ -227,7 +228,7 @@ function Gallery() {
 
 function About() {
   const [resumeOpen, setResumeOpen] = useState(false)
-  const isMobile = useIsMobile()
+  // const isMobile = useIsMobile()
 
   return (
     <>
@@ -269,6 +270,8 @@ function About() {
             decoration, and the card loses its full-viewport height at that
             width anyway. Rendering nothing beats hiding it in CSS, which
             would do all the work and then paint it to no one. */}
+        {/* SWITCHED OFF FOR NOW, not removed. Uncomment this block, the two
+            imports and `isMobile` at the top of About() to bring it back.
         {!isMobile && (
           <PulseRing
             above=".about-text"
@@ -276,6 +279,7 @@ function About() {
             centreOn=".about-text"
           />
         )}
+        */}
 
         <div className="card-header-static">
           <span className="card-title">About</span>
