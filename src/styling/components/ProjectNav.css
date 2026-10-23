@@ -36,16 +36,14 @@
    is. `--hover-tint`, not `--well-hover-tint`: this sits on the page, not in a
    well. */
 .project-nav:hover {
-    color: var(--textcolor);
+    color: var(--accent-ink);
     background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
 }
 
-/* The global reset clears `outline`, so focus has to be restated or these are
-   invisible to a keyboard. */
+/* Focus draws the same coral as hover; the ring itself is the global
+   `:focus-visible` rule in App.css. */
 .project-nav:focus-visible {
-    outline: 2px solid var(--textcolor);
-    outline-offset: 2px;
-    color: var(--textcolor);
+    color: var(--accent-ink);
 }
 
 /* These are outbound-looking <a>s to routes the reader WILL visit, and
@@ -57,7 +55,7 @@ a.project-nav:visited {
 }
 
 a.project-nav:visited:hover {
-    color: var(--textcolor);
+    color: var(--accent-ink);
 }
 
 .project-nav-prev {

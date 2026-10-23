@@ -13,8 +13,6 @@
        page behind a document you are meant to read instead; this one is a
        control you are meant to see the page through. */
     background: rgba(0, 0, 0, 0.32);
-    -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
     /* Above .pdf-overlay (1000), which is above the nav (100). */
     z-index: 1100;
     display: flex;
@@ -25,7 +23,24 @@
     padding: 12vh 16px 16px;
 }
 
+/* THE PAGE BLUR LIVES ON A SIBLING LAYER, NOT ON THE OVERLAY. An element with
+   `backdrop-filter` becomes a "backdrop root": anything inside it samples only
+   what is painted inside it, never the page behind. With the blur on the
+   overlay, the panel's own `blur(24px) saturate(180%)` saw nothing but the
+   overlay's flat dim, so the glass never blurred — the page showed through it
+   at 3px, dark thumbnails and all, and the panel read as a murky tint. A
+   pseudo-element is painted beneath the panel without containing it. */
+.palette-overlay::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    pointer-events: none;
+}
+
 .palette {
+    position: relative;
     width: 100%;
     max-width: 560px;
     display: flex;

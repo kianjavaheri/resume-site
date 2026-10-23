@@ -56,6 +56,13 @@ Defined on `[data-theme='light']` / `[data-theme='dark']`:
 
 `--toggle-btn-bg` / `--toggle-btn-bg-hover` feed only `.card-toggle-btn`, which is never rendered — see *Dead code and assets*.
 
+### The coral accent
+`--accent-ink` (`#c9473c` in light, `#f28b82` in dark), declared in the theme blocks of `App.css`. The coral swatch is only 2.4:1 on white, so light takes the deeper shade for anything drawn on the page: prev/next arrows on hover and the focus ring. **Text selection is not coral** — it is a literal `#fcf24c` highlighter yellow with black ink, in `::selection`.
+
+Meaning: **blue** (`--about-ink`, the Live badge) is "a link / a live thing"; **coral** is "where you are, what's responding". Keep the two jobs apart. Deliberately NOT coral: the commit calendar (GitHub's own green), the pulse ring, the charts — and, tried and rejected as too loud, the WIP badge, back-to-top hover, reading-progress line and active contents marker. It stays a text-level accent: hover ink and the focus ring.
+
+**Keyboard focus** is one global rule in `App.css`, `:focus-visible:not(.palette-input)`, `!important` and placed after the reset. The reset's `*:focus { outline: none !important }` used to beat every per-component `:focus-visible` rule written without `!important`, so nothing had a visible focus until this.
+
 ### Hover is a layered tint, never a replacement fill
 
 **This is the single most important convention here.** Hover is applied as:

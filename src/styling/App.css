@@ -47,6 +47,13 @@
 }
 
 [data-theme='light'] {
+    /* THE CORAL ACCENT (#f28b82), as ink. The swatch is only 2.4:1 on white, so
+       light uses the deeper shade (4.7:1) for anything drawn directly on the
+       page; dark uses the swatch itself. Blue (--about-ink, the Live badge)
+       stays the color for "a link / a live thing"; coral is for "what's
+       responding" — arrow hover and the focus ring. */
+    --accent-ink: #c9473c;
+
     --bgcolor: #ffffff;
     --textcolor: #000000;
     --border: #000000;
@@ -184,6 +191,8 @@
 }
 
 [data-theme='dark'] {
+    --accent-ink: #f28b82;
+
     --bgcolor: #000000;
     --textcolor: #ffffff;
     --border: #ffffff;
@@ -277,6 +286,27 @@
 *:active {
     outline: none !important;
     -webkit-tap-highlight-color: transparent;
+}
+
+/* KEYBOARD FOCUS. The reset above clears every outline with !important, which
+   also beats the per-component `:focus-visible` rules written without it — so
+   until this one, a keyboard user had no visible focus anywhere. It must be
+   !important and must come AFTER the reset (equal specificity, later wins).
+   `:focus-visible` only matches when the browser decides a ring is useful, so
+   a mouse click still shows nothing. The palette's text field is left out:
+   it is a field inside a panel that already draws its own focus, and a ring
+   around it would be a second frame. */
+:focus-visible:not(.palette-input) {
+    outline: 2px solid var(--accent-ink) !important;
+    outline-offset: 2px;
+}
+
+/* Selected text: a yellow highlighter, black ink in both themes (~17:1). A
+   literal rather than a token — nothing else uses it, and it is deliberately
+   not the coral. */
+::selection {
+    background: #fcf24c;
+    color: #000000;
 }
 
 a {
@@ -767,12 +797,13 @@ html {
        token, because this sits on a photograph in both themes. */
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
     color: #fff;
-    /* 12px/600 and NO tracking. It was 0.62rem/500 at 0.08em, which is the
+    /* 12px/500 and NO tracking. It was 0.62rem/500 at 0.08em, which is the
        site's micro-label — right for a uppercase caption, wrong here: the
        letterspacing is exactly the "spaced out" look being avoided, and it
-       pushed `2 / 4` to 44px where the reference is compact. */
+       pushed `2 / 4` to 44px where the reference is compact. Weight went
+       600 -> 500: white on the dark glass blooms, and 600 read heavy. */
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0;
     /* So the badge does not change width as the number does — a counter that
        jitters between slides is exactly what an autoplaying carousel must not
@@ -796,9 +827,11 @@ html {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* 7px mark + 2 x 6px = a ~19x24 target. The mark is what you see; this is
-       what you hit. */
-    padding: 8px 6px;
+    /* 7px mark + 2 x 4px = a 15x25 target, so a 15px pitch between dots. It was
+       2 x 6px (19px), which read as too far apart. Height carries the 24px
+       minimum, since the dots touch sideways. The mark is what you see; this
+       is what you hit. */
+    padding: 9px 4px;
 }
 
 .carousel-dot-mark {
