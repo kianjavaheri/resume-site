@@ -35,6 +35,10 @@ export type Block =
   // saying "put the strip here", because the numbers are not known at build
   // time and must not be baked into the bundle. See GitHubActivity.tsx.
   | { type: 'activity' }
+  // Live total downloads for a CurseForge project, fetched in the browser —
+  // a marker like `activity`, for the same reason: the number changes after
+  // the build. See CurseForgeDownloads.tsx for where it comes from.
+  | { type: 'downloads'; projectId: number; href: string }
   // Figures shown one at a time instead of stacked. Written inline on a
   // hand-written page; on a GENERATED one the module can't be hand-edited, so
   // Paper.tsx folds a run of consecutive figures into this same shape from
@@ -117,7 +121,7 @@ import { thesis } from './thesis'
 // Hand-written, not converted from a document — see project-pages.ts.
 // `wageEffects` is deliberately not imported — see the commented registry
 // line below and the matching entry in projects.ts.
-import { materialBoxes, rentalPrices } from './project-pages'
+import { liftTrack, materialBoxes, rentalPrices } from './project-pages'
 // The site's own page. Its own module rather than project-pages.ts, which is
 // specifically "the projects with no source document" — this is not a project.
 import { colophon } from './colophon'
@@ -129,8 +133,12 @@ import { colophon } from './colophon'
 // This is applied HERE rather than by editing the papers' own modules, because
 // those three are generated from the source PDFs and carry a `View PDF` action
 // in the generated output — a hand edit there is dropped by the next
-// regeneration, and this isn't. The files themselves are gone from `public/`,
-// so the action would 404 anyway.
+// regeneration, and this isn't. The thesis and Economics files are gone from
+// `public/`, so their actions would 404 anyway.
+//
+// THE CAPSTONE POSTER IS BACK, but only as an icon link on its project CARD
+// (content/projects.ts, opened in the PDF modal). Its reading-page action is
+// still withheld here; remove the entry below to show it there too.
 const withheldPdfs = new Set([
   '/pdfs/thesis/thesis.pdf',
   '/pdfs/cs-capstone/cs-capstone.pdf',
@@ -220,6 +228,7 @@ export const papers: Record<string, Paper> = {
   // [wageEffects.slug]: wageEffects,
   [rentalPrices.slug]: rentalPrices,
   [materialBoxes.slug]: materialBoxes,
+  [liftTrack.slug]: liftTrack,
   [colophon.slug]: colophon,
 }
 

@@ -15,6 +15,7 @@ import SurveyExplorer from '../components/SurveyExplorer'
 import FigureCarousel from '../components/FigureCarousel'
 import FigureChart from '../components/FigureChart'
 import GitHubActivity from '../components/GitHubActivity'
+import CurseForgeDownloads from '../components/CurseForgeDownloads'
 import ProjectNav from '../components/ProjectNav'
 import { figureCarousels, papers } from '../content/papers'
 import type { Block, PaperTable } from '../content/papers'
@@ -154,6 +155,9 @@ function renderBlock(b: Block, i: number) {
   // change after the build and must not be baked into the bundle.
   if (b.type === 'activity') {
     return <GitHubActivity key={i} />
+  }
+  if (b.type === 'downloads') {
+    return <CurseForgeDownloads key={i} projectId={b.projectId} href={b.href} />
   }
   if (b.type === 'carousel') {
     return <FigureCarousel key={i} figures={b.figures} plain={b.plain} />

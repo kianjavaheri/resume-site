@@ -635,6 +635,23 @@ A grid of **uniform tiles, each one a link to that project's page**. Modelled on
 
 **Two things the reference has that this deliberately doesn't:** a **year** under the tags (*Projects carry no dates* — see below), and a hairline **border** around each card instead of a shadow (*No card borders* is a site-wide rule; these carry `--card-shadow` like every other card).
 
+### The wide card: the colophon is a banner, not a tile
+
+A work with `wide: true` (only the colophon) is drawn by the same `WorkCard` but with no picture, in its own `.work-wide` stack **below** the grid instead of as a grid item. It used to be a tile on a row of its own, which looked lonely and left a gap.
+
+- **It is outside the grid on purpose.** The grid is `grid-auto-rows: 1fr` so every tile is one height; a short banner spanning it would be stretched to match the tall tiles above. A separate stack has no such rule.
+- **`image` is still required on it.** It isn't drawn, but the share image and its alt text are keyed off it in `prerender-meta.mjs`. Removing it fails the build.
+- Desktop and tablet: one row — title and blurb left, chips + icon + arrow right, no rule. At ≤768px it stacks like a tile with the rule restored.
+- **The row direction rule is `.sub-card.project-card-wide`, not `.project-card-wide`.** `.sub-card.project-card` (0-2-0) sets `column`, so a bare class (0-1-0) silently loses and the banner renders as a column.
+- `works` order is unchanged, so the prev/next arrows and the nav dropdown still put the colophon last.
+
+### A PDF link on a card opens like the resume
+
+A link with `icon: 'pdf'` (the CS capstone poster) behaves like About's *View Resume*: **`PdfModal` on desktop, a new tab at ≤768px**, where an iframe PDF viewer is cramped and can't be pinched. It is still a real `<a href target=_blank>` so middle-click and *open in new tab* work; the click handler only intercepts on desktop.
+
+- **The modal's state lives in `Projects`, not in the card.** A card lifts on hover with a `transform`, and a transformed ancestor becomes the containing block for `position: fixed` — a modal rendered inside one would be laid out against the card.
+- The poster's reading-page action is still withheld (`withheldPdfs` in `papers.ts`); only the card link brings it back.
+
 ### The whole tile is one `<Link>`
 `to` is what the card's old "Read" button pointed at. Every project has a page under `/projects/:slug`, so there is no outbound-link case to handle and `to` is a plain string.
 

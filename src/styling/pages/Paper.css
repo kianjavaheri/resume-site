@@ -614,6 +614,37 @@
     font-variant-numeric: tabular-nums;
 }
 
+/* The mod's live download count (components/CurseForgeDownloads.tsx). A quiet
+   line, the colophon commit sentence's register: the number is the one thing
+   at full strength and the rest is apparatus. `min-height` holds the line while
+   the figure loads, so nothing below it jumps. */
+.paper-downloads {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    min-height: 1.6em;
+    color: var(--muted);
+    margin: 0 0 22px;
+}
+
+.paper-downloads strong {
+    font-weight: 500;
+    color: var(--textcolor);
+}
+
+/* An outbound link, drawn like the deflist's: a --card-border underline rather
+   than the header's uppercase micro-label. `:visited` is restated because it
+   outranks a bare class and would otherwise take the UA's purple. */
+.paper-downloads a,
+.paper-downloads a:visited {
+    color: var(--textcolor);
+    border-bottom: 1px solid var(--card-border);
+    transition: opacity 0.15s;
+}
+
+.paper-downloads a:hover {
+    opacity: 0.45;
+}
+
 /* ---- Survey explorer --------------------------------------------------- */
 /* The thesis's survey section, drawn from its response counts instead of shown
    as its twenty-three chart images. See components/SurveyExplorer.tsx for why

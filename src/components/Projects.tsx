@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import LinkIcon from './LinkIcon'
 import ArrowOut from './ArrowOut'
 import Tags from './Tags'
+import PdfModal, { withViewerParams } from './PdfModal'
 import { works } from '../content/projects'
 import type { WorkProps } from '../content/projects'
 import './../styling/components/Projects.css'
@@ -17,7 +18,9 @@ import './../styling/components/Projects.css'
 // ::after covers the card while the icons sit above it on z-index), and it
 // needs no :has() support. The cost is that clicking the tag row doesn't
 // navigate, which is the right behaviour anyway.
-function WorkCard({ image, to, wip, release, title, blurb, tags, links }: WorkProps) {
+function WorkCard({
+  image, to, wide, wip, release, title, blurb, tags, links, onOpenPdf,
+}: WorkProps & { onOpenPdf: (src: string) => void }) {
   /* DERIVED, NOT A FLAG. A card earns the LIVE badge by carrying a link whose
      icon is `site`, which is already what that icon means — somewhere you can
      open and use the thing right now, in a browser, without installing
@@ -27,17 +30,21 @@ function WorkCard({ image, to, wip, release, title, blurb, tags, links }: WorkPr
      build, a mod you have to install into Minecraft, a document you read. */
   const live = links?.some((l) => l.icon === 'site') ?? false
   return (
-    <div className="sub-card project-card">
+    <div className={`sub-card project-card${wide ? ' project-card-wide' : ''}`}>
       <Link to={to} className="project-main">
-        <div className="project-visual">
-          <img
-            src={image.src}
-            alt={image.alt}
-            width={image.width}
-            height={image.height}
-            loading="lazy"
-          />
-        </div>
+        {/* A wide card draws no picture — `image` is only there for its share
+            image. See `wide` in content/projects.ts. */}
+        {!wide && (
+          <div className="project-visual">
+            <img
+              src={image.src}
+              alt={image.alt}
+              width={image.width}
+              height={image.height}
+              loading="lazy"
+            />
+          </div>
+        )}
         {/* Badges are inline in the title, so on a wrapping title they follow
             the last word rather than floating beside the first line. */}
         <h2 className="project-title">
@@ -64,12 +71,26 @@ function WorkCard({ image, to, wip, release, title, blurb, tags, links }: WorkPr
             {links?.map((l) => (
               <a
                 key={l.label}
-                href={l.href}
+                // A PDF opens like the About card's resume: in the modal on
+                // desktop, and in a new tab at ≤768px, where an iframe PDF
+                // viewer is cramped and can't be pinched. It stays a real
+                // anchor, so middle-click and "open in new tab" still work.
+                href={l.icon === 'pdf' ? withViewerParams(l.href) : l.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="project-icon-link"
                 aria-label={l.label}
                 title={l.label}
+                onClick={
+                  l.icon === 'pdf'
+                    ? (e) => {
+                        if (window.innerWidth > 768) {
+                          e.preventDefault()
+                          onOpenPdf(l.href)
+                        }
+                      }
+                    : undefined
+                }
               >
                 <LinkIcon kind={l.icon} />
               </a>
@@ -91,6 +112,10 @@ function WorkCard({ image, to, wip, release, title, blurb, tags, links }: WorkPr
 
 function Projects() {
   const [open, setOpen] = useState(true)
+  // Held HERE and not in the card: a card lifts on hover with a `transform`,
+  // and a transformed ancestor becomes the containing block for `position:
+  // fixed`, so a modal rendered inside one would be laid out against the card.
+  const [pdf, setPdf] = useState<string | null>(null)
 
   return (
     <section id="projects" className={`section-card projects-section ${open ? 'section-open' : ''}`}>
@@ -101,12 +126,23 @@ function Projects() {
       <div className="section-body-wrapper">
         <div className="section-body-inner">
           <div className="sub-cards-stack work-grid">
-            {works.map((w) => (
-              <WorkCard key={w.to} {...w} />
+            {works.filter((w) => !w.wide).map((w) => (
+              <WorkCard key={w.to} {...w} onOpenPdf={setPdf} />
             ))}
           </div>
+          {/* OUTSIDE the grid, not a card that spans it. The grid's rows are
+              `1fr` so every tile is one height, which would stretch a short
+              banner to match them. */}
+          {works.some((w) => w.wide) && (
+            <div className="sub-cards-stack work-wide">
+              {works.filter((w) => w.wide).map((w) => (
+                <WorkCard key={w.to} {...w} onOpenPdf={setPdf} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
+      {pdf && <PdfModal src={pdf} onClose={() => setPdf(null)} />}
     </section>
   )
 }

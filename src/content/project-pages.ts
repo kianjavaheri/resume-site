@@ -441,7 +441,7 @@ export const materialBoxes: Paper = {
   meta: [
     { label: 'Platform', value: 'Minecraft 26.2, Fabric' },
     { label: 'Version', value: '1.1.0' },
-    { label: 'Status', value: 'In progress' },
+    { label: 'Status', value: 'Released' },
   ],
   actions: [
     { label: 'View CurseForge', href: 'https://www.curseforge.com/minecraft/mc-mods/material-boxes' },
@@ -463,6 +463,14 @@ export const materialBoxes: Paper = {
         {
           type: 'p',
           text: 'It\u2019s client-only, so it works on servers that don\u2019t have it installed.',
+        },
+        // Live total from CurseForge, fetched in the browser. It sits directly
+        // above the CurseForge screenshot it is a figure from. 1696819 is the mod's
+        // CurseForge project ID (its page's "About Project" panel lists it).
+        {
+          type: 'downloads',
+          projectId: 1696819,
+          href: 'https://www.curseforge.com/minecraft/mc-mods/material-boxes',
         },
         {
           type: 'figure',
@@ -591,6 +599,124 @@ export const materialBoxes: Paper = {
               href: 'https://github.com/kianjavaheri/material-boxes/blob/main/docs/compatibility.md',
               detail: 'Requirements, tested mods, known limitations, troubleshooting.',
             },
+          ],
+        },
+      ],
+    },
+  ],
+}
+
+// The prose is the app's own description, lightly edited — the project was
+// written up in its own repo before it was written up here, so this follows
+// that text rather than re-deriving it. The carousel is real iPhone
+// screenshots, composed two to a slide (see docs/paper-pages.md).
+//
+// "Coming soon" is the status line, and it is meant literally: the web app is
+// live, the iPhone app is in TestFlight beta, and there is no App Store listing
+// to link to yet. Don't add a download link until there is one.
+export const liftTrack: Paper = {
+  slug: 'lifttrack',
+  eyebrow: 'Personal Project',
+  title: 'LiftTrack',
+  meta: [
+    { label: 'Platform', value: 'iPhone, web, installable PWA' },
+    { label: 'Status', value: 'TestFlight beta, App Store soon' },
+    { label: 'Stack', value: 'React, TypeScript, Firebase, Capacitor, Swift' },
+  ],
+  actions: [
+    { label: 'View Web App', href: 'https://fitness-tracker-cb4cd.web.app/' },
+    { label: 'View GitHub', href: 'https://github.com/kianjavaheri/fitness-tracker' },
+  ],
+  sections: [
+    {
+      id: 'overview',
+      title: 'Overview',
+      blocks: [
+        {
+          type: 'p',
+          text: 'LiftTrack is a workout tracker I built to replace the notes app I was logging my lifts in. It runs on the web, as a home-screen app, and as an iPhone app, which is in beta on TestFlight and coming soon to the App Store.',
+        },
+        {
+          // Three 1400x1100 slides, each the real iPhone screenshots set on one
+          // dark canvas — the screenshots are 1:2, which in a carousel frame
+          // would run 1,500px tall. Two phones per slide, one on the last.
+          type: 'carousel',
+          plain: true,
+          figures: [
+            {
+              src: '/images/lifttrack/home-workouts.507624c0.webp',
+              width: 1400,
+              height: 1100,
+              label: 'Home shows today\u2019s workout and a six-month heatmap; Workouts holds the routines behind it',
+            },
+            {
+              src: '/images/lifttrack/live-analytics.389c0bf1.webp',
+              width: 1400,
+              height: 1100,
+              label: 'Logging a set with the rest timer running, and a workout\u2019s progress charts',
+            },
+            {
+              src: '/images/lifttrack/log.0efbc04e.webp',
+              width: 1400,
+              height: 1100,
+              label: 'The log: every exercise\u2019s last session at a glance',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'features',
+      title: 'What it does',
+      blocks: [
+        {
+          type: 'deflist',
+          items: [
+            {
+              term: 'Plan',
+              detail: 'Build workouts and group them into routines, with optional days of the week. Paste a plan from your notes and it turns it into workouts, asking about anything it can\u2019t work out.',
+            },
+            {
+              term: 'Log',
+              detail: 'Check in and fill in sets as you go. Last time\u2019s numbers show in each set, so you know what to beat. Checking off a set starts a rest timer.',
+            },
+            {
+              term: 'Track',
+              detail: 'A training heatmap, a week-over-week summary, and progress charts for each exercise and workout: estimated 1RM, or total reps for bodyweight moves.',
+            },
+            {
+              term: 'Look back',
+              detail: 'A notes-style log of each exercise\u2019s last day, and a full history of every workout.',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'iphone',
+      title: 'On the iPhone',
+      blocks: [
+        {
+          type: 'list',
+          items: [
+            'The live workout sits on the lock screen and in the Dynamic Island: the current exercise and set, and the rest countdown.',
+            'A notification when your rest is over, haptics, and finished workouts saved to Apple Health.',
+            'Swipe between tabs, press and hold for menus, and drag to reorder.',
+          ],
+        },
+      ],
+    },
+    {
+      id: 'build',
+      title: 'How it\u2019s built',
+      blocks: [
+        {
+          type: 'list',
+          items: [
+            'React 19, TypeScript and Vite, with the domain logic (stats, progression, supersets, import parsing) kept in plain TypeScript, separate from the UI.',
+            'Firebase sign-in and Firestore sync that works offline, with a local IndexedDB mode when signed out.',
+            'Capacitor for the iPhone app, with Swift for the Live Activity, haptics and HealthKit.',
+            'An installable PWA that opens with no signal.',
           ],
         },
       ],

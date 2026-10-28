@@ -11,7 +11,7 @@ src/
                        #   "View Resume" + the contact icon row at the card's foot
     Education.tsx      # Collapsible, default OPEN. ASU sub-card + course data + nested <Coursework> blocks
     Experience.tsx     # Collapsible, default OPEN. Three expandable role cards (Sandia, ASU RA, ASU TA) w/ tags
-    Projects.tsx       # Collapsible, default OPEN. Six uniform tiles, each a <Link> to
+    Projects.tsx       # Collapsible, default OPEN. Six uniform tiles plus a wide banner (the colophon), each a <Link> to
                        #   /projects/:slug. Entries live in content/projects.ts
     Proficiency.tsx    # Collapsible, default OPEN. 27 skills in 4 labelled groups of rounded icon
                        #   tiles. On mobile the tiles are BUTTONS and the names are tap-to-reveal
@@ -37,6 +37,7 @@ src/
     Scroll.tsx         # Back-to-top button; inverted fill, fades in past 400px
     ArrowOut.tsx       # Inline SVG ↗ for outbound links — replaces the emoji-prone U+2197
     GitHubActivity.tsx # The colophon's 30-day commit strip; public GitHub API, no token
+    CurseForgeDownloads.tsx # Material Boxes' live download count, via shields.io; degrades to nothing
     ProjectNav.tsx     # Prev/next chevrons on a reading page; order comes from `works`
     ArrowBack.tsx      # Inline SVG ← for the paper pages' back button; 1em via .arrow-back
     AnchorIcon.tsx     # Inline SVG chain-link for HeadingAnchor; 1em via .anchor-icon
@@ -68,8 +69,8 @@ src/
     intros.ts          # Intro block by slug (abstract or overview), the gate flag and the
                        #   capstone's lead figure. Hand-written
     colophon.ts        # The site's OWN reading page. Hand-written, third person — see paper-pages.md
-    project-pages.ts   # Reading pages for the 3 projects with no source document. Hand-written.
-                       #   All three have now grown past their stubs
+    project-pages.ts   # Reading pages for the projects with no source document (rent model, Material Boxes,
+                       #   LiftTrack, and the held wage-effects). Hand-written
   App.tsx              # <Routes>: "/" → Home, "/projects/:slug" → Paper,
                        #   "/papers/:slug" → legacy redirect, "*" → NotFound;
                        #   mounts <CommandPalette /> outside the routes
@@ -107,8 +108,9 @@ public/
                        #   img_dep*.jpg (4) are unreferenced
     projects/          # One .webp thumbnail per project — see Projects
     material-boxes/    # 8 content-hashed .webp for that project's reading page
+    lifttrack/         # 3 content-hashed .webp slides (iPhone screenshots, two to a canvas)
     wage-effects/      # 7 content-hashed .webp — cover + 6 figures padded to one ratio
-  og/                  # 7 content-hashed 1200x630 JPEGs — the link-preview cards
+  og/                  # content-hashed 1200x630 JPEGs, one per project card plus home — the link-preview cards
   svgs/                # 31 files: asu, sandia + 27 skill icons, plus two with no caller —
                        #   apachespark.svg (PySpark's) and matplotlib.svg (commented out),
                        #   PySpark left behind when it came off the list (see Skills)

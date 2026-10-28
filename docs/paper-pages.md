@@ -259,6 +259,24 @@ The first of the three hand-written project pages to grow past its stub blurb, a
 - **The eight `Features` links point at the repo's real `docs/` files** — `github.com/kianjavaheri/material-boxes/blob/main/docs/<name>.md`. All eight were checked for a 200 before shipping; a docs index of dead links is worse than no links. A **View Documentation** action was added to the page header alongside CurseForge and GitHub.
 - **The card blurb is NOT on this page.** It shipped alongside the mod's own documentation for one round and the two said the same thing in two voices, 400px apart; Kian cut the blurb. So Overview opens in documentation voice, and the resume-voice sentence survives only on the project card, which is the one place it belongs. **`wage-effects` and `rental-prices` have since grown the same way** (see below), and each dropped its card blurb on the way for this exact reason.
 
+### The LiftTrack page
+
+Hand-written in `project-pages.ts` (`liftTrack`), registered in `papers.ts`, and placed in `works` after Material Boxes and before the colophon — the colophon stays last. Prose follows the app's own write-up in its repo; four sections (Overview, What it does as a `deflist`, On the iPhone, How it's built) and nothing else.
+
+- **The carousel is real iPhone screenshots, composed two to a slide.** The captures are 1:2 portraits, and a carousel frame is sized to its tallest slide, so five of them would have been a 1,500px-tall frame. Instead each slide is a 1400x1100 canvas with the phones set on near-black, rounded and hairline-ringed: Home + Workouts, Live workout + Analytics, Log alone. Same trick as the wage-effects figures — pad to one ratio. They are lossy q90 WebPs in `public/images/lifttrack/`, content-hashed. **The composites are built outside the repo** (a throwaway Swift/AppKit script over the five source captures); to change a slide, rebuild it, don't edit the WebP. **On a phone each handset is only ~130px wide**, so the in-app text is not legible there — the trade for keeping the frame short.
+- **The card's thumbnail is the app's logo, cropped to 16/9** from the 1080p source (a 1280x720 window centred on the mark, resized to 900x506, lossy q90 — it is a smooth gradient and glow, which lossless would bloat). The source PNG is NOT in the repo; the WebP is the asset.
+- **Three badges, all true.** **Live** is derived from the web-app link (`site` icon) and is accurate — the web build is deployed. **Version 1.0 Beta** is the green `release` badge, and **WIP** is the red one. (Material Boxes lost its WIP badge and its page's `Status` now reads *Released*.) Don't add a store link until the App Store listing exists; "coming soon" on the page is meant literally.
+- **Tags are what the write-up states** (TypeScript, React, Swift, Firebase, Capacitor). Don't add a tag the page doesn't back.
+
+### The live CurseForge download count
+
+A `downloads` block (`{ type: 'downloads', projectId, href }`) on the Material Boxes page, rendered by `CurseForgeDownloads.tsx` as a quiet "**83** downloads on CurseForge" line above the CurseForge screenshot. It is on the project's page and NOT the home card: the card would spend a third-party request on every landing-page load for a number nobody reads there.
+
+- **Not CurseForge's own API.** That needs a key whose terms forbid sharing it, so it would need a server function to hold it plus an application and approval. Instead it reads **shields.io's `curseforge/dt/:id`** endpoint — public, keyless, CORS-open, cached 30 minutes — and takes the figure from the returned SVG's `aria-label` (`downloads: 83`). The project ID (1696819) is on the CurseForge page under *About Project*.
+- **It prints the string it is given**, never a parsed number: shields abbreviates past 1,000 ("1.2k").
+- **Degrades to nothing**, like the commit calendar: if the fetch fails or the label changes shape the line is removed. While loading, its height is held so nothing below jumps. Module-level cache, so moving between pages doesn't refetch.
+- It is a **third party in the path**. If this ever matters enough to be exact, the upgrade is a Vercel function holding a CurseForge key — not a different client-side trick.
+
 ### The wage-effects page
 
 The second hand-written project page to grow past its stub. Built from the repo's README (`github.com/kianjavaheri/welfare-model`) but **deliberately not a copy of it**: Installation, Usage, Data setup and Project structure are all dropped, because a portfolio page describes a project rather than telling a reader how to run it. What survives is the design, the method, a **Results** section, the three validity threats, and the pivot that produced the current specification.

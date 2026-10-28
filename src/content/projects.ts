@@ -38,6 +38,12 @@ export interface WorkProps {
   // Where the card goes. Always a route on this site — every project has a
   // page under /projects/:slug, so there is no outbound-link case to handle.
   to: string
+  // A full-width banner under the grid instead of a tile: no picture, title and
+  // blurb on the left, chips and icons on the right. `image` is STILL required
+  // on one — it is not drawn, but the share image and its alt text are keyed
+  // off it (see prerender-meta.mjs), so a wide card with no image would fail
+  // the build.
+  wide?: boolean
   wip?: boolean
   // Shipped version, e.g. 'Version 1.1.0'. Green badge, left of the WIP one.
   release?: string
@@ -72,6 +78,9 @@ export const works: Array<WorkProps> = [
     title: 'Revolution Parts Shipment Quoting Microservice',
     navLabel: 'Shipment Quoting Microservice',
     to: '/projects/cs-capstone',
+    // The poster, opened the way the resume is: in the PDF modal on desktop, in
+    // a new tab on a phone. See WorkCard's `onOpenPdf`.
+    links: [{ label: 'View Poster PDF', icon: 'pdf', href: '/pdfs/cs-capstone/cs-capstone.pdf' }],
     image: { src: '/images/projects/shipment-quoting.18712804.webp', width: 900, height: 534, alt: 'The quoting tool: shipment and package details on the left, live carrier rates and cache status on the right' },
     blurb: 'A Dockerized caching layer sitting in front of carrier quote APIs, in Flask and PostgreSQL. Cut quoting latency 64.4%, a 2.8x speedup over live calls.',
     tags: ['Python', 'Flask', 'PostgreSQL', 'Docker'],
@@ -124,7 +133,6 @@ export const works: Array<WorkProps> = [
     tags: ['LightGBM', 'Linear Regression', 'Gradient Boosting', 'Ridge Regression', 'Feature Engineering'],
   },
   {
-    wip: true,
     release: 'Version 1.1.0',
     title: 'Material Boxes',
     to: '/projects/material-boxes',
@@ -137,6 +145,23 @@ export const works: Array<WorkProps> = [
     // tags: ['Java', 'Fabric', 'Minecraft Modding', 'Claude API'],
     tags: ['Java', 'Fabric', 'Minecraft Modding'],
   },
+  // Three badges, each true: LIVE is derived from the web-app link below (the
+  // web build is deployed and usable today), the green one is the version, and
+  // WIP says it is still being built — the iPhone app is in TestFlight beta,
+  // with the App Store release still to come.
+  {
+    wip: true,
+    release: 'Version 1.0 Beta',
+    title: 'LiftTrack',
+    to: '/projects/lifttrack',
+    links: [
+      { label: 'View Web App', icon: 'site', href: 'https://fitness-tracker-cb4cd.web.app/' },
+      { label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/fitness-tracker' },
+    ],
+    image: { src: '/images/projects/lifttrack.976fc0bd.webp', width: 900, height: 506, alt: 'The LiftTrack logo: a barbell whose uprights form an L and a T, in a pastel gradient glowing against black' },
+    blurb: 'A workout tracker I built to replace my notes app: plan routines, log sets against last time, chart progress. On the web and in beta on iPhone.',
+    tags: ['TypeScript', 'React', 'Swift', 'Firebase', 'Capacitor'],
+  },
   // LAST IN THE GRID, and that is the order it should keep: it is the site
   // itself, not a project, so it reads as a footnote to the five above rather
   // than competing with them. It still earns a card rather than a footer link,
@@ -148,6 +173,7 @@ export const works: Array<WorkProps> = [
   // the same constants components/PulseRing.tsx animates — so the card cannot
   // show a motif the page no longer uses. See docs/components.md.
   {
+    wide: true,
     title: 'How This Site Is Built',
     navLabel: 'Colophon',
     to: '/projects/colophon',
