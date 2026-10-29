@@ -25,6 +25,7 @@ src/
     useScrollRestore.ts # Per-history-entry scroll save/restore — used by Home AND Paper
     useModalChrome.ts  # Escape / click-outside / scroll lock for PdfModal
     FigureChart.tsx    # Inline SVG line charts for the thesis's Background figures
+    Zoomable.tsx       # Click-to-magnify lens: paper figures, the paper carousel's frame, the About gallery's frame (own CSS in styling/components/Zoomable.css)
     FigureCarousel.tsx # Consecutive figures shown one at a time — the capstone's design diagrams
     SurveyExplorer.tsx # The thesis's survey section: question + dimension pickers, drawn bars
     Tags.tsx           # Tech tag pills — Experience cards and Projects card footers
@@ -70,7 +71,7 @@ src/
                        #   capstone's lead figure. Hand-written
     colophon.ts        # The site's OWN reading page. Hand-written, third person — see paper-pages.md
     project-pages.ts   # Reading pages for the projects with no source document (rent model, Material Boxes,
-                       #   LiftTrack, and the held wage-effects). Hand-written
+                       #   Rerack, and the held wage-effects). Hand-written
   App.tsx              # <Routes>: "/" → Home, "/projects/:slug" → Paper,
                        #   "/papers/:slug" → legacy redirect, "*" → NotFound;
                        #   mounts <CommandPalette /> outside the routes
@@ -108,7 +109,7 @@ public/
                        #   img_dep*.jpg (4) are unreferenced
     projects/          # One .webp thumbnail per project — see Projects
     material-boxes/    # 8 content-hashed .webp for that project's reading page
-    lifttrack/         # 3 content-hashed .webp slides (iPhone screenshots, two to a canvas)
+    rerack/            # 3 content-hashed .webp slides (iPhone screenshots, two to a canvas)
     wage-effects/      # 7 content-hashed .webp — cover + 6 figures padded to one ratio
   og/                  # content-hashed 1200x630 JPEGs, one per project card plus home — the link-preview cards
   svgs/                # 31 files: asu, sandia + 27 skill icons, plus two with no caller —

@@ -121,7 +121,7 @@ import { thesis } from './thesis'
 // Hand-written, not converted from a document — see project-pages.ts.
 // `wageEffects` is deliberately not imported — see the commented registry
 // line below and the matching entry in projects.ts.
-import { liftTrack, materialBoxes, rentalPrices } from './project-pages'
+import { rerack, materialBoxes, rentalPrices } from './project-pages'
 // The site's own page. Its own module rather than project-pages.ts, which is
 // specifically "the projects with no source document" — this is not a project.
 import { colophon } from './colophon'
@@ -228,7 +228,7 @@ export const papers: Record<string, Paper> = {
   // [wageEffects.slug]: wageEffects,
   [rentalPrices.slug]: rentalPrices,
   [materialBoxes.slug]: materialBoxes,
-  [liftTrack.slug]: liftTrack,
+  [rerack.slug]: rerack,
   [colophon.slug]: colophon,
 }
 

@@ -1,0 +1,29 @@
+/* Click-to-magnify (components/Zoomable.tsx). Wraps a paper figure's <img>, the
+   paper carousel's frame and the About gallery's frame. `overflow: hidden` so the
+   lens is cut at the figure's edge instead of hanging into the page margin. */
+.zoomable {
+    position: relative;
+    overflow: hidden;
+}
+
+.zoomable img {
+    cursor: zoom-in;
+}
+
+/* The lens sits centred under the pointer, so the pointer is hidden while it
+   is open: a magnifier cursor in the middle would cover the very spot being
+   magnified. Any click still closes it. Square-cornered on purpose — it is a
+   window onto the picture, not a card — and ringed in white with a shadow
+   rather than a border, which reads on both themes. */
+.zoomable-on img {
+    cursor: none;
+}
+
+.zoom-lens {
+    position: absolute;
+    z-index: 3;
+    pointer-events: none;
+    background-color: var(--well-bg);
+    background-repeat: no-repeat;
+    box-shadow: 0 0 0 2px #ffffff, 0 10px 30px rgba(0, 0, 0, 0.4);
+}

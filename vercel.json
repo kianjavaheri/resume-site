@@ -1,6 +1,11 @@
 {
   "redirects": [
     {
+      "source": "/projects/lifttrack",
+      "destination": "/projects/rerack",
+      "permanent": true
+    },
+    {
       "source": "/papers/:slug",
       "destination": "/projects/:slug",
       "permanent": true

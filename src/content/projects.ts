@@ -17,6 +17,12 @@ export interface WorkImage {
   // Describes what the picture SHOWS. Not a repeat of the title, which sits
   // next to it and is already read out.
   alt: string
+  // The same picture drawn for the LIGHT theme, same pixel size. `src` is the
+  // dark one (and what the share image is made from). Optional: most
+  // thumbnails are photographs or screenshots that read on either theme.
+  // Swapped in CSS, not with <picture>, because the theme is a stored
+  // preference as well as the OS setting — see `.project-img-light`.
+  srcLight?: string
 }
 
 // Icon-only, so `label` is the ONLY name this link has: it is both the
@@ -148,17 +154,17 @@ export const works: Array<WorkProps> = [
   // Three badges, each true: LIVE is derived from the web-app link below (the
   // web build is deployed and usable today), the green one is the version, and
   // WIP says it is still being built — the iPhone app is in TestFlight beta,
-  // with the App Store release still to come.
+  // with the App Store release still to come. (Renamed from LiftTrack.)
   {
     wip: true,
     release: 'Version 1.0 Beta',
-    title: 'LiftTrack',
-    to: '/projects/lifttrack',
+    title: 'Rerack',
+    to: '/projects/rerack',
     links: [
       { label: 'View Web App', icon: 'site', href: 'https://fitness-tracker-cb4cd.web.app/' },
-      { label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/fitness-tracker' },
+      { label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/rerack' },
     ],
-    image: { src: '/images/projects/lifttrack.976fc0bd.webp', width: 900, height: 506, alt: 'The LiftTrack logo: a barbell whose uprights form an L and a T, in a pastel gradient glowing against black' },
+    image: { src: '/images/projects/rerack.c7754e0a.webp', srcLight: '/images/projects/rerack-light.e3721380.webp', width: 900, height: 506, alt: 'The Rerack logo: a barbell whose bar runs through two split, hooked uprights, in a rainbow gradient' },
     blurb: 'A workout tracker I built to replace my notes app: plan routines, log sets against last time, chart progress. On the web and in beta on iPhone.',
     tags: ['TypeScript', 'React', 'Swift', 'Firebase', 'Capacitor'],
   },

@@ -563,6 +563,14 @@ It was **re-compressed from 1.5MB to 391KB** at its native size (`sips -s format
 
 The frame is `aspect-ratio: 1 / 1`, `border-radius: 24px !important`, `overflow: hidden`. It was 4/3 — see above for why it is square. The radius went 75px (a shape nothing else on the site used) to 14px (matching `.sub-card`) to **24px** — Kian asked for about 10px more than the sub-card radius. Softer than the panels around it without going back to a shape of its own.
 
+### Click to magnify
+
+The gallery frame is a `<Zoomable>` (`components/Zoomable.tsx`, shared with the paper pages — behaviour and caveats are in *Click to magnify* in paper-pages.md). Two things are specific to here:
+
+- **The photos are `cover`-cropped in a square frame**, so the lens maps to the *visible* window: it only opens over what you can see, and never magnifies a part the crop hides. That is why `Zoomable` reads `object-fit` and `object-position` instead of assuming `contain`.
+- **The frame caps the lens.** At 344px the frame allows about 310x217, not the 485x340 the paper pages get. Near an edge the lens is clipped by the frame's own `overflow: hidden` and `border-radius`.
+- **`resetKey={idx}`** closes the lens on a slide change, so it never sits over a photo that is sliding away. Hovering already pauses autoplay.
+
 ### Both slides animate, not just the incoming one
 The transition keeps **two** images mounted: `idx` (incoming) and `outgoing`. They animate in step — the old one exits a full frame width while the new one enters — and the frame's `overflow: hidden` clips both. `outgoing` is cleared in `onAnimationEnd` on the incoming image.
 
@@ -651,6 +659,15 @@ A link with `icon: 'pdf'` (the CS capstone poster) behaves like About's *View Re
 
 - **The modal's state lives in `Projects`, not in the card.** A card lifts on hover with a `transform`, and a transformed ancestor becomes the containing block for `position: fixed` — a modal rendered inside one would be laid out against the card.
 - The poster's reading-page action is still withheld (`withheldPdfs` in `papers.ts`); only the card link brings it back.
+
+### A thumbnail with a light twin
+
+`image.srcLight` (Rerack only) is the same picture drawn for the light theme: the logo is a pastel glow on black in dark and a saturated gradient on near-white in light, and neither reads on the other's ground. `WorkCard` renders **both** `<img>`s and CSS shows the one matching `data-theme` (`.project-img-dark` / `.project-img-light`).
+
+- **CSS, not `<picture media="(prefers-color-scheme)">`.** The theme is a stored preference as well as the OS setting; a media query would show the wrong logo whenever the visitor has picked a theme by hand.
+- **Only one file is fetched.** Both are `loading="lazy"`, and a lazy image that is `display: none` is not requested until it is shown. After a theme switch the other one loads on demand, so it can be a beat late in a hidden or throttled pane — that is the pane, not a bug.
+- The `!important`s on the two display rules are there because `.project-visual img` sets `display: block` at 0-1-1, which outranks a bare `.project-img-light` (0-1-0).
+- Both files share one pixel size so the box doesn't move on switch.
 
 ### The whole tile is one `<Link>`
 `to` is what the card's old "Read" button pointed at. Every project has a page under `/projects/:slug`, so there is no outbound-link case to handle and `to` is a plain string.

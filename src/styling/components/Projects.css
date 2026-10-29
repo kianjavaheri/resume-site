@@ -124,6 +124,20 @@
     display: block;
 }
 
+/* A thumbnail with a light twin (`srcLight`) renders both <img>s and shows the
+   one that matches the theme. Keyed off `data-theme`, which `useTheme` resolves
+   from the stored preference AND the OS setting, so `prefers-color-scheme`
+   would be wrong whenever the visitor has picked a theme by hand. The dark one
+   is the default if no theme has resolved yet. */
+.project-img-light,
+[data-theme='light'] .project-img-dark {
+    display: none !important;
+}
+
+[data-theme='light'] .project-img-light {
+    display: block !important;
+}
+
 /* Left-aligned. The reference sets its titles flush right and that was tried
    here, but these titles run to eleven words where the reference's run to three,
    and four lines of ragged-left text is materially harder to read than one.

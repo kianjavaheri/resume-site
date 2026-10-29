@@ -55,6 +55,9 @@ hash_and_place() {  # $1 = finished jpg, $2 = slug
 echo "Project cards — fitted to 630 tall, padded to 1200 wide:"
 for src in public/images/projects/*.webp; do
   slug=$(basename "$src" | cut -d. -f1)
+  # A `-light` file is the light-theme twin of a thumbnail (`srcLight`); the
+  # share image is made from the dark one, so the twin gets no card of its own.
+  case "$slug" in *-light) continue ;; esac
   dwebp -quiet "$src" -ppm -o "$TMP/$slug.ppm"
   dwebp -quiet "$src" -o "$TMP/$slug.png"
   pad=$(edge_color "$TMP/$slug.ppm")

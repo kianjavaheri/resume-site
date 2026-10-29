@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import type { CarouselFigure } from '../content/papers'
 import CarouselDots, { CarouselCounter } from './CarouselDots'
 import { useCarouselAutoplay } from './useCarouselAutoplay'
+import Zoomable from './Zoomable'
 
 // Figures shown one at a time instead of stacked down the page. A hand-written
 // page writes a `carousel` block; a generated one declares `figureCarousels` in
@@ -69,7 +70,7 @@ function FigureCarousel({ figures, plain }: { figures: CarouselFigure[]; plain?:
       aria-roledescription="carousel"
       {...pauseProps}
     >
-      <div className="paper-carousel-frame" style={{ aspectRatio: String(1 / ratio) }}>
+      <Zoomable className="paper-carousel-frame" style={{ aspectRatio: String(1 / ratio) }} resetKey={idx}>
         {figures.map((f, i) => (
           <img
             key={f.src}
@@ -91,7 +92,7 @@ function FigureCarousel({ figures, plain }: { figures: CarouselFigure[]; plain?:
           />
         ))}
         <CarouselCounter index={idx} count={n} />
-      </div>
+      </Zoomable>
       <div className="paper-carousel-bar">
         {/* A live region announces CHANGES only — its content on first paint is
             never read — so this needs no "has the reader moved yet" guard. */}

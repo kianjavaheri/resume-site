@@ -23,6 +23,7 @@ import { linkableIds, renderedSections } from '../content/paper-view'
 import { paperTables } from '../content/tables'
 import { paperCharts } from '../content/charts'
 import { paperIntros } from '../content/intros'
+import Zoomable from '../components/Zoomable'
 import './../styling/pages/Paper.css'
 
 // Columns of figures read better flush right, where the decimal points line
@@ -135,13 +136,15 @@ function renderBlock(b: Block, i: number) {
 
     return (
       <figure key={i} className={`paper-figure${b.plain ? ' paper-figure-plain' : ''}`}>
-        <img
-          src={b.src}
-          alt={b.alt ?? b.caption ?? ''}
-          width={b.width}
-          height={b.height}
-          loading="lazy"
-        />
+        <Zoomable>
+          <img
+            src={b.src}
+            alt={b.alt ?? b.caption ?? ''}
+            width={b.width}
+            height={b.height}
+            loading="lazy"
+          />
+        </Zoomable>
         {b.caption ? <figcaption>{b.caption}</figcaption> : null}
       </figure>
     )
@@ -479,12 +482,14 @@ function Paper() {
                 ))}
                 {intro.figure ? (
                   <figure className="paper-figure paper-intro-figure">
-                    <img
-                      src={intro.figure.src}
-                      alt={intro.figure.alt}
-                      width={intro.figure.width}
-                      height={intro.figure.height}
-                    />
+                    <Zoomable>
+                      <img
+                        src={intro.figure.src}
+                        alt={intro.figure.alt}
+                        width={intro.figure.width}
+                        height={intro.figure.height}
+                      />
+                    </Zoomable>
                   </figure>
                 ) : null}
               </section>

@@ -8,6 +8,7 @@ import CarouselDots, { CarouselCounter } from './CarouselDots'
 // import PulseRing from './PulseRing'
 // import { useIsMobile } from './useIsMobile'
 import { useCarouselAutoplay } from './useCarouselAutoplay'
+import Zoomable from './Zoomable'
 import './../styling/components/About.css'
 
 // The running order. The gallery was reordered and the FILES were renamed to
@@ -168,7 +169,7 @@ function Gallery() {
 
   return (
     <div className="about-gallery" ref={rootRef} {...pauseProps}>
-      <div className="gallery-frame">
+      <Zoomable className="gallery-frame" resetKey={idx}>
         {sliding && (
           <img
             key={`out-${outgoing}`}
@@ -191,7 +192,7 @@ function Gallery() {
         {/* Inside the frame, so it rides above both slides and is clipped by
             the frame's own `overflow: hidden` like they are. */}
         <CarouselCounter index={idx} count={images.length} />
-      </div>
+      </Zoomable>
       <div className="gallery-controls">
         <button type="button" className="gallery-arrow" onClick={go(-1, 'left')} aria-label="Previous">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">

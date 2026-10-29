@@ -34,6 +34,7 @@ Four decisions inside it that are not arbitrary:
 
 `scripts/make-og-images.sh` regenerates `public/og/*.jpg`. Run it by hand after changing a thumbnail or the hero photo; it is **not** part of `npm run build`, because these are committed assets with content hashes in their names and a build that rewrote them every time would defeat the hash.
 
+- **A `*-light.webp` thumbnail is skipped.** It is the light-theme twin of the thumbnail beside it (`srcLight`), and the share image comes from the dark one, so the twin would only produce an unreferenced card.
 - **JPEG, not WebP.** The whole point is the LinkedIn unfurler, and LinkedIn does not reliably render a WebP `og:image`. The source thumbnails *are* WebP, so each is decoded with `dwebp` first.
 - **1200x630** (1.905), the size every unfurler crops toward. The thumbnails are 16/9 (1.778), so they are **fitted by height and padded at the sides** rather than cropped — losing nothing, the same call the thumbnails themselves make.
 - **The pad color is sampled from each image's own edge**, by reading the decoded PPM and taking the most common pixel down the left and right columns. That is not ceremony: the six sampled to `#FFFFFF`, `#FCFBFC`, `#F7F7F7`, `#F5F8F7`, **`#C7BA7E`** (the basic-income engraving's tan paper) and **`#151713`** (the Material Boxes Minecraft screenshot). Two of the six are nowhere near white, and a white bar on either would have been obvious.

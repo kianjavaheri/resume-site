@@ -42,7 +42,21 @@ function WorkCard({
               width={image.width}
               height={image.height}
               loading="lazy"
+              className={image.srcLight ? 'project-img-dark' : undefined}
             />
+            {/* The light-theme twin. Hidden by CSS, not swapped in JS, so a
+                theme change needs no re-render; a display:none lazy image is
+                not fetched until it is shown, so only one of the two loads. */}
+            {image.srcLight && (
+              <img
+                src={image.srcLight}
+                alt={image.alt}
+                width={image.width}
+                height={image.height}
+                loading="lazy"
+                className="project-img-light"
+              />
+            )}
           </div>
         )}
         {/* Badges are inline in the title, so on a wrapping title they follow

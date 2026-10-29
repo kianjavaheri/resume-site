@@ -614,10 +614,10 @@ export const materialBoxes: Paper = {
 // "Coming soon" is the status line, and it is meant literally: the web app is
 // live, the iPhone app is in TestFlight beta, and there is no App Store listing
 // to link to yet. Don't add a download link until there is one.
-export const liftTrack: Paper = {
-  slug: 'lifttrack',
+export const rerack: Paper = {
+  slug: 'rerack',
   eyebrow: 'Personal Project',
-  title: 'LiftTrack',
+  title: 'Rerack',
   meta: [
     { label: 'Platform', value: 'iPhone, web, installable PWA' },
     { label: 'Status', value: 'TestFlight beta, App Store soon' },
@@ -625,7 +625,7 @@ export const liftTrack: Paper = {
   ],
   actions: [
     { label: 'View Web App', href: 'https://fitness-tracker-cb4cd.web.app/' },
-    { label: 'View GitHub', href: 'https://github.com/kianjavaheri/fitness-tracker' },
+    { label: 'View GitHub', href: 'https://github.com/kianjavaheri/rerack' },
   ],
   sections: [
     {
@@ -634,7 +634,7 @@ export const liftTrack: Paper = {
       blocks: [
         {
           type: 'p',
-          text: 'LiftTrack is a workout tracker I built to replace the notes app I was logging my lifts in. It runs on the web, as a home-screen app, and as an iPhone app, which is in beta on TestFlight and coming soon to the App Store.',
+          text: 'Rerack is a workout tracker I built to replace the notes app I was logging my lifts in. It runs on the web, as a home-screen app, and as an iPhone app, which is in beta on TestFlight and coming soon to the App Store.',
         },
         {
           // Three 1400x1100 slides, each the real iPhone screenshots set on one
@@ -644,19 +644,19 @@ export const liftTrack: Paper = {
           plain: true,
           figures: [
             {
-              src: '/images/lifttrack/home-workouts.507624c0.webp',
+              src: '/images/rerack/home-workouts.507624c0.webp',
               width: 1400,
               height: 1100,
               label: 'Home shows today\u2019s workout and a six-month heatmap; Workouts holds the routines behind it',
             },
             {
-              src: '/images/lifttrack/live-analytics.389c0bf1.webp',
+              src: '/images/rerack/live-analytics.389c0bf1.webp',
               width: 1400,
               height: 1100,
               label: 'Logging a set with the rest timer running, and a workout\u2019s progress charts',
             },
             {
-              src: '/images/lifttrack/log.0efbc04e.webp',
+              src: '/images/rerack/log.0efbc04e.webp',
               width: 1400,
               height: 1100,
               label: 'The log: every exercise\u2019s last session at a glance',
