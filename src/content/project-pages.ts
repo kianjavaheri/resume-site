@@ -624,7 +624,7 @@ export const rerack: Paper = {
     { label: 'Stack', value: 'React, TypeScript, Firebase, Capacitor, Swift' },
   ],
   actions: [
-    { label: 'View Web App', href: 'https://fitness-tracker-cb4cd.web.app/' },
+    { label: 'View Web App', href: 'https://www.rerackapp.net/' },
     { label: 'View GitHub', href: 'https://github.com/kianjavaheri/rerack' },
   ],
   sections: [

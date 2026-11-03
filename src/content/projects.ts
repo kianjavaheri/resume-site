@@ -161,7 +161,7 @@ export const works: Array<WorkProps> = [
     title: 'Rerack',
     to: '/projects/rerack',
     links: [
-      { label: 'View Web App', icon: 'site', href: 'https://fitness-tracker-cb4cd.web.app/' },
+      { label: 'View Web App', icon: 'site', href: 'https://www.rerackapp.net/' },
       { label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/rerack' },
     ],
     image: { src: '/images/projects/rerack.c7754e0a.webp', srcLight: '/images/projects/rerack-light.e3721380.webp', width: 900, height: 506, alt: 'The Rerack logo: a barbell whose bar runs through two split, hooked uprights, in a rainbow gradient' },
