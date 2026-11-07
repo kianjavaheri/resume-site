@@ -62,6 +62,9 @@
     --page-base: #ffffff;
     --card-bg: #f7f7f7;
     --card-border: rgba(0, 0, 0, 0.1);
+    /* The ring round the Experience logo tiles: the opposite of the page, and
+       a notch stronger than --card-border so it reads on a recessed tile. */
+    --logo-ring: rgba(0, 0, 0, 0.3);
     --sub-card-fill: #ffffff;
     --sub-card-grad: linear-gradient(145deg, #ffffff 0%, #eff1f8 100%);
 
@@ -201,6 +204,7 @@
     --page-base: #000000;
     --card-bg: #101012;
     --card-border: rgba(255, 255, 255, 0.1);
+    --logo-ring: rgba(255, 255, 255, 0.3);
     --sub-card-fill: #252525;
     /* #1a1c24 is intentionally blue-leaning (B is 10 above R) — that cool cast
        toward the bottom-right is what gives the cards their depth. */

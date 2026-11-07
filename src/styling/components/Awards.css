@@ -17,7 +17,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 6px;
+    /* The ring is Experience's too (--logo-ring, 1.5px out of the padding). */
+    padding: 4.5px;
+    border: 1.5px solid var(--logo-ring);
     border-radius: 15px !important;
     background: var(--well-bg);
     box-shadow: var(--well-shadow);

@@ -624,7 +624,7 @@ export const rerack: Paper = {
     { label: 'Stack', value: 'React, TypeScript, Firebase, Capacitor, Swift' },
   ],
   actions: [
-    { label: 'View Web App', href: 'https://www.rerackapp.net/' },
+    { label: 'View Web App', href: 'https://www.rerackapp.net/about' },
     { label: 'View GitHub', href: 'https://github.com/kianjavaheri/rerack' },
   ],
   sections: [
@@ -633,33 +633,50 @@ export const rerack: Paper = {
       title: 'Overview',
       blocks: [
         {
+          // The landing page, 2000x1118, in both themes (`srcLight` is the
+          // light capture) — `plain`, no white plate. It opens the page, ahead
+          // of the text, as the first thing a reader sees.
+          type: 'figure',
+          src: '/images/rerack/landing.a4d7875a.webp',
+          srcLight: '/images/rerack/landing-light.7c364d52.webp',
+          caption: 'The Rerack landing page',
+          alt: 'The Rerack landing page: the headline \u201cThe workout log that remembers last time\u201d beside an iPhone showing the app\u2019s home screen with the week, the next workout and a six-month activity heatmap',
+          plain: true,
+          width: 2000,
+          height: 1118,
+        },
+        {
           type: 'p',
           text: 'Rerack is a workout tracker I built to replace the notes app I was logging my lifts in. It runs on the web, as a home-screen app, and as an iPhone app, which is in beta on TestFlight and coming soon to the App Store.',
         },
         {
-          // Three 1400x1100 slides, each the real iPhone screenshots set on one
-          // dark canvas — the screenshots are 1:2, which in a carousel frame
-          // would run 1,500px tall. Two phones per slide, one on the last.
+          // Three 2100x1650 slides, each pair of real iPhone screenshots set on
+          // one canvas (near-black, or pale for `srcLight`) — the screenshots
+          // are 1:2, which in a carousel frame would run 1,500px tall. Two
+          // phones per slide, in both themes.
           type: 'carousel',
           plain: true,
           figures: [
             {
-              src: '/images/rerack/home-workouts.507624c0.webp',
-              width: 1400,
-              height: 1100,
-              label: 'Home shows today\u2019s workout and a six-month heatmap; Workouts holds the routines behind it',
+              src: '/images/rerack/home-programs.b6c8f82d.webp',
+              srcLight: '/images/rerack/home-programs-light.6910c334.webp',
+              width: 2100,
+              height: 1650,
+              label: 'Home shows today\u2019s workout and a six-month heatmap; Programs offers routines to start from',
             },
             {
-              src: '/images/rerack/live-analytics.389c0bf1.webp',
-              width: 1400,
-              height: 1100,
-              label: 'Logging a set with the rest timer running, and a workout\u2019s progress charts',
+              src: '/images/rerack/live-summary.539d1d01.webp',
+              srcLight: '/images/rerack/live-summary-light.0ebe5926.webp',
+              width: 2100,
+              height: 1650,
+              label: 'Logging a set with the rest timer running, and the summary when the workout is done',
             },
             {
-              src: '/images/rerack/log.0efbc04e.webp',
-              width: 1400,
-              height: 1100,
-              label: 'The log: every exercise\u2019s last session at a glance',
+              src: '/images/rerack/analytics-log.f8b0d9f9.webp',
+              srcLight: '/images/rerack/analytics-log-light.da06065a.webp',
+              width: 2100,
+              height: 1650,
+              label: 'An exercise\u2019s estimated 1RM over time, and the log of every exercise\u2019s last session',
             },
           ],
         },

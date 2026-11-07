@@ -71,26 +71,33 @@ function FigureCarousel({ figures, plain }: { figures: CarouselFigure[]; plain?:
       {...pauseProps}
     >
       <Zoomable className="paper-carousel-frame" style={{ aspectRatio: String(1 / ratio) }} resetKey={idx}>
-        {figures.map((f, i) => (
-          <img
-            key={f.src}
-            src={f.src}
-            alt={i === idx ? f.label ?? '' : ''}
-            aria-hidden={i !== idx}
-            width={f.width}
-            height={f.height}
-            loading="lazy"
-            /* Three states, not two: the active slide, the ones already
-               passed (parked LEFT) and the ones still ahead (parked RIGHT).
-               That is what makes the direction read — with a single "on"
-               class every inactive slide would sit on the same side and
-               going back would look identical to going forward. */
-            className={
-              'paper-carousel-img' +
-              (i === idx ? ' paper-carousel-img-on' : i < idx ? ' paper-carousel-img-before' : '')
-            }
-          />
-        ))}
+        {figures.flatMap((f, i) => {
+          /* Three states, not two: the active slide, the ones already
+             passed (parked LEFT) and the ones still ahead (parked RIGHT).
+             That is what makes the direction read — with a single "on"
+             class every inactive slide would sit on the same side and
+             going back would look identical to going forward. */
+          const state =
+            'paper-carousel-img' +
+            (i === idx ? ' paper-carousel-img-on' : i < idx ? ' paper-carousel-img-before' : '')
+          // A slide with a light twin mounts BOTH; CSS shows the one for the
+          // page's theme, and the hidden one (display: none) never loads.
+          const slide = (src: string, theme?: 'dark' | 'light') => (
+            <img
+              key={src}
+              src={src}
+              alt={i === idx ? f.label ?? '' : ''}
+              aria-hidden={i !== idx}
+              width={f.width}
+              height={f.height}
+              loading="lazy"
+              className={theme ? `${state} paper-img-${theme}` : state}
+            />
+          )
+          return f.srcLight
+            ? [slide(f.src, 'dark'), slide(f.srcLight, 'light')]
+            : [slide(f.src)]
+        })}
         <CarouselCounter index={idx} count={n} />
       </Zoomable>
       <div className="paper-carousel-bar">

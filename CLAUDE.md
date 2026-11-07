@@ -1,6 +1,6 @@
 # Kian Javaheri — Resume Site
 
-Portfolio for Kian Javaheri: May 2026 ASU/Barrett grad, **two degrees** (B.S. CS, B.S. Economics), seeking SWE/Data roles. React 18 + TS + Vite, react-router v7, Vercel.
+Portfolio for Kian Javaheri: May 2026 ASU/Barrett grad, **two degrees** (B.S. CS, B.S. Economics), incoming Associate Software Engineer at Veeva Systems (Pleasanton, CA) from Feb 2027 — not started yet, team unknown. React 18 + TS + Vite, react-router v7, Vercel.
 
 ## Rules
 

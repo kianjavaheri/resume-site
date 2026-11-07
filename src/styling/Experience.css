@@ -124,10 +124,22 @@
        (a contained circle wastes its corners and reads smaller still than a
        square glyph at the same box). The mark is now 48px: 26% bigger.
        Radius still scales with the tile at 0.25 — keep 60/15 in step. */
-    padding: 6px;
+    padding: 4.5px;
+    /* The ring: 1.5px, taken out of the padding (6 -> 4.5) so the mark stays
+       48px. --logo-ring is the page's opposite in each theme. */
+    border: 1.5px solid var(--logo-ring);
     border-radius: 15px !important;
     background: var(--well-bg);
     box-shadow: var(--well-shadow);
+}
+
+/* The tile's stand-in when a company has no logo on file: its initial, in the
+   body face, at the weight the card's own company line uses. */
+.exp-logo-mono {
+    font-size: 1.6rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--textcolor);
 }
 
 .exp-org-logo {

@@ -7,7 +7,9 @@ import './../styling/Experience.css'
 interface ExpCardProps {
   company: string
   date: string
-  logo: string
+  // Optional: a company with no mark on file gets a monogram tile instead of
+  // a stand-in picture. Drop the SVG in public/svgs/ and pass it to replace it.
+  logo?: string
   role: string
   tags?: string[]
   // The preview is the first two lines of the first child, so lead with text.
@@ -28,7 +30,11 @@ function ExpCard({ company, date, logo, role, tags, children }: ExpCardProps) {
         <div className="exp-meta-head">
           {/* Decorative: the company name is right beside it. */}
           <div className="exp-logo">
-            <img src={logo} className="exp-org-logo" alt="" />
+            {logo ? (
+              <img src={logo} className="exp-org-logo" alt="" />
+            ) : (
+              <span className="exp-logo-mono" aria-hidden="true">{company.charAt(0)}</span>
+            )}
           </div>
           <p className="exp-company">{company}</p>
         </div>
@@ -63,6 +69,21 @@ function Experience() {
       <div className="section-body-wrapper">
         <div className="section-body-inner">
           <div className="sub-cards-stack">
+
+            {/* INCOMING, newest first. Not started, so the chip says when it
+                begins rather than a range, and there are no bullets or tags:
+                nothing has been done yet and the team is not known. Update
+                this card when the job starts in February 2027. */}
+            <ExpCard
+              company="Veeva Systems"
+              date="Starts Feb 2027"
+              logo="/svgs/veeva.svg"
+              role="Associate Software Engineer"
+            >
+              <p className="exp-desc">
+                Incoming at the Pleasanton, California office.
+              </p>
+            </ExpCard>
 
             <ExpCard
               company="Sandia National Laboratories"

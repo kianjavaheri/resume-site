@@ -143,7 +143,18 @@ function renderBlock(b: Block, i: number) {
             width={b.width}
             height={b.height}
             loading="lazy"
+            className={b.srcLight ? 'paper-img-dark' : undefined}
           />
+          {b.srcLight ? (
+            <img
+              src={b.srcLight}
+              alt={b.alt ?? b.caption ?? ''}
+              width={b.width}
+              height={b.height}
+              loading="lazy"
+              className="paper-img-light"
+            />
+          ) : null}
         </Zoomable>
         {b.caption ? <figcaption>{b.caption}</figcaption> : null}
       </figure>

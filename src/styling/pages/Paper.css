@@ -459,6 +459,20 @@
     margin-top: 24px;
 }
 
+/* A figure that is itself themed — a screenshot of an app with a dark and a
+   light mode — mounts both files (`srcLight`) and shows the one for the page's
+   theme. CSS rather than <picture>, so the theme toggle swaps it with no
+   reload; the hidden <img> is display: none and lazy, so it never downloads
+   until the theme is switched. */
+.paper-img-light,
+[data-theme='light'] .paper-img-dark {
+    display: none !important;
+}
+
+[data-theme='light'] .paper-img-light {
+    display: block !important;
+}
+
 /* ---- Figure carousel --------------------------------------------------- */
 /* A run of consecutive figures shown one at a time. Opt-in per section, via
    `carouselSections` in content/papers.ts. See components/FigureCarousel.tsx

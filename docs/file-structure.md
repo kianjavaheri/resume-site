@@ -112,7 +112,7 @@ public/
     rerack/            # 3 content-hashed .webp slides (iPhone screenshots, two to a canvas)
     wage-effects/      # 7 content-hashed .webp — cover + 6 figures padded to one ratio
   og/                  # content-hashed 1200x630 JPEGs, one per project card plus home — the link-preview cards
-  svgs/                # 31 files: asu, sandia + 27 skill icons, plus two with no caller —
+  svgs/                # 32 files: asu, sandia, veeva + 27 skill icons, plus two with no caller —
                        #   apachespark.svg (PySpark's) and matplotlib.svg (commented out),
                        #   PySpark left behind when it came off the list (see Skills)
   pdfs/                # resume.pdf + a folder per paper: cs-capstone/, basic-income/, thesis/

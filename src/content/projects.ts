@@ -161,10 +161,10 @@ export const works: Array<WorkProps> = [
     title: 'Rerack',
     to: '/projects/rerack',
     links: [
-      { label: 'View Web App', icon: 'site', href: 'https://www.rerackapp.net/' },
+      { label: 'View Web App', icon: 'site', href: 'https://www.rerackapp.net/about' },
       { label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/rerack' },
     ],
-    image: { src: '/images/projects/rerack.c7754e0a.webp', srcLight: '/images/projects/rerack-light.e3721380.webp', width: 900, height: 506, alt: 'The Rerack logo: a barbell whose bar runs through two split, hooked uprights, in a rainbow gradient' },
+    image: { src: '/images/projects/rerack.30498167.webp', srcLight: '/images/projects/rerack-light.0aaf3361.webp', width: 900, height: 506, alt: 'The Rerack logo: a barbell whose bar runs through two split, hooked uprights, in a rainbow gradient' },
     blurb: 'A workout tracker I built to replace my notes app: plan routines, log sets against last time, chart progress. On the web and in beta on iPhone.',
     tags: ['TypeScript', 'React', 'Swift', 'Firebase', 'Capacitor'],
   },

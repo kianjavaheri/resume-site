@@ -6,6 +6,10 @@
 // drawn under the frame and is also the active slide's alt text.
 export interface CarouselFigure {
   src: string
+  // The light-theme twin of `src`, for a picture that is itself themed (a
+  // screenshot of an app that has both). Both <img>s render and CSS shows the
+  // one matching the page's theme — see `.paper-img-light` in Paper.css.
+  srcLight?: string
   width?: number
   height?: number
   label?: string
@@ -58,6 +62,8 @@ export type Block =
   | {
       type: 'figure'
       src: string
+      // Light-theme twin of `src` — see CarouselFigure.
+      srcLight?: string
       caption: string
       alt?: string
       plain?: boolean

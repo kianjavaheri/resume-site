@@ -293,11 +293,13 @@ function About() {
             <h1 className="about-hero-name">Hi, I'm Kian Javaheri!</h1>
             {/* <p className="about-bio">Hi, I'm Kian Javaheri.</p> */}
             <p className="about-bio">
-              I am a recent graduate based in the Bay Area, California, looking to start my career in software engineering or data science. I graduated Summa Cum Laude from Barrett, The Honors College at Arizona State University with dual B.S. degrees in Computer Science and Economics.
+              I am a recent graduate based in the Bay Area, California. I graduated Summa Cum Laude from Barrett, The Honors College at Arizona State University with dual B.S. degrees in Computer Science and Economics.
             </p>
+            {/* INCOMING, not started: update the tense (and add the role to
+                Experience) when the job begins in February 2027. The team is
+                not known yet, so none is named. */}
             <p className="about-bio">
-              I'm actively applying for full-time Data Science, Software Engineering and ML/AI roles. Open to any
-              opportunities in the Bay Area.
+              In February 2027, I'll be joining Veeva Systems as an Associate Software Engineer, based in Pleasanton, California.
             </p>
             <button
               type="button"
