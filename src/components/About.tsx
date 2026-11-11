@@ -335,7 +335,7 @@ function About() {
                 key={l.label}
                 href={l.href}
                 {...(isMailto(l.href) ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
-                className="about-social-link"
+                className={`about-social-link about-social-link-${l.icon}`}
                 aria-label={l.label}
                 title={l.label}
               >

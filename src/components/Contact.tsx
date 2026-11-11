@@ -17,7 +17,7 @@ function Contact() {
             className="contact-card"
           >
             <span className="contact-card-main">
-              <span className="contact-card-icon" aria-hidden="true">
+              <span className={`contact-card-icon contact-card-icon-${l.icon}`} aria-hidden="true">
                 <LinkIcon kind={l.icon} />
               </span>
               <span className="contact-card-label">{l.label}</span>

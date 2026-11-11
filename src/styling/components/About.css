@@ -185,6 +185,16 @@ a.about-social-link:visited {
         linear-gradient(var(--well-hover-tint), var(--well-hover-tint));
 }
 
+/* LinkedIn turns its own blue on hover, unhovered stays as the others. Declared
+   after the `:visited` rule above, which it must outrank. */
+a.about-social-link-linkedin {
+    transition: background-image 0.15s ease, color 0.15s ease;
+}
+
+a.about-social-link-linkedin:hover {
+    color: var(--linkedin-blue);
+}
+
 /* The global reset clears `outline`, so focus has to be restated. */
 .about-social-link:focus-visible {
     outline: 2px solid var(--textcolor);

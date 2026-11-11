@@ -62,6 +62,7 @@
     --page-base: #ffffff;
     --card-bg: #f7f7f7;
     --card-border: rgba(0, 0, 0, 0.1);
+    --linkedin-blue: #0a66c2;
     /* The ring round the Experience logo tiles: the opposite of the page, and
        a notch stronger than --card-border so it reads on a recessed tile. */
     --logo-ring: rgba(0, 0, 0, 0.3);
@@ -204,6 +205,8 @@
     --page-base: #000000;
     --card-bg: #101012;
     --card-border: rgba(255, 255, 255, 0.1);
+    /* LinkedIn's blue, lifted for the dark ground, where #0a66c2 is too dim. */
+    --linkedin-blue: #4a9ae8;
     --logo-ring: rgba(255, 255, 255, 0.3);
     --sub-card-fill: #252525;
     /* #1a1c24 is intentionally blue-leaning (B is 10 above R) — that cool cast
