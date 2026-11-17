@@ -11,22 +11,17 @@ import { useCarouselAutoplay } from './useCarouselAutoplay'
 import Zoomable from './Zoomable'
 import './../styling/components/About.css'
 
-// The running order. The gallery was reordered and the FILES were renamed to
-// match rather than the array being shuffled, so img1..img4 on disk really are
-// the gallery's 1st..4th. (It was briefly img3, img1, img_dep2, img2.) Keep it
-// that way -- renaming beats a comment explaining why the numbers are out of
-// sequence.
+// The running order. The FILES are named to match it (img1..img3 are the
+// gallery's 1st..3rd) rather than the array being shuffled -- renaming beats a
+// comment explaining why the numbers are out of sequence.
 //
-// img4 is the one PORTRAIT source here (992x1119, against the others' ~1.3
-// landscape). The frame is 4/3 with `object-fit: cover` and
-// `object-position: center top`, so it keeps the top ~66% -- head to knees --
-// and takes the crop off the bottom, which is where the path is. Checked by
-// rendering it, per the rule the project thumbnails follow.
+// There was a fourth, the one PORTRAIT photo, and it was removed. The frame is
+// still square because of it (see `.gallery-frame` in About.css); with only
+// landscape photos left it could go back to 4/3. Not changed, just noted.
 const images = [
   '/images/img1.jpg',
   '/images/img2.jpg',
   '/images/img3.jpg',
-  '/images/img4.jpg',
 ]
 
 /* KEPT FOR <DotGrid />, WHICH IS NOT CURRENTLY RENDERED — see the note at the
