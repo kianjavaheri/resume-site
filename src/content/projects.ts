@@ -164,7 +164,7 @@ export const works: Array<WorkProps> = [
       { label: 'View Web App', icon: 'site', href: 'https://www.rerackapp.net/about' },
       { label: 'View GitHub', icon: 'github', href: 'https://github.com/kianjavaheri/rerack' },
     ],
-    image: { src: '/images/projects/rerack.30498167.webp', srcLight: '/images/projects/rerack-light.0aaf3361.webp', width: 900, height: 506, alt: 'The Rerack logo: a barbell whose bar runs through two split, hooked uprights, in a rainbow gradient' },
+    image: { src: '/images/projects/rerack.91cb7c84.webp', srcLight: '/images/projects/rerack-light.338c2eeb.webp', width: 900, height: 506, alt: 'The Rerack logo: a barbell whose bar runs through two split, hooked uprights, in solid white on black (dark) or near-black on white (light)' },
     blurb: 'A workout tracker I built to replace my notes app: plan routines, log sets against last time, chart progress. On the web and in beta on iPhone.',
     tags: ['TypeScript', 'React', 'Swift', 'Firebase', 'Capacitor'],
   },
